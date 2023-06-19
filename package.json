@@ -4,6 +4,10 @@
     "workspaces": [
         "packages/*"
     ],
+    "scripts": {
+        "dev": "yarn workspaces run dev",
+        "start": "docker compose up -d"
+    },
     "dependencies": {},
     "devDependencies": {}
 }

@@ -1,0 +1,11 @@
+version: '2'
+services:
+  web:
+    build: ./packages/webapp
+    command: npm run dev
+    volumes:
+      - .:/usr/app/
+      - /usr/app/node_modules
+    ports:
+      - "8744:8744"
+    restart: always
