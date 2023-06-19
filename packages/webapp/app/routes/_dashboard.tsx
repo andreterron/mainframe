@@ -1,15 +1,8 @@
-import type { V2_MetaFunction } from "@remix-run/node";
 import { useState } from "react";
 import clsx from "clsx";
+import { Outlet } from "@remix-run/react";
 
-export const meta: V2_MetaFunction = () => {
-    return [
-        { title: "New Remix App" },
-        { name: "description", content: "Welcome to Remix!" },
-    ];
-};
-
-export default function Index() {
+export default function Dashboard() {
     const [tables, setTables] = useState<{ id: string; name: string }[]>([]);
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -112,7 +105,9 @@ export default function Index() {
                 ])}
             />
 
-            <div className="p-4 sm:ml-64">Content</div>
+            <div className="p-4 sm:ml-64">
+                <Outlet />
+            </div>
         </div>
     );
 }
