@@ -1,18 +1,23 @@
 import { useState } from "react";
 import clsx from "clsx";
-import { Outlet } from "@remix-run/react";
+import { Outlet, useLoaderData } from "@remix-run/react";
 import { useAllDocs, usePouch } from "use-pouchdb";
+import { db } from "../lib/db";
+import { json } from "@remix-run/node";
+import { DBTypes, Table } from "../lib/types";
 
-export interface Table {
-    type: "table";
-    name: string;
+export async function loader() {
+    const docs = await db.allDocs({ include_docs: true });
+    return json({
+        initialRows: docs.rows,
+    });
 }
 
 export default function Dashboard() {
-    // const [tables, setTables] = useState<{ id: string; name: string }[]>([]);
+    const { initialRows } = useLoaderData<typeof loader>();
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
-    const db = usePouch<Table>(); // get the database
+    const db = usePouch<DBTypes>();
 
     const handleAddTable = async () => {
         const id = Math.random().toString(36).substring(2, 8);
@@ -21,13 +26,11 @@ export default function Dashboard() {
         await db.put(doc);
     };
 
-    const { rows, loading } = useAllDocs<Table>({
-        include_docs: true, // Load all document bodies
-    });
+    const { rows, loading } = useAllDocs<DBTypes>({ include_docs: true });
 
-    console.log(rows);
-
-    const tables = rows.map((row) => row.doc!);
+    const tables = (loading && !rows?.length ? initialRows : rows).map(
+        (row) => row.doc!,
+    );
 
     return (
         <div>

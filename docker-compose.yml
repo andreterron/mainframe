@@ -2,10 +2,24 @@ version: '2'
 services:
   web:
     build: ./packages/webapp
+    environment:
+      - COUCHDB_SERVER_CONNECTION_STRING=http://couchdb:5984/mainframe
     command: npm run dev
     volumes:
       - .:/usr/app/
       - /usr/app/node_modules
+      - /usr/app/packages/webapp/node_modules
     ports:
       - "8744:8744"
+      - "8002:8002"
     restart: always
+    depends_on:
+      - couchdb
+  couchdb:
+    build: ./packages/db-couchdb
+    restart: always
+    ports:
+      - "5984:5984"
+    environment:
+      - COUCHDB_USER
+      - COUCHDB_PASSWORD

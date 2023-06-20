@@ -3149,6 +3149,11 @@ enhanced-resolve@^5.12.0:
     graceful-fs "^4.2.4"
     tapable "^2.2.0"
 
+envsafe@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/envsafe/-/envsafe-2.0.3.tgz#cb88a9f750a67455638ebfc16f4cd5296bb5e1a0"
+  integrity sha512-51lek8h5btjXhXUDW//Pno7HPydM1WQzltOb1/ONRKdwB2QkfAURnN4Qn0cJ5LzGvX2Km1ReR2O3K3Bqq9sBMg==
+
 errno@~0.1.1:
   version "0.1.8"
   resolved "https://registry.yarnpkg.com/errno/-/errno-0.1.8.tgz#8bb3e9c7d463be4976ff888f76b4809ebc2e811f"

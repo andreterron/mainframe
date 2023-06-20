@@ -6,7 +6,10 @@
     ],
     "scripts": {
         "dev": "yarn workspaces run dev",
-        "start": "docker compose up -d"
+        "build": "yarn workspaces run build",
+        "start": "yarn workspaces run start",
+        "docker:up": "docker compose up -d",
+        "docker:down": "docker compose down -v --rmi=local"
     },
     "dependencies": {},
     "devDependencies": {}
