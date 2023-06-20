@@ -1,10 +1,10 @@
 import { useState } from "react";
 import clsx from "clsx";
-import { Outlet, useLoaderData } from "@remix-run/react";
+import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { useAllDocs, usePouch } from "use-pouchdb";
 import { db } from "../lib/db";
 import { json } from "@remix-run/node";
-import { DBTypes, Table } from "../lib/types";
+import { DBTypes } from "../lib/types";
 
 export async function loader() {
     const docs = await db.allDocs({ include_docs: true });
@@ -16,6 +16,7 @@ export async function loader() {
 export default function Dashboard() {
     const { initialRows } = useLoaderData<typeof loader>();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const navigate = useNavigate();
 
     const db = usePouch<DBTypes>();
 
@@ -23,7 +24,8 @@ export default function Dashboard() {
         const id = Math.random().toString(36).substring(2, 8);
         const doc = { _id: id, type: "table" as const, name: "" };
 
-        await db.put(doc);
+        const table = await db.put(doc);
+        navigate(`/table/${table.id}`);
     };
 
     const { rows, loading } = useAllDocs<DBTypes>({ include_docs: true });
@@ -71,7 +73,10 @@ export default function Dashboard() {
                         {tables.map((table) => {
                             return (
                                 <li key={table._id}>
-                                    <span className="block group py-1 cursor-pointer">
+                                    <Link
+                                        to={`/table/${table._id}`}
+                                        className="block group py-1"
+                                    >
                                         <span
                                             className={clsx([
                                                 "flex items-center p-2 rounded-lg",
@@ -89,15 +94,13 @@ export default function Dashboard() {
                                                 )}
                                             </span>
                                         </span>
-                                    </span>
+                                    </Link>
                                 </li>
                             );
                         })}
                         <li>
                             <button
-                                onClick={() => {
-                                    handleAddTable();
-                                }}
+                                onClick={() => handleAddTable()}
                                 className="block w-full group py-1 cursor-pointer"
                             >
                                 <span
