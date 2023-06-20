@@ -8,23 +8,23 @@ import { db } from "../lib/db";
 import { useDoc } from "use-pouchdb";
 import { useLoaderData, useParams } from "@remix-run/react";
 import { DBTypes } from "../lib/types";
-import TableSetup from "../components/TableSetup";
-import TableOAKTokenInput from "../components/TableOAKTokenInput";
+import DatasetSetup from "../components/DatasetSetup";
+import DatasetOAKTokenInput from "../components/DatasetOAKTokenInput";
 
 export const meta: V2_MetaFunction<typeof loader> = (args) => {
-    const table = args.data?.initialTableData;
-    return [{ title: table?.name ? table.name : "Mainframe" }];
+    const dataset = args.data?.initialDatasetValue;
+    return [{ title: dataset?.name ? dataset.name : "Mainframe" }];
 };
 
 export async function loader({ params }: LoaderArgs) {
     const id = params.id;
     if (!id) {
-        throw new Response("Missing table ID", { status: 404 });
+        throw new Response("Missing dataset ID", { status: 404 });
     }
     try {
-        const table = await db.get(id);
+        const dataset = await db.get(id);
         return json({
-            initialTableData: table,
+            initialDatasetValue: dataset,
         });
     } catch (e: any) {
         // TODO: Better handle PouchDB error
@@ -36,11 +36,11 @@ export async function loader({ params }: LoaderArgs) {
     }
 }
 
-export default function TableDetails() {
-    const { initialTableData } = useLoaderData<typeof loader>();
+export default function DatasetDetails() {
+    const { initialDatasetValue } = useLoaderData<typeof loader>();
     const { id } = useParams();
-    const { doc, error } = useDoc<DBTypes>(id ?? "", {}, initialTableData);
-    const table = doc ?? initialTableData;
+    const { doc, error } = useDoc<DBTypes>(id ?? "", {}, initialDatasetValue);
+    const dataset = doc ?? initialDatasetValue;
 
     // Functions
 
@@ -66,7 +66,7 @@ export default function TableDetails() {
 
     // Early return
 
-    if (!table || error) {
+    if (!dataset || error) {
         // TODO: If we get an error, we might want to throw
         console.log("useDoc error", error);
         // TODO: Loading UI if we need to
@@ -77,11 +77,13 @@ export default function TableDetails() {
         <div className="flex flex-col">
             {/* TODO: Header */}
             {!doc?.integrationType ? (
-                <TableSetup
+                <DatasetSetup
                     onIntegrationSelected={(type) => setIntegrationType(type)}
                 />
             ) : !doc?.oakToken ? (
-                <TableOAKTokenInput onSubmit={(token) => setOakToken(token)} />
+                <DatasetOAKTokenInput
+                    onSubmit={(token) => setOakToken(token)}
+                />
             ) : (
                 "Done!"
             )}

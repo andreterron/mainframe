@@ -1,4 +1,8 @@
-export default function ({ onSubmit }: { onSubmit: (type: string) => void }) {
+export default function DatasetOAKTokenInput({
+    onSubmit,
+}: {
+    onSubmit: (type: string) => void;
+}) {
     return (
         <form
             onSubmit={(e) => {

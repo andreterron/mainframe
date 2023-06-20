@@ -20,17 +20,17 @@ export default function Dashboard() {
 
     const db = usePouch<DBTypes>();
 
-    const handleAddTable = async () => {
+    const handleAddDataset = async () => {
         const id = Math.random().toString(36).substring(2, 8);
-        const doc = { _id: id, type: "table" as const, name: "" };
+        const doc = { _id: id, type: "dataset" as const, name: "" };
 
-        const table = await db.put(doc);
-        navigate(`/table/${table.id}`);
+        const dataset = await db.put(doc);
+        navigate(`/dataset/${dataset.id}`);
     };
 
     const { rows, loading } = useAllDocs<DBTypes>({ include_docs: true });
 
-    const tables = (loading && !rows?.length ? initialRows : rows).map(
+    const datasets = (loading && !rows?.length ? initialRows : rows).map(
         (row) => row.doc!,
     );
 
@@ -70,11 +70,11 @@ export default function Dashboard() {
             >
                 <div className="h-full flex flex-col justify-between px-3 py-4 overflow-y-auto bg-white sm:bg-gray-100 dark:bg-gray-800">
                     <ul className="w-full font-medium flex-shrink">
-                        {tables.map((table) => {
+                        {datasets.map((dataset) => {
                             return (
-                                <li key={table._id}>
+                                <li key={dataset._id}>
                                     <Link
-                                        to={`/table/${table._id}`}
+                                        to={`/dataset/${dataset._id}`}
                                         className="block group py-1"
                                     >
                                         <span
@@ -85,8 +85,8 @@ export default function Dashboard() {
                                             ])}
                                         >
                                             <span className="relative">
-                                                {table.name ? (
-                                                    table.name
+                                                {dataset.name ? (
+                                                    dataset.name
                                                 ) : (
                                                     <span className="text-gray-400">
                                                         Untitled
@@ -100,7 +100,7 @@ export default function Dashboard() {
                         })}
                         <li>
                             <button
-                                onClick={() => handleAddTable()}
+                                onClick={() => handleAddDataset()}
                                 className="block w-full group py-1 cursor-pointer"
                             >
                                 <span
@@ -110,7 +110,7 @@ export default function Dashboard() {
                                         "group-hover:bg-gray-200 dark:group-hover:bg-gray-700",
                                     ])}
                                 >
-                                    <span className="">New Table</span>
+                                    <span className="">New Dataset</span>
                                 </span>
                             </button>
                         </li>

@@ -1,4 +1,4 @@
-export default function TableSetup({
+export default function DatasetSetup({
     onIntegrationSelected,
 }: {
     onIntegrationSelected: (type: string) => void;
