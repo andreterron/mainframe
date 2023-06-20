@@ -7,12 +7,16 @@
 import { RemixBrowser } from "@remix-run/react";
 import { startTransition, StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
+import { Provider as PouchDBProvider } from "use-pouchdb";
+import { db } from "./lib/db";
 
 startTransition(() => {
-  hydrateRoot(
-    document,
-    <StrictMode>
-      <RemixBrowser />
-    </StrictMode>
-  );
+    hydrateRoot(
+        document,
+        <StrictMode>
+            <PouchDBProvider pouchdb={db}>
+                <RemixBrowser />
+            </PouchDBProvider>
+        </StrictMode>,
+    );
 });

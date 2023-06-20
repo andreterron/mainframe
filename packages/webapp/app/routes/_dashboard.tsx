@@ -1,10 +1,33 @@
 import { useState } from "react";
 import clsx from "clsx";
 import { Outlet } from "@remix-run/react";
+import { useAllDocs, usePouch } from "use-pouchdb";
+
+export interface Table {
+    type: "table";
+    name: string;
+}
 
 export default function Dashboard() {
-    const [tables, setTables] = useState<{ id: string; name: string }[]>([]);
+    // const [tables, setTables] = useState<{ id: string; name: string }[]>([]);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    const db = usePouch<Table>(); // get the database
+
+    const handleAddTable = async () => {
+        const id = Math.random().toString(36).substring(2, 8);
+        const doc = { _id: id, type: "table" as const, name: "" };
+
+        await db.put(doc);
+    };
+
+    const { rows, loading } = useAllDocs<Table>({
+        include_docs: true, // Load all document bodies
+    });
+
+    console.log(rows);
+
+    const tables = rows.map((row) => row.doc!);
 
     return (
         <div>
@@ -44,7 +67,7 @@ export default function Dashboard() {
                     <ul className="w-full font-medium flex-shrink">
                         {tables.map((table) => {
                             return (
-                                <li key={table.id}>
+                                <li key={table._id}>
                                     <span className="block group py-1 cursor-pointer">
                                         <span
                                             className={clsx([
@@ -70,13 +93,7 @@ export default function Dashboard() {
                         <li>
                             <button
                                 onClick={() => {
-                                    const id = Math.random()
-                                        .toString(36)
-                                        .substring(2, 8);
-                                    setTables((prev) => [
-                                        ...prev,
-                                        { id, name: "" },
-                                    ]);
+                                    handleAddTable();
                                 }}
                                 className="block w-full group py-1 cursor-pointer"
                             >
