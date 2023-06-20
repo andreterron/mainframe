@@ -8,6 +8,8 @@ import { db } from "../lib/db";
 import { useDoc } from "use-pouchdb";
 import { useLoaderData, useParams } from "@remix-run/react";
 import { DBTypes } from "../lib/types";
+import TableSetup from "../components/TableSetup";
+import TableOAKTokenInput from "../components/TableOAKTokenInput";
 
 export const meta: V2_MetaFunction<typeof loader> = (args) => {
     const table = args.data?.initialTableData;
@@ -39,17 +41,50 @@ export default function TableDetails() {
     const { id } = useParams();
     const { doc, error } = useDoc<DBTypes>(id ?? "", {}, initialTableData);
     const table = doc ?? initialTableData;
+
+    // Functions
+
+    function setIntegrationType(integrationType: string) {
+        if (!doc) {
+            console.error("No doc to set integration type");
+            return;
+        }
+        db.put({
+            ...doc,
+            integrationType,
+            name: doc.name ? doc.name : "Toggl",
+        });
+    }
+
+    function setOakToken(token: string) {
+        if (!doc) {
+            console.error("No doc to set token");
+            return;
+        }
+        db.put({ ...doc, oakToken: token });
+    }
+
+    // Early return
+
     if (!table || error) {
+        // TODO: If we get an error, we might want to throw
         console.log("useDoc error", error);
+        // TODO: Loading UI if we need to
         return null;
     }
+
     return (
-        <>
-            Table!
-            <br />
-            {table._id}
-            <br />
-            {table.name}
-        </>
+        <div className="flex flex-col">
+            {/* TODO: Header */}
+            {!doc?.integrationType ? (
+                <TableSetup
+                    onIntegrationSelected={(type) => setIntegrationType(type)}
+                />
+            ) : !doc?.oakToken ? (
+                <TableOAKTokenInput onSubmit={(token) => setOakToken(token)} />
+            ) : (
+                "Done!"
+            )}
+        </div>
     );
 }
