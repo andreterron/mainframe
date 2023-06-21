@@ -1,4 +1,9 @@
 import { envsafe, str } from "envsafe";
+import dotenv from "dotenv";
+
+if (typeof window === "undefined") {
+    dotenv.config({ path: "../../.env" });
+}
 
 export const env = envsafe(
     {
