@@ -36,6 +36,8 @@ export async function loader({ params }: LoaderArgs) {
     }
 }
 
+const types = ["Time Entries", "Projects", "Workspaces", "Clients"];
+
 export default function DatasetDetails() {
     const { initialDatasetValue } = useLoaderData<typeof loader>();
     const { id } = useParams();
@@ -85,7 +87,33 @@ export default function DatasetDetails() {
                     onSubmit={(token) => setOakToken(token)}
                 />
             ) : (
-                "Done!"
+                <div className="flex flex-col gap-8 items-start">
+                    <h1 className="text-2xl font-medium">{doc.name}</h1>
+                    <div className="flex flex-col gap-1">
+                        {types.map((type) => (
+                            <span className="flex items-center gap-3 cursor-pointer select-none text-gray-900 bg-white focus:outline-none hover:bg-gray-100 active:bg-gray-200 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg px-4 py-2 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    className="humbleicons hi-database flex-grow-0 flex-shrink-0 w-5 h-5"
+                                >
+                                    <g
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <path d="M20 12c0 1.657-3.582 3-8 3s-8-1.343-8-3M20 18c0 1.657-3.582 3-8 3s-8-1.343-8-3" />
+                                        <ellipse cx="12" cy="6" rx="8" ry="3" />
+                                        <path d="M4 6v12M20 6v12" />
+                                    </g>
+                                </svg>
+                                <span>{type}</span>
+                            </span>
+                        ))}
+                    </div>
+                </div>
             )}
         </div>
     );
