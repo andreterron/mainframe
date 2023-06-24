@@ -1,9 +1,21 @@
 import { Integration } from "../integration-types";
+import { Dataset } from "../types";
 
 export const toggl: Integration = {
     tables: {
         timeEntries: {
             name: "Time Entries",
+            get: async (dataset: Dataset) => {
+                const res = await fetch(
+                    "https://1ak.io/toggl/api/v9/me/time_entries",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${dataset.oakToken}`,
+                        },
+                    },
+                );
+                return res.json();
+            },
         },
         projects: {
             name: "Projects",

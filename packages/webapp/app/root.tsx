@@ -7,6 +7,7 @@ import {
     Scripts,
     ScrollRestoration,
     useLoaderData,
+    V2_MetaFunction,
 } from "@remix-run/react";
 
 import stylesheet from "~/tailwind.css";
@@ -15,6 +16,8 @@ import { env } from "./lib/env";
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: stylesheet },
 ];
+
+export const meta: V2_MetaFunction = () => [{ title: "Mainframe" }];
 
 export async function loader() {
     return json({
