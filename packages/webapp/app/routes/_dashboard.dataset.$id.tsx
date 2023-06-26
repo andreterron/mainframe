@@ -25,6 +25,9 @@ export async function loader({ params }: LoaderArgs) {
     }
     try {
         const dataset = await db.get(id);
+        if (dataset.type !== "dataset") {
+            throw new Response("Not Found", { status: 404 });
+        }
         return json({
             initialDatasetValue: dataset,
         });
@@ -48,7 +51,7 @@ export default function DatasetDetails() {
     // Functions
 
     function setIntegrationType(integrationType: string) {
-        if (!doc) {
+        if (!doc || doc.type !== "dataset") {
             console.error("No doc to set integration type");
             return;
         }
@@ -69,7 +72,7 @@ export default function DatasetDetails() {
 
     // Early return
 
-    if (!dataset || error) {
+    if (!dataset || error || dataset.type !== "dataset") {
         // TODO: If we get an error, we might want to throw
         console.log("useDoc error", error);
         // TODO: Loading UI if we need to
@@ -81,11 +84,11 @@ export default function DatasetDetails() {
     return (
         <div className="flex flex-col p-4">
             {/* TODO: Header */}
-            {!doc?.integrationType ? (
+            {!dataset?.integrationType ? (
                 <DatasetSetup
                     onIntegrationSelected={(type) => setIntegrationType(type)}
                 />
-            ) : !doc?.oakToken ? (
+            ) : !dataset?.oakToken ? (
                 <DatasetOAKTokenInput
                     onSubmit={(token) => setOakToken(token)}
                 />

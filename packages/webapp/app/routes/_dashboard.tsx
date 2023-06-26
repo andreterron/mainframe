@@ -1,15 +1,22 @@
 import { useState } from "react";
 import clsx from "clsx";
 import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
-import { useAllDocs, usePouch } from "use-pouchdb";
+import { useAllDocs, usePouch, useFind } from "use-pouchdb";
 import { db } from "../lib/db";
 import { json } from "@remix-run/node";
-import { DBTypes } from "../lib/types";
+import { DBTypes, Dataset } from "../lib/types";
 
 export async function loader() {
-    const docs = await db.allDocs({ include_docs: true });
+    const docs = (await db.find({
+        selector: {
+            type: "dataset",
+        },
+    })) as PouchDB.Find.FindResponse<Dataset>;
+    if (docs.warning) {
+        console.warn(docs.warning);
+    }
     return json({
-        initialRows: docs.rows,
+        initialRows: docs.docs,
     });
 }
 
@@ -28,11 +35,15 @@ export default function Dashboard() {
         navigate(`/dataset/${dataset.id}`);
     };
 
-    const { rows, loading } = useAllDocs<DBTypes>({ include_docs: true });
+    const { docs: rows, loading } = useFind<Dataset>({
+        selector: {
+            type: "dataset",
+        },
+    });
 
-    const datasets = (loading && !rows?.length ? initialRows : rows).map(
-        (row) => row.doc!,
-    );
+    // const { rows, loading } = useAllDocs<DBTypes>({ include_docs: true });
+
+    const datasets = loading && !rows?.length ? initialRows : rows;
 
     return (
         <div>

@@ -1,4 +1,5 @@
 import PouchDB from "pouchdb";
+import PouchDBFind from "pouchdb-find";
 import { env } from "./env";
 import { DBTypes } from "./types";
 
@@ -11,6 +12,8 @@ export const db =
                   password: env.COUCHDB_PASSWORD,
               },
           });
+
+PouchDB.plugin(PouchDBFind);
 
 if (typeof window !== "undefined") {
     db.sync(

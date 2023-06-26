@@ -5,4 +5,21 @@ export interface Dataset {
     oakToken?: string;
 }
 
-export type DBTypes = Dataset;
+export interface Table {
+    type: "table";
+    name: string;
+
+    dataset: string; // Ref -> Dataset
+}
+
+export interface Row {
+    type: "row";
+
+    table: string; // Ref -> Table
+
+    data: {
+        [key: string]: any;
+    };
+}
+
+export type DBTypes = Dataset | Row;

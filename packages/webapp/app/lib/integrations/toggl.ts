@@ -16,6 +16,8 @@ export const toggl: Integration = {
                 );
                 return res.json();
             },
+            rowId: (dataset: Dataset & { _id: string }, row: any) =>
+                `${dataset._id}_${row.id}`,
         },
         projects: {
             name: "Projects",

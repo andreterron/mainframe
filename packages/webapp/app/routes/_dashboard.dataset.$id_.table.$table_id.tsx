@@ -27,6 +27,10 @@ export async function loader({ params }: LoaderArgs) {
     try {
         const dataset = await db.get(datasetId);
 
+        if (dataset.type !== "dataset") {
+            throw new Response("Not Found", { status: 404 });
+        }
+
         const integration = getIntegrationForDataset(dataset);
 
         if (!integration) {
@@ -74,7 +78,7 @@ export default function DatasetTableDetails() {
 
     // Early return
 
-    if (!dataset || error) {
+    if (!dataset || error || dataset.type !== "dataset") {
         // TODO: If we get an error, we might want to throw
         console.log("useDoc error", error);
         // TODO: Loading UI if we need to
@@ -85,7 +89,7 @@ export default function DatasetTableDetails() {
         <div className="flex flex-col">
             {/* TODO: Header */}
             <div className="flex flex-col gap-8 items-start">
-                <h1 className="text-2xl m-4 font-medium">{doc?.name}</h1>
+                <h1 className="text-2xl m-4 font-medium">{dataset?.name}</h1>
                 <div></div>
                 {Array.isArray(data) ? (
                     <div className="relative overflow-x-auto">

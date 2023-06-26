@@ -8,3 +8,12 @@ export function getIntegrationForDataset(dataset: Dataset): Integration | null {
     }
     return null;
 }
+
+export function getTablesForDataset(dataset: Dataset) {
+    const integration = getIntegrationForDataset(dataset);
+    if (!integration) return [];
+    return Object.entries(integration.tables).map(([id, table]) => ({
+        id,
+        ...table,
+    }));
+}
