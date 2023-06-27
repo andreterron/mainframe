@@ -7,6 +7,21 @@ import { isEqual } from "lodash";
 
 console.log("Server is up!");
 
+async function createIndexes() {
+    db.createIndex({
+        index: {
+            fields: ["type"],
+        },
+    });
+    db.createIndex({
+        index: {
+            fields: ["type", "datasetId", "table"],
+        },
+    });
+}
+
+createIndexes().catch((e) => console.error(e));
+
 // Create cron
 const task = cron.schedule(
     "*/10 * * * *",
@@ -57,7 +72,11 @@ const task = cron.schedule(
                     try {
                         const row = await db.get(id);
 
-                        if (row.type === "row" && isEqual(row.data, rowData)) {
+                        if (
+                            row.type === "row" &&
+                            isEqual(row.data, rowData) &&
+                            row.datasetId
+                        ) {
                             continue;
                         }
 
@@ -66,6 +85,7 @@ const task = cron.schedule(
                         await db.put({
                             ...row,
                             data: rowData,
+                            datasetId: dataset._id,
                         });
                     } catch (e: any) {
                         if (e.error === "not_found") {
@@ -75,6 +95,7 @@ const task = cron.schedule(
                                 type: "row",
                                 data: rowData,
                                 table: table.id,
+                                datasetId: dataset._id,
                             });
                         }
                     }

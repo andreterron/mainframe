@@ -16,6 +16,7 @@ export interface Row {
     type: "row";
 
     table: string; // Ref -> Table
+    datasetId?: string; // Ref -> Dataset
 
     data: {
         [key: string]: any;

@@ -5,10 +5,22 @@ import {
     json,
 } from "@remix-run/node";
 import { db } from "../lib/db";
-import { useDoc } from "use-pouchdb";
+import { useDoc, useFind } from "use-pouchdb";
 import { useLoaderData, useParams } from "@remix-run/react";
-import { DBTypes } from "../lib/types";
+import { DBTypes, Row } from "../lib/types";
 import { getIntegrationForDataset } from "../lib/integrations";
+
+const replacer = (_key: string, value: any) =>
+    value instanceof Object && !(value instanceof Array)
+        ? Object.keys(value)
+              .sort()
+              .reduce((sorted, key) => {
+                  sorted[key] = value[key];
+                  return sorted;
+              }, {} as any)
+        : value;
+
+const LIMIT = 50;
 
 export const meta: V2_MetaFunction<typeof loader> = (args) => {
     const table = args.data?.initialTableValue;
@@ -47,16 +59,19 @@ export async function loader({ params }: LoaderArgs) {
 
         const table = tableEntry[1];
 
-        let data: any;
-        if (table.get) {
-            data = await table.get(dataset);
-        }
+        const rows = (await db.find({
+            selector: {
+                type: "row",
+                table: tableEntry[0],
+                datasetId: dataset._id,
+            },
+            limit: LIMIT,
+        })) as PouchDB.Find.FindResponse<Row>;
 
-        // const table = await db.get(tableId);
         return json({
             initialDatasetValue: dataset,
             initialTableValue: table,
-            data,
+            initialRowsValue: rows.docs,
         });
     } catch (e: any) {
         // TODO: Better handle PouchDB error
@@ -69,12 +84,20 @@ export async function loader({ params }: LoaderArgs) {
 }
 
 export default function DatasetTableDetails() {
-    const { initialDatasetValue, data } = useLoaderData<typeof loader>();
-    const { id } = useParams();
+    const { initialDatasetValue, initialRowsValue } =
+        useLoaderData<typeof loader>();
+    const { id, table_id } = useParams();
     const { doc, error } = useDoc<DBTypes>(id ?? "", {}, initialDatasetValue);
+    const { docs, loading: rowsLoading } = useFind<Row>({
+        selector: {
+            type: "row",
+            table: table_id,
+            datasetId: id,
+        },
+        limit: LIMIT,
+    });
     const dataset = doc ?? initialDatasetValue;
-
-    // Functions
+    const rows = rowsLoading ? initialRowsValue : docs;
 
     // Early return
 
@@ -91,21 +114,22 @@ export default function DatasetTableDetails() {
             <div className="flex flex-col gap-8 items-start">
                 <h1 className="text-2xl m-4 font-medium">{dataset?.name}</h1>
                 <div></div>
-                {Array.isArray(data) ? (
-                    <div className="relative overflow-x-auto">
-                        <table className="w-full border-t text-sm text-left text-gray-500 dark:text-gray-400">
-                            <tbody>
-                                {data.map((row) => (
-                                    <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                        <td className="px-6 py-4 font-mono whitespace-nowrap">
-                                            {JSON.stringify(row)}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                ) : null}
+                <div className="relative overflow-x-auto">
+                    <table className="w-full border-t text-sm text-left text-gray-500 dark:text-gray-400">
+                        <tbody>
+                            {rows.map((row) => (
+                                <tr
+                                    key={row._id}
+                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                                >
+                                    <td className="px-6 py-4 font-mono whitespace-nowrap">
+                                        {JSON.stringify(row, replacer)}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );
