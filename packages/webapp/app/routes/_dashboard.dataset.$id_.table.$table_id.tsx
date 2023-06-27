@@ -10,16 +10,6 @@ import { useLoaderData, useParams } from "@remix-run/react";
 import { DBTypes, Row } from "../lib/types";
 import { getIntegrationForDataset } from "../lib/integrations";
 
-const replacer = (_key: string, value: any) =>
-    value instanceof Object && !(value instanceof Array)
-        ? Object.keys(value)
-              .sort()
-              .reduce((sorted, key) => {
-                  sorted[key] = value[key];
-                  return sorted;
-              }, {} as any)
-        : value;
-
 const LIMIT = 50;
 
 export const meta: V2_MetaFunction<typeof loader> = (args) => {
@@ -123,7 +113,7 @@ export default function DatasetTableDetails() {
                                     className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
                                 >
                                     <td className="px-6 py-4 font-mono whitespace-nowrap">
-                                        {JSON.stringify(row, replacer)}
+                                        {JSON.stringify(row.data)}
                                     </td>
                                 </tr>
                             ))}
