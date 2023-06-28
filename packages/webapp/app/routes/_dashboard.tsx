@@ -117,7 +117,7 @@ export default function Dashboard() {
                                 <span
                                     className={clsx([
                                         "flex w-full items-center p-2 rounded-lg",
-                                        "text-slate-400 group-hover:text-sky-500",
+                                        "text-slate-400 group-hover:text-sky-600",
                                         "group-hover:bg-sky-300/40",
                                     ])}
                                 >
