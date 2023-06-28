@@ -9,6 +9,7 @@ import { useDoc, useFind } from "use-pouchdb";
 import { useLoaderData, useParams } from "@remix-run/react";
 import { DBTypes, Row } from "../lib/types";
 import { getIntegrationForDataset } from "../lib/integrations";
+import { useMemo } from "react";
 
 const LIMIT = 50;
 
@@ -89,6 +90,14 @@ export default function DatasetTableDetails() {
     const dataset = doc ?? initialDatasetValue;
     const rows = rowsLoading ? initialRowsValue : docs;
 
+    let columns = useMemo(() => {
+        const columnsSet = new Set<string>();
+        rows.forEach((row) =>
+            Object.keys(row.data).forEach((key) => columnsSet.add(key)),
+        );
+        return [...columnsSet];
+    }, [rows]);
+
     // Early return
 
     if (!dataset || error || dataset.type !== "dataset") {
@@ -99,22 +108,42 @@ export default function DatasetTableDetails() {
     }
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col relative max-h-screen overflow-y-auto">
             {/* TODO: Header */}
             <div className="flex flex-col gap-8 items-start">
                 <h1 className="text-2xl m-4 font-medium">{dataset?.name}</h1>
                 <div></div>
-                <div className="relative overflow-x-auto">
-                    <table className="w-full border-t text-sm text-left text-gray-500 dark:text-gray-400">
+                <div className="">
+                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 border-separate border-spacing-0 border-t">
+                        <thead className="text-xs text-gray-700 uppercase ">
+                            <tr className="">
+                                {columns.map((col) => (
+                                    <th
+                                        key={col}
+                                        scope="col"
+                                        className="box-border border-b bg-gray-50 dark:bg-gray-700 dark:text-gray-400 px-6 py-3 sticky top-0"
+                                    >
+                                        {col}
+                                    </th>
+                                ))}
+                            </tr>
+                        </thead>
                         <tbody>
                             {rows.map((row) => (
                                 <tr
                                     key={row._id}
-                                    className="bg-white border-b dark:bg-gray-800 dark:border-gray-700"
+                                    className="bg-white dark:bg-gray-800 dark:border-gray-700"
                                 >
-                                    <td className="px-6 py-4 font-mono whitespace-nowrap">
-                                        {JSON.stringify(row.data)}
-                                    </td>
+                                    {columns.map((col) => (
+                                        <td
+                                            key={col}
+                                            className="px-6 py-4 border-b font-mono whitespace-nowrap"
+                                        >
+                                            {row.data[col] !== undefined
+                                                ? JSON.stringify(row.data[col])
+                                                : ""}
+                                        </td>
+                                    ))}
                                 </tr>
                             ))}
                         </tbody>
