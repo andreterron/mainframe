@@ -67,7 +67,12 @@ export async function loader({ params }: LoaderArgs) {
     } catch (e: any) {
         // TODO: Better handle PouchDB error
         if (e.error === "not_found") {
-            throw new Response("Not Found", { status: 404 });
+            // It might not have synced yet
+            return json({
+                initialDatasetValue: null,
+                initialTableValue: null,
+                initialRowsValue: null,
+            });
         }
         console.error(e);
         throw new Response(null, { status: 500 });
@@ -78,7 +83,11 @@ export default function DatasetTableDetails() {
     const { initialDatasetValue, initialRowsValue } =
         useLoaderData<typeof loader>();
     const { id, table_id } = useParams();
-    const { doc, error } = useDoc<DBTypes>(id ?? "", {}, initialDatasetValue);
+    const { doc, error } = useDoc<DBTypes>(
+        id ?? "",
+        {},
+        initialDatasetValue ?? undefined,
+    );
     const { docs, loading: rowsLoading } = useFind<Row>({
         selector: {
             type: "row",
@@ -92,7 +101,7 @@ export default function DatasetTableDetails() {
 
     let columns = useMemo(() => {
         const columnsSet = new Set<string>();
-        rows.forEach((row) =>
+        rows?.forEach((row) =>
             Object.keys(row.data).forEach((key) => columnsSet.add(key)),
         );
         return [...columnsSet];
@@ -129,7 +138,7 @@ export default function DatasetTableDetails() {
                             </tr>
                         </thead>
                         <tbody>
-                            {rows.map((row) => (
+                            {rows?.map((row) => (
                                 <tr
                                     key={row._id}
                                     className="bg-white dark:bg-gray-800 dark:border-gray-700"

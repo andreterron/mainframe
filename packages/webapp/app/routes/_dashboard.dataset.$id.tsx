@@ -34,7 +34,10 @@ export async function loader({ params }: LoaderArgs) {
     } catch (e: any) {
         // TODO: Better handle PouchDB error
         if (e.error === "not_found") {
-            throw new Response("Not Found", { status: 404 });
+            // It might not have synced yet
+            return json({
+                initialDatasetValue: null,
+            });
         }
         console.error(e);
         throw new Response(null, { status: 500 });
@@ -44,7 +47,11 @@ export async function loader({ params }: LoaderArgs) {
 export default function DatasetDetails() {
     const { initialDatasetValue } = useLoaderData<typeof loader>();
     const { id } = useParams();
-    const { doc, error } = useDoc<DBTypes>(id ?? "", {}, initialDatasetValue);
+    const { doc, error } = useDoc<DBTypes>(
+        id ?? "",
+        {},
+        initialDatasetValue ?? undefined,
+    );
 
     const dataset = doc ?? initialDatasetValue;
 
