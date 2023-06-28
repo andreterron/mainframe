@@ -33,8 +33,7 @@ export function SidebarButton({
                         "flex items-center p-2 rounded-lg",
                         "text-slate-900",
                         "group-hover:bg-sky-300/40",
-                        "transition-shadow",
-                        "relative before:transition-all before:duration-200 before:border before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:rounded-lg",
+                        "relative before:border before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:rounded-lg",
                         isActive
                             ? "before:bg-white before:border-gray-400 shadow-0-2"
                             : "before:bg-transparent before:border-transparent shadow-0",
