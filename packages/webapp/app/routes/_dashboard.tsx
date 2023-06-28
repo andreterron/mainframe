@@ -1,6 +1,6 @@
 import { useState } from "react";
 import clsx from "clsx";
-import { Link, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
+import { NavLink, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
 import { useAllDocs, usePouch, useFind } from "use-pouchdb";
 import { db } from "../lib/db";
 import { json } from "@remix-run/node";
@@ -18,6 +18,48 @@ export async function loader() {
     return json({
         initialRows: docs.docs,
     });
+}
+
+export function SidebarButton({
+    dataset,
+}: {
+    dataset: Dataset & { _id: string };
+}) {
+    return (
+        <NavLink to={`/dataset/${dataset._id}`} className={"block group py-1"}>
+            {({ isActive }) => (
+                <span
+                    className={clsx([
+                        "flex items-center p-2 rounded-lg",
+                        "text-slate-900",
+                        "group-hover:bg-sky-300/40",
+                        "transition-shadow",
+                        "relative before:transition-all before:duration-200 before:border before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:rounded-lg",
+                        isActive
+                            ? "before:bg-white before:border-gray-400 shadow-0-2"
+                            : "before:bg-transparent before:border-transparent shadow-0",
+                    ])}
+                >
+                    <span className="relative">
+                        {dataset.name ? (
+                            dataset.name
+                        ) : (
+                            <span
+                                className={clsx([
+                                    "text-slate-400",
+                                    isActive
+                                        ? "text-slate-500"
+                                        : "group-hover:text-slate-500",
+                                ])}
+                            >
+                                Untitled
+                            </span>
+                        )}
+                    </span>
+                </span>
+            )}
+        </NavLink>
+    );
 }
 
 export default function Dashboard() {
@@ -84,28 +126,7 @@ export default function Dashboard() {
                         {datasets.map((dataset) => {
                             return (
                                 <li key={dataset._id}>
-                                    <Link
-                                        to={`/dataset/${dataset._id}`}
-                                        className="block group py-1"
-                                    >
-                                        <span
-                                            className={clsx([
-                                                "flex items-center p-2 rounded-lg",
-                                                "text-slate-900",
-                                                "group-hover:bg-sky-300/40",
-                                            ])}
-                                        >
-                                            <span className="relative">
-                                                {dataset.name ? (
-                                                    dataset.name
-                                                ) : (
-                                                    <span className="text-slate-400 group-hover:text-slate-500">
-                                                        Untitled
-                                                    </span>
-                                                )}
-                                            </span>
-                                        </span>
-                                    </Link>
+                                    <SidebarButton dataset={dataset} />
                                 </li>
                             );
                         })}
