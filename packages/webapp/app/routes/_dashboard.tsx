@@ -53,7 +53,7 @@ export default function Dashboard() {
                 aria-controls="default-sidebar"
                 type="button"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="inline-flex items-center p-2 mt-2 ml-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+                className="inline-flex items-center p-2 mt-2 ml-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
             >
                 <span className="sr-only">Open sidebar</span>
                 <svg
@@ -79,7 +79,7 @@ export default function Dashboard() {
                 ])}
                 aria-label="Sidebar"
             >
-                <div className="h-full flex flex-col justify-between px-3 py-4 overflow-y-auto bg-white sm:bg-gray-100 dark:bg-gray-800">
+                <div className="h-full flex flex-col justify-between px-3 py-4 overflow-y-auto bg-gradient-to-b from-sky-100 to-sky-200">
                     <ul className="w-full font-medium flex-shrink">
                         {datasets.map((dataset) => {
                             return (
@@ -91,15 +91,15 @@ export default function Dashboard() {
                                         <span
                                             className={clsx([
                                                 "flex items-center p-2 rounded-lg",
-                                                "text-gray-900 dark:text-white",
-                                                "group-hover:bg-gray-200 dark:group-hover:bg-gray-700",
+                                                "text-slate-900",
+                                                "group-hover:bg-sky-300/40",
                                             ])}
                                         >
                                             <span className="relative">
                                                 {dataset.name ? (
                                                     dataset.name
                                                 ) : (
-                                                    <span className="text-gray-400">
+                                                    <span className="text-slate-400 group-hover:text-slate-500">
                                                         Untitled
                                                     </span>
                                                 )}
@@ -117,8 +117,8 @@ export default function Dashboard() {
                                 <span
                                     className={clsx([
                                         "flex w-full items-center p-2 rounded-lg",
-                                        "text-gray-400 dark:text-gray-200",
-                                        "group-hover:bg-gray-200 dark:group-hover:bg-gray-700",
+                                        "text-slate-400 group-hover:text-sky-500",
+                                        "group-hover:bg-sky-300/40",
                                     ])}
                                 >
                                     <span className="">New Dataset</span>
