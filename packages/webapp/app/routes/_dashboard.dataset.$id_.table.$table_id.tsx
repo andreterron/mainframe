@@ -10,6 +10,14 @@ import { useLoaderData, useParams } from "@remix-run/react";
 import { DBTypes, Row } from "../lib/types";
 import { getIntegrationForDataset } from "../lib/integrations";
 import { useMemo } from "react";
+import {
+    createColumnHelper,
+    flexRender,
+    getCoreRowModel,
+    useReactTable,
+} from "@tanstack/react-table";
+
+const colHelper = createColumnHelper<PouchDB.Core.ExistingDocument<Row>>();
 
 const LIMIT = 50;
 
@@ -104,8 +112,27 @@ export default function DatasetTableDetails() {
         rows?.forEach((row) =>
             Object.keys(row.data).forEach((key) => columnsSet.add(key)),
         );
-        return [...columnsSet];
+        return [...columnsSet].map((col) =>
+            colHelper.accessor(`data.${col}`, {
+                header() {
+                    return col;
+                },
+                cell({ cell }) {
+                    const value = cell.getValue();
+                    return value === undefined ? "" : JSON.stringify(value);
+                },
+            }),
+        );
     }, [rows]);
+
+    const table = useReactTable({
+        columns,
+        data: rows ?? [],
+        getCoreRowModel: getCoreRowModel(),
+        getRowId(originalRow) {
+            return originalRow._id;
+        },
+    });
 
     // Early return
 
@@ -118,39 +145,47 @@ export default function DatasetTableDetails() {
 
     return (
         <div className="flex flex-col relative max-h-screen overflow-y-auto">
-            {/* TODO: Header */}
             <div className="flex flex-col gap-8 items-start">
                 <h1 className="text-2xl m-4 font-medium">{dataset?.name}</h1>
                 <div></div>
                 <div className="">
                     <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 border-separate border-spacing-0 border-t">
                         <thead className="text-xs text-gray-700 uppercase ">
-                            <tr className="">
-                                {columns.map((col) => (
-                                    <th
-                                        key={col}
-                                        scope="col"
-                                        className="box-border border-b bg-gray-50 dark:bg-gray-700 dark:text-gray-400 px-6 py-3 sticky top-0"
-                                    >
-                                        {col}
-                                    </th>
-                                ))}
-                            </tr>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <tr key={headerGroup.id} className="">
+                                    {headerGroup.headers.map((header) => (
+                                        <th
+                                            key={header.id}
+                                            scope="col"
+                                            className="box-border border-b bg-gray-50 dark:bg-gray-700 dark:text-gray-400 px-6 py-3 sticky top-0"
+                                        >
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                      header.column.columnDef
+                                                          .header,
+                                                      header.getContext(),
+                                                  )}
+                                        </th>
+                                    ))}
+                                </tr>
+                            ))}
                         </thead>
                         <tbody>
-                            {rows?.map((row) => (
+                            {table.getRowModel().rows.map((row) => (
                                 <tr
-                                    key={row._id}
+                                    key={row.id}
                                     className="bg-white dark:bg-gray-800 dark:border-gray-700"
                                 >
-                                    {columns.map((col) => (
+                                    {row.getVisibleCells().map((cell) => (
                                         <td
-                                            key={col}
+                                            key={cell.id}
                                             className="px-6 py-4 border-b font-mono whitespace-nowrap"
                                         >
-                                            {row.data[col] !== undefined
-                                                ? JSON.stringify(row.data[col])
-                                                : ""}
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext(),
+                                            )}
                                         </td>
                                     ))}
                                 </tr>
