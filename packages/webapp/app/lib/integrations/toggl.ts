@@ -2,6 +2,7 @@ import { Integration } from "../integration-types";
 import { Dataset } from "../types";
 
 export const toggl: Integration = {
+    name: "Toggl",
     tables: {
         timeEntries: {
             name: "Time Entries",

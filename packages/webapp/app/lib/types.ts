@@ -1,6 +1,6 @@
 export interface Dataset {
     type: "dataset";
-    name: string;
+    name?: string | undefined;
     integrationType?: string;
     oakToken?: string;
 }

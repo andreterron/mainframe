@@ -7,6 +7,7 @@ export interface IntegrationTable {
 }
 
 export interface Integration {
+    name: string;
     tables: {
         [key: string]: IntegrationTable;
     };

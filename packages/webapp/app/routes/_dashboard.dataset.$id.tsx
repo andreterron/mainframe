@@ -10,7 +10,10 @@ import { useLoaderData, useParams } from "@remix-run/react";
 import { DBTypes } from "../lib/types";
 import DatasetSetup from "../components/DatasetSetup";
 import DatasetOAKTokenInput from "../components/DatasetOAKTokenInput";
-import { getIntegrationForDataset } from "../lib/integrations";
+import {
+    getIntegrationForDataset,
+    getIntegrationFromType,
+} from "../lib/integrations";
 import { DatasetPage } from "../components/DatasetPage";
 
 export const meta: V2_MetaFunction<typeof loader> = (args) => {
@@ -62,10 +65,11 @@ export default function DatasetDetails() {
             console.error("No doc to set integration type");
             return;
         }
+        const integration = getIntegrationFromType(integrationType);
         db.put({
             ...doc,
             integrationType,
-            name: doc.name ? doc.name : "Toggl",
+            name: doc.name ? doc.name : integration?.name,
         });
     }
 

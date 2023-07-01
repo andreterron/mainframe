@@ -13,6 +13,12 @@ export default function DatasetSetup({
                 >
                     Toggl
                 </button>
+                <button
+                    className="block border shadow rounded-lg py-2 px-4"
+                    onClick={() => onIntegrationSelected("network")}
+                >
+                    Network
+                </button>
             </div>
         </div>
     );
