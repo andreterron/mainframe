@@ -7,10 +7,12 @@
     "scripts": {
         "dev": "yarn workspaces run dev",
         "build": "yarn workspaces run build",
-        "start": "yarn workspaces run start",
+        "start": "yarn run docker:up && yarn workspaces run dev",
         "docker:up": "docker compose up -d",
         "docker:down": "docker compose down -v --rmi=local"
     },
     "dependencies": {},
-    "devDependencies": {}
+    "devDependencies": {
+        "concurrently": "^8.2.0"
+    }
 }
