@@ -7,12 +7,12 @@
     "scripts": {
         "dev": "yarn workspaces run dev",
         "build": "yarn workspaces run build",
-        "start": "yarn run docker:up && yarn workspaces run dev",
+        "start": "node scripts/generate-env.mjs && yarn run docker:up && yarn workspaces run dev",
         "docker:up": "docker compose up -d",
         "docker:down": "docker compose down -v --rmi=local"
     },
-    "dependencies": {},
     "devDependencies": {
-        "concurrently": "^8.2.0"
+        "concurrently": "^8.2.0",
+        "nanoid": "^4.0.2"
     }
 }
