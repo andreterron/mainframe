@@ -3,6 +3,25 @@ import { Dataset } from "../types";
 
 export const toggl: Integration = {
     name: "Toggl",
+    objects: {
+        currentEntry: {
+            name: "Current Time Entry",
+            get: async (dataset: Dataset) => {
+                const res = await fetch(
+                    "https://1ak.io/toggl/api/v9/me/time_entries/current",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${dataset.oakToken}`,
+                        },
+                    },
+                );
+                return res.json();
+            },
+            objId: (dataset: Dataset & { _id: string }, obj: any) => {
+                return `${dataset._id}_currentEntry_${obj.id}`;
+            },
+        },
+    },
     tables: {
         timeEntries: {
             name: "Time Entries",

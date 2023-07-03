@@ -1,7 +1,10 @@
 import cron from "node-cron";
 import closeWithGrace from "close-with-grace";
 import { db } from "../app/lib/db";
-import { getTablesForDataset } from "../app/lib/integrations";
+import {
+    getObjectsForDataset,
+    getTablesForDataset,
+} from "../app/lib/integrations";
 import { Dataset } from "../app/lib/types";
 import { isEqual } from "lodash";
 
@@ -16,6 +19,11 @@ async function createIndexes() {
     db.createIndex({
         index: {
             fields: ["type", "datasetId", "table"],
+        },
+    });
+    db.createIndex({
+        index: {
+            fields: ["type", "datasetId", "objectType"],
         },
     });
 }
@@ -42,6 +50,54 @@ const task = cron.schedule(
         for (let dataset of datasets.docs) {
             if (!dataset.integrationType || !dataset.oakToken) {
                 continue;
+            }
+
+            // Load all objects
+            const objects = getObjectsForDataset(dataset);
+
+            for (let object of objects) {
+                if (!object.get || !object.objId) {
+                    continue;
+                }
+
+                console.log(
+                    `Loading data for object ${object.name} from ${dataset.name}`,
+                );
+
+                // Call fetch for each object definition
+                const data = await object.get(dataset);
+
+                // Save object to the DB
+                const id = object.objId(dataset, data);
+
+                try {
+                    const obj = await db.get(id);
+
+                    if (
+                        obj.type === "object" &&
+                        isEqual(obj.data, data) &&
+                        obj.datasetId
+                    ) {
+                        continue;
+                    }
+
+                    await db.put({
+                        ...obj,
+                        data: data,
+                        objectType: object.id,
+                        datasetId: dataset._id,
+                    });
+                } catch (e: any) {
+                    if (e.error === "not_found") {
+                        await db.put({
+                            _id: id,
+                            type: "object",
+                            data: data,
+                            objectType: object.id,
+                            datasetId: dataset._id,
+                        });
+                    }
+                }
             }
 
             // Load all tables
@@ -85,6 +141,7 @@ const task = cron.schedule(
                         await db.put({
                             ...row,
                             data: rowData,
+                            table: table.id,
                             datasetId: dataset._id,
                         });
                     } catch (e: any) {

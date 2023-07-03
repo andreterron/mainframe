@@ -19,6 +19,15 @@ export function getIntegrationForDataset(dataset: Dataset): Integration | null {
     return getIntegrationFromType(dataset.integrationType);
 }
 
+export function getObjectsForDataset(dataset: Dataset) {
+    const integration = getIntegrationForDataset(dataset);
+    if (!integration || !integration.objects) return [];
+    return Object.entries(integration.objects).map(([id, obj]) => ({
+        id,
+        ...obj,
+    }));
+}
+
 export function getTablesForDataset(dataset: Dataset) {
     const integration = getIntegrationForDataset(dataset);
     if (!integration) return [];

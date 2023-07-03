@@ -1,6 +1,7 @@
 import { Link } from "@remix-run/react";
 import { Integration } from "../lib/integration-types";
 import { Dataset } from "../lib/types";
+import { getObjectsForDataset, getTablesForDataset } from "../lib/integrations";
 
 export function DatasetPage({
     dataset,
@@ -9,16 +10,42 @@ export function DatasetPage({
     dataset: Dataset & { _id: string };
     integration: Integration;
 }) {
-    const tableEntries = Object.entries(integration.tables);
+    const tables = getTablesForDataset(dataset);
+    const objects = getObjectsForDataset(dataset);
 
     return (
         <div className="flex flex-col gap-8 items-start">
             <h1 className="text-2xl font-medium">{dataset.name}</h1>
             <div className="flex flex-col gap-1">
-                {tableEntries.map(([tableId, table]) => (
+                {objects.map((obj) => (
                     <Link
-                        to={`/dataset/${dataset._id}/table/${tableId}`}
-                        key={tableId}
+                        to={`/dataset/${dataset._id}/object/${obj.id}`}
+                        key={obj.id}
+                        className="flex items-center gap-3 cursor-pointer select-none text-gray-900 bg-white focus:outline-none hover:bg-gray-100 active:bg-gray-200 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg px-4 py-2 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            className="humbleicons hi-document flex-grow-0 flex-shrink-0 w-5 h-5"
+                        >
+                            <g
+                                xmlns="http://www.w3.org/2000/svg"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                            >
+                                <path d="M5 20V4a1 1 0 011-1h6.172a2 2 0 011.414.586l4.828 4.828A2 2 0 0119 9.828V20a1 1 0 01-1 1H6a1 1 0 01-1-1z" />
+                                <path d="M12 3v6a1 1 0 001 1h6" />
+                            </g>
+                        </svg>
+                        <span>{obj.name}</span>
+                    </Link>
+                ))}
+                {tables.map((table) => (
+                    <Link
+                        to={`/dataset/${dataset._id}/table/${table.id}`}
+                        key={table.id}
                         className="flex items-center gap-3 cursor-pointer select-none text-gray-900 bg-white focus:outline-none hover:bg-gray-100 active:bg-gray-200 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg px-4 py-2 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
                     >
                         <svg

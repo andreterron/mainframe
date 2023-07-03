@@ -23,4 +23,15 @@ export interface Row {
     };
 }
 
-export type DBTypes = Dataset | Row;
+export interface DatasetObject {
+    type: "object";
+
+    objectType: string; // Ref -> ObjectDefinition
+    datasetId?: string; // Ref -> Dataset
+
+    data: {
+        [key: string]: any;
+    };
+}
+
+export type DBTypes = Dataset | Row | DatasetObject;
