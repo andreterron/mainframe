@@ -17,8 +17,8 @@ export const toggl: Integration = {
                 );
                 return res.json();
             },
-            objId: (dataset: Dataset & { _id: string }, obj: any) => {
-                return `${dataset._id}_currentEntry_${obj.id}`;
+            objId: (dataset: Dataset & { _id: string }) => {
+                return `${dataset._id}_currentEntry`;
             },
         },
     },
