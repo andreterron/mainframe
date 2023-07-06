@@ -5,9 +5,9 @@
     "sideEffects": false,
     "scripts": {
         "build": "remix build",
-        "dev": "concurrently npm:dev:*",
+        "dev": "concurrently yarn:dev:*",
         "dev:remix": "PORT=8744 remix dev",
-        "dev:sync": "nodemon server/index.ts",
+        "dev:sync": "tsx watch server/index.ts",
         "start": "remix-serve build",
         "typecheck": "tsc"
     },
@@ -44,9 +44,8 @@
         "clsx": "^1.2.1",
         "concurrently": "^8.2.0",
         "eslint": "^8.38.0",
-        "nodemon": "^2.0.22",
         "tailwindcss": "^3.3.2",
-        "ts-node": "^10.9.1",
+        "tsx": "^3.12.7",
         "typescript": "^5.0.4"
     },
     "engines": {
