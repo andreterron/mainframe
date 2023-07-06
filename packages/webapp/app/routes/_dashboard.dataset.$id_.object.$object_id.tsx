@@ -9,6 +9,7 @@ import { useDoc, useFind } from "use-pouchdb";
 import { useLoaderData, useParams } from "@remix-run/react";
 import { DBTypes, DatasetObject } from "../lib/types";
 import { getIntegrationForDataset } from "../lib/integrations";
+import { env } from "../lib/env";
 
 const LIMIT = 1;
 
@@ -26,6 +27,13 @@ export async function loader({ params }: LoaderArgs) {
     if (!objectId) {
         throw new Response("Missing objects ID", { status: 404 });
     }
+    // Trigger sync of this object
+    void fetch(
+        `http://localhost:${env.SYNC_PORT}/sync/dataset/${datasetId}/object/${objectId}`,
+        {
+            method: "POST",
+        },
+    ).catch((e) => console.error(e));
     try {
         const dataset = await db.get(datasetId);
 

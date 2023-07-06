@@ -1,4 +1,4 @@
-import { envsafe, str } from "envsafe";
+import { envsafe, num, str } from "envsafe";
 import dotenv from "dotenv";
 
 if (typeof window === "undefined") {
@@ -15,6 +15,7 @@ export const env = envsafe(
         }),
         COUCHDB_USER: str({ default: "mainframe" }),
         COUCHDB_PASSWORD: str(),
+        SYNC_PORT: num({ default: 8745 }),
     },
     {
         env: typeof window !== "undefined" ? (window as any).ENV : process.env,

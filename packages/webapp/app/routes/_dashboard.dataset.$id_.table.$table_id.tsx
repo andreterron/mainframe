@@ -16,6 +16,7 @@ import {
     getCoreRowModel,
     useReactTable,
 } from "@tanstack/react-table";
+import { env } from "../lib/env";
 
 const colHelper = createColumnHelper<PouchDB.Core.ExistingDocument<Row>>();
 
@@ -35,6 +36,13 @@ export async function loader({ params }: LoaderArgs) {
     if (!tableId) {
         throw new Response("Missing table ID", { status: 404 });
     }
+    // Trigger sync of this table
+    void fetch(
+        `http://localhost:${env.SYNC_PORT}/sync/dataset/${datasetId}/table/${tableId}`,
+        {
+            method: "POST",
+        },
+    ).catch((e) => console.error(e));
     try {
         const dataset = await db.get(datasetId);
 

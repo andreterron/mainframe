@@ -1,4 +1,8 @@
-import { Integration } from "./integration-types";
+import {
+    Integration,
+    IntegrationObject,
+    IntegrationTable,
+} from "./integration-types";
 import { network } from "./integrations/network";
 import { toggl } from "./integrations/toggl";
 import { Dataset } from "./types";
@@ -28,6 +32,15 @@ export function getObjectsForDataset(dataset: Dataset) {
     }));
 }
 
+export function getDatasetObject(
+    dataset: Dataset,
+    objectId: string,
+): (IntegrationObject & { id: string }) | null {
+    const integration = getIntegrationForDataset(dataset);
+    const object = integration?.objects?.[objectId];
+    return object ? { ...object, id: objectId } : null;
+}
+
 export function getTablesForDataset(dataset: Dataset) {
     const integration = getIntegrationForDataset(dataset);
     if (!integration) return [];
@@ -35,4 +48,13 @@ export function getTablesForDataset(dataset: Dataset) {
         id,
         ...table,
     }));
+}
+
+export function getDatasetTable(
+    dataset: Dataset,
+    tableId: string,
+): (IntegrationTable & { id: string }) | null {
+    const integration = getIntegrationForDataset(dataset);
+    const table = integration?.tables?.[tableId];
+    return table ? { ...table, id: tableId } : null;
 }
