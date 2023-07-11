@@ -2,12 +2,13 @@ import { Link } from "@remix-run/react";
 import { Integration } from "../lib/integration-types";
 import { Dataset } from "../lib/types";
 import { getObjectsForDataset, getTablesForDataset } from "../lib/integrations";
+import { DatasetHeader } from "./DatasetHeader";
 
 export function DatasetPage({
     dataset,
     integration,
 }: {
-    dataset: Dataset & { _id: string };
+    dataset: Dataset & PouchDB.Core.RemoveDocument;
     integration: Integration;
 }) {
     const tables = getTablesForDataset(dataset);
@@ -15,7 +16,7 @@ export function DatasetPage({
 
     return (
         <div className="flex flex-col gap-8 items-start">
-            <h1 className="text-2xl font-medium">{dataset.name}</h1>
+            <DatasetHeader dataset={dataset}>{dataset.name}</DatasetHeader>
             <div className="flex flex-col gap-1">
                 {objects.map((obj) => (
                     <Link

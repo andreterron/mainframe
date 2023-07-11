@@ -1,11 +1,16 @@
+import { Dataset } from "../lib/types";
+import { DatasetHeader } from "./DatasetHeader";
+
 export default function DatasetSetup({
     onIntegrationSelected,
+    dataset,
 }: {
     onIntegrationSelected: (type: string) => void;
+    dataset: Dataset & PouchDB.Core.RemoveDocument;
 }) {
     return (
         <div className="flex flex-col items-start gap-4">
-            <h2 className="text-xl">Import</h2>
+            <DatasetHeader dataset={dataset}>Import</DatasetHeader>
             <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <button
                     className="block border shadow rounded-lg py-2 px-4"

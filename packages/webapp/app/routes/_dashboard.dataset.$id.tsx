@@ -95,13 +95,15 @@ export default function DatasetDetails() {
     return (
         <div className="flex flex-col p-4">
             {/* TODO: Header */}
-            {!dataset?.integrationType ? (
+            {!dataset.integrationType ? (
                 <DatasetSetup
                     onIntegrationSelected={(type) => setIntegrationType(type)}
+                    dataset={dataset}
                 />
-            ) : !dataset?.oakToken ? (
+            ) : !dataset.oakToken ? (
                 <DatasetOAKTokenInput
                     onSubmit={(token) => setOakToken(token)}
+                    dataset={dataset}
                 />
             ) : integration ? (
                 <DatasetPage dataset={dataset} integration={integration} />
