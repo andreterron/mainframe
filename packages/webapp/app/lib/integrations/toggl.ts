@@ -39,17 +39,17 @@ export const toggl: Integration = {
             rowId: (dataset: Dataset & { _id: string }, row: any) =>
                 `${dataset._id}_${row.id}`,
         },
-        projects: {
-            name: "Projects",
-        },
-        workspaces: {
-            name: "Workspaces",
-        },
-        clients: {
-            name: "Clients",
-        },
-        tasks: {
-            name: "Tasks",
-        },
+        // projects: {
+        //     name: "Projects",
+        // },
+        // workspaces: {
+        //     name: "Workspaces",
+        // },
+        // clients: {
+        //     name: "Clients",
+        // },
+        // tasks: {
+        //     name: "Tasks",
+        // },
     },
 };
