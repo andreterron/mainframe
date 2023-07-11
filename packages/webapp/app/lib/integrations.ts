@@ -4,6 +4,7 @@ import {
     IntegrationTable,
 } from "./integration-types";
 import { network } from "./integrations/network";
+import { peloton } from "./integrations/peloton";
 import { posthog } from "./integrations/posthog";
 import { toggl } from "./integrations/toggl";
 import { Dataset } from "./types";
@@ -16,6 +17,9 @@ export function getIntegrationFromType(
     }
     if (type === "posthog") {
         return posthog;
+    }
+    if (type === "peloton") {
+        return peloton;
     }
     if (type === "network") {
         return network;

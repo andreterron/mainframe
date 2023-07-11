@@ -101,7 +101,7 @@ async function syncTable(
     dataset: Dataset & { _id: string },
     table: IntegrationTable & { id: string },
 ) {
-    if (!table.get || !table.rowId) {
+    if (!table.get) {
         return;
     }
 
@@ -112,6 +112,12 @@ async function syncTable(
 
     // Save the rows on the DB
     if (!Array.isArray(data)) {
+        console.error("Data is not an array");
+        return;
+    }
+
+    if (!table.rowId) {
+        console.log("Find the id", data[0]);
         return;
     }
 

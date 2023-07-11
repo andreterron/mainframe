@@ -6,29 +6,34 @@ async function getProjectChildren(
     dataset: Dataset & { _id: string },
     urlPath: string,
 ) {
-    const rows = (await db.find({
-        selector: {
-            type: "row",
-            table: "projects",
-            datasetId: dataset._id,
-        },
-    })) as PouchDB.Find.FindResponse<Row>;
-    const projectIds: string[] = rows.docs.map((row) => row.data.id);
-    const projectItems = await Promise.all(
-        projectIds.map(async (id): Promise<any[]> => {
-            const res = await fetch(
-                `https://app.posthog.com/api/projects/${id}/${urlPath}`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${dataset.token}`,
+    try {
+        const rows = (await db.find({
+            selector: {
+                type: "row",
+                table: "projects",
+                datasetId: dataset._id,
+            },
+        })) as PouchDB.Find.FindResponse<Row>;
+        const projectIds: string[] = rows.docs.map((row) => row.data.id);
+        const projectItems = await Promise.all(
+            projectIds.map(async (id): Promise<any[]> => {
+                const res = await fetch(
+                    `https://app.posthog.com/api/projects/${id}/${urlPath}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${dataset.token}`,
+                        },
                     },
-                },
-            );
-            const json = await res.json();
-            return json.results;
-        }),
-    );
-    return projectItems.flat(1);
+                );
+                const json = await res.json();
+                return json.results;
+            }),
+        );
+        return projectItems.flat(1);
+    } catch (e) {
+        console.error(e);
+        return [];
+    }
 }
 
 export const posthog: Integration = {
