@@ -9,7 +9,7 @@ import { useDoc } from "use-pouchdb";
 import { useLoaderData, useParams } from "@remix-run/react";
 import { DBTypes } from "../lib/types";
 import DatasetSetup from "../components/DatasetSetup";
-import DatasetOAKTokenInput from "../components/DatasetOAKTokenInput";
+import DatasetTokenInput from "../components/DatasetTokenInput";
 import {
     getIntegrationForDataset,
     getIntegrationFromType,
@@ -73,12 +73,12 @@ export default function DatasetDetails() {
         });
     }
 
-    function setOakToken(token: string) {
+    function setToken(token: string) {
         if (!doc) {
             console.error("No doc to set token");
             return;
         }
-        db.put({ ...doc, oakToken: token });
+        db.put({ ...doc, token });
     }
 
     // Early return
@@ -100,9 +100,9 @@ export default function DatasetDetails() {
                     onIntegrationSelected={(type) => setIntegrationType(type)}
                     dataset={dataset}
                 />
-            ) : !dataset.oakToken ? (
-                <DatasetOAKTokenInput
-                    onSubmit={(token) => setOakToken(token)}
+            ) : !dataset.token ? (
+                <DatasetTokenInput
+                    onSubmit={(token) => setToken(token)}
                     dataset={dataset}
                 />
             ) : integration ? (

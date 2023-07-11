@@ -1,7 +1,7 @@
 import { Dataset } from "../lib/types";
 import { DatasetHeader } from "./DatasetHeader";
 
-export default function DatasetOAKTokenInput({
+export default function DatasetTokenInput({
     onSubmit,
     dataset,
 }: {
@@ -14,9 +14,8 @@ export default function DatasetOAKTokenInput({
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
-                    const token = (
-                        (e.target as any)?.oakToken as HTMLInputElement
-                    )?.value;
+                    const token = ((e.target as any)?.token as HTMLInputElement)
+                        ?.value;
                     // TODO: Consider using zod
                     if (token && typeof token === "string") {
                         onSubmit(token);
@@ -24,9 +23,9 @@ export default function DatasetOAKTokenInput({
                 }}
             >
                 <div className="flex flex-col gap-2 items-start">
-                    <label>One API Key token:</label>
+                    <label>Token:</label>
                     <input
-                        name="oakToken"
+                        name="token"
                         type="password"
                         className="px-2 py-1 border rounded-md w-96 max-w-full"
                         // Hack to get browsers to not save this "password" field

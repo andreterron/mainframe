@@ -2,7 +2,7 @@ export interface Dataset {
     type: "dataset";
     name?: string | undefined;
     integrationType?: string;
-    oakToken?: string;
+    token?: string;
 }
 
 export interface Table {

@@ -157,7 +157,7 @@ async function syncTable(
 }
 
 async function syncDataset(dataset: Dataset & { _id: string }) {
-    if (!dataset.integrationType || !dataset.oakToken) {
+    if (!dataset.integrationType || !dataset.token) {
         return;
     }
 

@@ -8,10 +8,10 @@ export const toggl: Integration = {
             name: "Current Time Entry",
             get: async (dataset: Dataset) => {
                 const res = await fetch(
-                    "https://1ak.io/toggl/api/v9/me/time_entries/current",
+                    "https://api.track.toggl.com/api/v9/me/time_entries/current",
                     {
                         headers: {
-                            Authorization: `Bearer ${dataset.oakToken}`,
+                            Authorization: `Bearer ${dataset.token}`,
                         },
                     },
                 );
@@ -27,10 +27,10 @@ export const toggl: Integration = {
             name: "Time Entries",
             get: async (dataset: Dataset) => {
                 const res = await fetch(
-                    "https://1ak.io/toggl/api/v9/me/time_entries",
+                    "https://api.track.toggl.com/api/v9/me/time_entries",
                     {
                         headers: {
-                            Authorization: `Bearer ${dataset.oakToken}`,
+                            Authorization: `Bearer ${dataset.token}`,
                         },
                     },
                 );
