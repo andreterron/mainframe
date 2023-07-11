@@ -4,6 +4,7 @@ import {
     IntegrationTable,
 } from "./integration-types";
 import { network } from "./integrations/network";
+import { posthog } from "./integrations/posthog";
 import { toggl } from "./integrations/toggl";
 import { Dataset } from "./types";
 
@@ -12,6 +13,9 @@ export function getIntegrationFromType(
 ): Integration | null {
     if (type === "toggl") {
         return toggl;
+    }
+    if (type === "posthog") {
+        return posthog;
     }
     if (type === "network") {
         return network;

@@ -20,6 +20,12 @@ export default function DatasetSetup({
                 </button>
                 <button
                     className="block border shadow rounded-lg py-2 px-4"
+                    onClick={() => onIntegrationSelected("posthog")}
+                >
+                    Posthog
+                </button>
+                <button
+                    className="block border shadow rounded-lg py-2 px-4"
                     onClick={() => onIntegrationSelected("network")}
                 >
                     Network

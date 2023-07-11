@@ -2,7 +2,7 @@ import { Dataset } from "./types";
 
 export interface IntegrationTable {
     name: string;
-    get?: (dataset: Dataset) => Promise<any>;
+    get?: (dataset: Dataset & { _id: string }) => Promise<any>;
     rowId?: (dataset: Dataset & { _id: string }, row: any) => string;
 }
 
