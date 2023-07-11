@@ -127,7 +127,13 @@ export default function DatasetTableDetails() {
                 },
                 cell({ cell }) {
                     const value = cell.getValue();
-                    return value === undefined ? "" : JSON.stringify(value);
+                    return value === undefined
+                        ? ""
+                        : value && typeof value === "object"
+                        ? Array.isArray(value)
+                            ? "[...]"
+                            : "{...}"
+                        : JSON.stringify(value);
                 },
             }),
         );
