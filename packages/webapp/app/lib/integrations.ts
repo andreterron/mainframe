@@ -3,6 +3,7 @@ import {
     IntegrationObject,
     IntegrationTable,
 } from "./integration-types";
+import { github } from "./integrations/github";
 import { network } from "./integrations/network";
 import { peloton } from "./integrations/peloton";
 import { posthog } from "./integrations/posthog";
@@ -17,6 +18,9 @@ export function getIntegrationFromType(
     }
     if (type === "posthog") {
         return posthog;
+    }
+    if (type === "github") {
+        return github;
     }
     if (type === "peloton") {
         return peloton;
