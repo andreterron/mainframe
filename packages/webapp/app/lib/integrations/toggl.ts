@@ -1,8 +1,10 @@
 import { Integration } from "../integration-types";
 import { Dataset } from "../types";
+import icon from "./icons/toggl.png";
 
 export const toggl: Integration = {
     name: "Toggl",
+    icon,
     objects: {
         currentEntry: {
             name: "Current Time Entry",

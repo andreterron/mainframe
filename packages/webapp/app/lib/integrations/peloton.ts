@@ -1,9 +1,11 @@
 import { db } from "../db";
 import { Integration } from "../integration-types";
 import { Dataset, Row } from "../types";
+import icon from "./icons/peloton.png";
 
 export const peloton: Integration = {
     name: "Peloton",
+    icon,
     objects: {
         currentUser: {
             name: "Current User",

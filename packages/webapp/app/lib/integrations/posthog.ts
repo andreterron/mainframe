@@ -1,6 +1,7 @@
 import { db } from "../db";
 import { Integration } from "../integration-types";
 import { Dataset, Row } from "../types";
+import icon from "./icons/posthog.png";
 
 async function getProjectChildren(
     dataset: Dataset & { _id: string },
@@ -38,6 +39,7 @@ async function getProjectChildren(
 
 export const posthog: Integration = {
     name: "Posthog",
+    icon,
     objects: {
         user: {
             name: "Current User",
