@@ -6,7 +6,7 @@ import {
 } from "@remix-run/node";
 import { db } from "../lib/db";
 import { useDoc, useFind } from "use-pouchdb";
-import { useLoaderData, useParams } from "@remix-run/react";
+import { Link, useLoaderData, useParams } from "@remix-run/react";
 import { DBTypes, Row } from "../lib/types";
 import { getIntegrationForDataset } from "../lib/integrations";
 import { useMemo } from "react";
@@ -120,7 +120,7 @@ export default function DatasetTableDetails() {
         rows?.forEach((row) =>
             Object.keys(row.data).forEach((key) => columnsSet.add(key)),
         );
-        return [...columnsSet].map((col) =>
+        const cols = [...columnsSet].map((col) =>
             colHelper.accessor(`data.${col}`, {
                 header() {
                     return col;
@@ -137,6 +137,34 @@ export default function DatasetTableDetails() {
                 },
             }),
         );
+        return [
+            colHelper.display({
+                id: "open",
+                cell({ row }) {
+                    return (
+                        <Link to={`/row/${row.id}`}>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                                className="humbleicons hi-external-link w-4 h-4"
+                            >
+                                <path
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    stroke="currentColor"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M12 6H7a1 1 0 00-1 1v10a1 1 0 001 1h10a1 1 0 001-1v-5m-6 0l7.5-7.5M15 3h6v6"
+                                />
+                            </svg>
+                        </Link>
+                    );
+                },
+            }),
+            ...cols,
+        ];
     }, [rows]);
 
     const table = useReactTable({
