@@ -26,3 +26,7 @@ This will run 3 services:
 3. And a remix server to host the front-end dashboard
 
 To open the dashboard, navigate to <http://localhost:8744>
+
+## License
+
+MIT
