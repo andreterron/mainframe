@@ -56,12 +56,12 @@ export function SidebarButton({
                             <g
                                 xmlns="http://www.w3.org/2000/svg"
                                 stroke="currentColor"
-                                stroke-linejoin="round"
-                                stroke-width="2"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
                             >
                                 <path d="M4 8l8-4 8 4-8 4-8-4z" />
                                 <path
-                                    stroke-linecap="round"
+                                    strokeLinecap="round"
                                     d="M4 12l8 4 8-4M4 16l8 4 8-4"
                                 />
                             </g>
@@ -179,8 +179,8 @@ export default function Dashboard() {
                                         <g
                                             xmlns="http://www.w3.org/2000/svg"
                                             stroke="currentColor"
-                                            stroke-linecap="round"
-                                            stroke-width="2"
+                                            strokeLinecap="round"
+                                            strokeWidth="2"
                                         >
                                             <path d="M12 19V5M19 12H5" />
                                         </g>
