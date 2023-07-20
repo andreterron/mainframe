@@ -14,7 +14,6 @@ export interface IntegrationObject {
 
 // TODO: Merge `objects` and `tables` options
 export interface Integration {
-    icon?: any;
     name: string;
     objects?: {
         [key: string]: IntegrationObject;

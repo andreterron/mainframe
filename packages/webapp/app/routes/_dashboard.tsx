@@ -6,6 +6,7 @@ import { db } from "../lib/db";
 import { json } from "@remix-run/node";
 import { DBTypes, Dataset } from "../lib/types";
 import { getIntegrationForDataset } from "../lib/integrations";
+import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 
 export async function loader() {
     const docs = (await db.find({
@@ -26,7 +27,8 @@ export function SidebarButton({
 }: {
     dataset: Dataset & { _id: string };
 }) {
-    const integration = getIntegrationForDataset(dataset);
+    const type = dataset.integrationType;
+    const icon = type ? datasetIcon(type) : undefined;
     return (
         <NavLink to={`/dataset/${dataset._id}`} className={"block group py-1"}>
             {({ isActive }) => (
@@ -41,11 +43,8 @@ export function SidebarButton({
                             : "before:bg-transparent before:border-transparent shadow-0",
                     ])}
                 >
-                    {integration?.icon ? (
-                        <img
-                            className="relative h-4 w-4 m-0.5"
-                            src={integration.icon}
-                        />
+                    {icon ? (
+                        <img className="relative h-4 w-4 m-0.5" src={icon} />
                     ) : (
                         <svg
                             xmlns="http://www.w3.org/2000/svg"

@@ -1,10 +1,8 @@
 import { Integration } from "../integration-types";
 import { Dataset } from "../types";
-import icon from "./icons/github.png";
 
 export const github: Integration = {
     name: "GitHub",
-    icon,
     objects: {
         currentUser: {
             name: "Current User",
