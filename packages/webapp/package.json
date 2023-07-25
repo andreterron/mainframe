@@ -7,7 +7,7 @@
         "build": "remix build",
         "dev": "concurrently yarn:dev:*",
         "dev:remix": "PORT=8744 remix dev",
-        "dev:sync": "tsx watch server/index.ts",
+        "dev:sync": "tsx watch --clear-screen=false server/index.ts",
         "start": "remix-serve build",
         "typecheck": "tsc"
     },
