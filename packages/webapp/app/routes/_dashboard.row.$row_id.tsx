@@ -9,7 +9,10 @@ export default function DatasetRowDetails() {
     // Early return
 
     if (!doc || error || doc.type !== "row") {
-        console.log("useDoc error", error);
+        if (error) {
+            console.log("useDoc error", error);
+        }
+        // TODO: Loading UI if we need to
         return null;
     }
 
