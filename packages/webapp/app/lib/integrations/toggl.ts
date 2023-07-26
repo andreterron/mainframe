@@ -1,6 +1,14 @@
 import { Integration } from "../integration-types";
 import { Dataset } from "../types";
 
+function togglHeaders(dataset: Dataset) {
+    return {
+        Authorization: `Basic ${Buffer.from(
+            dataset.token + ":api_token",
+        ).toString("base64")}`,
+    };
+}
+
 export const toggl: Integration = {
     name: "Toggl",
     objects: {
@@ -10,12 +18,18 @@ export const toggl: Integration = {
                 const res = await fetch(
                     "https://api.track.toggl.com/api/v9/me/time_entries/current",
                     {
-                        headers: {
-                            Authorization: `Bearer ${dataset.token}`,
-                        },
+                        headers: togglHeaders(dataset),
                     },
                 );
-                return res.json();
+                if (res.ok) {
+                    return res.json();
+                }
+                console.error(
+                    `Request failed with status ${
+                        res.status
+                    }:\n${await res.text()}`,
+                );
+                return null;
             },
             objId: (dataset: Dataset & { _id: string }) => {
                 return `${dataset._id}_currentEntry`;
@@ -29,12 +43,18 @@ export const toggl: Integration = {
                 const res = await fetch(
                     "https://api.track.toggl.com/api/v9/me/time_entries",
                     {
-                        headers: {
-                            Authorization: `Bearer ${dataset.token}`,
-                        },
+                        headers: togglHeaders(dataset),
                     },
                 );
-                return res.json();
+                if (res.ok) {
+                    return res.json();
+                }
+                console.error(
+                    `Request failed with status ${
+                        res.status
+                    }:\n${await res.text()}`,
+                );
+                return null;
             },
             rowId: (dataset: Dataset & { _id: string }, row: any) =>
                 `${dataset._id}_${row.id}`,

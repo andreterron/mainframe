@@ -14,7 +14,7 @@ import {
     IntegrationObject,
     IntegrationTable,
 } from "../app/lib/integration-types";
-import { env } from "../app/lib/env";
+import { json } from "body-parser";
 
 console.log("Server is up!");
 
@@ -205,8 +205,12 @@ createIndexes().catch((e) => console.error(e));
 const task = cron.schedule(
     "*/10 * * * *",
     async (now) => {
-        // TODO: Ensure index exists
-        await syncAll();
+        try {
+            // TODO: Ensure index exists
+            await syncAll();
+        } catch (e) {
+            console.error(e);
+        }
     },
     {
         runOnInit: true,
@@ -215,66 +219,93 @@ const task = cron.schedule(
 
 const app = express();
 
-app.post("/sync", async (_, res) => {
-    await syncAll();
-    res.send({ result: "success" });
+app.use(json());
+
+app.post("/sync", async (_, res, next) => {
+    try {
+        await syncAll();
+        res.send({ result: "success" });
+    } catch (e) {
+        next(e);
+    }
 });
 
-app.post("/sync/dataset/:datasetId", async (req, res) => {
-    const { datasetId } = req.params;
-    const dataset = await db.get(datasetId);
-    if (dataset.type !== "dataset") {
-        res.sendStatus(404);
-        return;
-    }
+app.post("/sync/dataset/:datasetId", async (req, res, next) => {
+    try {
+        const { datasetId } = req.params;
+        const dataset = await db.get(datasetId);
+        if (dataset.type !== "dataset") {
+            res.sendStatus(404);
+            return;
+        }
 
-    await syncDataset(dataset);
-    res.send({ result: "success" });
+        await syncDataset(dataset);
+        res.send({ result: "success" });
+    } catch (e) {
+        next(e);
+    }
 });
 
-app.post("/sync/dataset/:datasetId/object/:objectId", async (req, res) => {
-    const { datasetId, objectId } = req.params;
-    const dataset = await db.get(datasetId);
-    if (dataset.type !== "dataset") {
-        res.sendStatus(404);
-        return;
+app.post(
+    "/sync/dataset/:datasetId/object/:objectId",
+    async (req, res, next) => {
+        try {
+            const { datasetId, objectId } = req.params;
+            const dataset = await db.get(datasetId);
+            if (dataset.type !== "dataset") {
+                res.sendStatus(404);
+                return;
+            }
+
+            const object = getDatasetObject(dataset, objectId);
+
+            if (!object) {
+                res.sendStatus(404);
+                return;
+            }
+
+            await syncObject(dataset, object);
+            res.send({ result: "success" });
+        } catch (e) {
+            next(e);
+        }
+    },
+);
+
+app.post("/sync/dataset/:datasetId/table/:tableId", async (req, res, next) => {
+    try {
+        const { datasetId, tableId } = req.params;
+        const dataset = await db.get(datasetId);
+        if (dataset.type !== "dataset") {
+            res.sendStatus(404);
+            return;
+        }
+
+        const table = getDatasetTable(dataset, tableId);
+
+        if (!table) {
+            res.sendStatus(404);
+            return;
+        }
+
+        await syncTable(dataset, table);
+        res.send({ result: "success" });
+    } catch (e) {
+        next(e);
     }
-
-    const object = getDatasetObject(dataset, objectId);
-
-    if (!object) {
-        res.sendStatus(404);
-        return;
-    }
-
-    await syncObject(dataset, object);
-    res.send({ result: "success" });
 });
 
-app.post("/sync/dataset/:datasetId/table/:tableId", async (req, res) => {
-    const { datasetId, tableId } = req.params;
-    const dataset = await db.get(datasetId);
-    if (dataset.type !== "dataset") {
-        res.sendStatus(404);
-        return;
-    }
-
-    const table = getDatasetTable(dataset, tableId);
-
-    if (!table) {
-        res.sendStatus(404);
-        return;
-    }
-
-    await syncTable(dataset, table);
-    res.send({ result: "success" });
+app.get("/healthcheck", (req, res) => {
+    res.json({ success: true });
 });
 
-const port = env.SYNC_PORT;
-
-app.listen(port, () => {
-    console.log(`Sync server listening on port ${port}`);
-});
+process
+    .on("unhandledRejection", (reason, p) => {
+        console.error(reason, "Unhandled Rejection at Promise", p);
+    })
+    .on("uncaughtException", (err) => {
+        console.error(err, "Uncaught Exception thrown");
+    });
 
 closeWithGrace(() => {
     task.stop();
