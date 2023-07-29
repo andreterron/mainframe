@@ -1,14 +1,7 @@
-import {
-    Response,
-    type LoaderArgs,
-    type V2_MetaFunction,
-    json,
-} from "@remix-run/node";
-import { db } from "../lib/db";
+import { type LoaderArgs, json } from "@remix-run/node";
 import { useDoc, useFind } from "use-pouchdb";
-import { Link, useLoaderData, useParams } from "@remix-run/react";
+import { Link, useParams } from "@remix-run/react";
 import { DBTypes, Row } from "../lib/types";
-import { getIntegrationForDataset } from "../lib/integrations";
 import { useMemo } from "react";
 import {
     createColumnHelper,
@@ -16,94 +9,32 @@ import {
     getCoreRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import { env } from "../lib/env";
+import { apiBaseUrl } from "../lib/url";
 
 const colHelper = createColumnHelper<PouchDB.Core.ExistingDocument<Row>>();
 
 const LIMIT = 50;
 
-export const meta: V2_MetaFunction<typeof loader> = (args) => {
-    const table = args.data?.initialTableValue;
-    return [{ title: table?.name ? table.name : "Mainframe" }];
-};
+// export const meta: V2_MetaFunction<typeof loader> = (args) => {
+//     const table = args.data?.initialTableValue;
+//     return [{ title: table?.name ? table.name : "Mainframe" }];
+// };
 
 export async function loader({ params }: LoaderArgs) {
     const datasetId = params.id;
     const tableId = params.table_id;
-    if (!datasetId) {
-        throw new Response("Missing dataset ID", { status: 404 });
-    }
-    if (!tableId) {
-        throw new Response("Missing table ID", { status: 404 });
-    }
-    // Trigger sync of this table
-    void fetch(
-        `http://localhost:${env.SYNC_PORT}/sync/dataset/${datasetId}/table/${tableId}`,
-        {
+    if (datasetId && tableId) {
+        // Trigger sync of this table
+        void fetch(`${apiBaseUrl}/sync/dataset/${datasetId}/table/${tableId}`, {
             method: "POST",
-        },
-    ).catch((e) => console.error(e));
-    try {
-        const dataset = await db.get(datasetId);
-
-        if (dataset.type !== "dataset") {
-            throw new Response("Not Found", { status: 404 });
-        }
-
-        const integration = getIntegrationForDataset(dataset);
-
-        if (!integration) {
-            throw new Response("Missing integration", { status: 404 });
-        }
-
-        const tableEntry = Object.entries(integration.tables).find(
-            ([id]) => id.toLowerCase() === tableId.toLowerCase(),
-        );
-
-        if (!tableEntry) {
-            throw new Response("Table not found", { status: 404 });
-        }
-
-        const table = tableEntry[1];
-
-        const rows = (await db.find({
-            selector: {
-                type: "row",
-                table: tableEntry[0],
-                datasetId: dataset._id,
-            },
-            limit: LIMIT,
-        })) as PouchDB.Find.FindResponse<Row>;
-
-        return json({
-            initialDatasetValue: dataset,
-            initialTableValue: table,
-            initialRowsValue: rows.docs,
-        });
-    } catch (e: any) {
-        // TODO: Better handle PouchDB error
-        if (e.error === "not_found") {
-            // It might not have synced yet
-            return json({
-                initialDatasetValue: null,
-                initialTableValue: null,
-                initialRowsValue: null,
-            });
-        }
-        console.error(e);
-        throw new Response(null, { status: 500 });
+        }).catch((e) => console.error(e));
     }
+    return json({});
 }
 
 export default function DatasetTableDetails() {
-    const { initialDatasetValue, initialRowsValue } =
-        useLoaderData<typeof loader>();
     const { id, table_id } = useParams();
-    const { doc, error } = useDoc<DBTypes>(
-        id ?? "",
-        {},
-        initialDatasetValue ?? undefined,
-    );
+    const { doc, error } = useDoc<DBTypes>(id ?? "", {});
     const { docs, loading: rowsLoading } = useFind<Row>({
         selector: {
             type: "row",
@@ -112,8 +43,8 @@ export default function DatasetTableDetails() {
         },
         limit: LIMIT,
     });
-    const dataset = doc ?? initialDatasetValue;
-    const rows = rowsLoading ? initialRowsValue : docs;
+    const dataset = doc;
+    const rows = rowsLoading ? undefined : docs;
 
     let columns = useMemo(() => {
         const columnsSet = new Set<string>();
@@ -180,7 +111,7 @@ export default function DatasetTableDetails() {
 
     if (!dataset || error || dataset.type !== "dataset") {
         // TODO: If we get an error, we might want to throw
-        console.log("useDoc error", error);
+        if (error) console.log("useDoc error", error);
         // TODO: Loading UI if we need to
         return null;
     }

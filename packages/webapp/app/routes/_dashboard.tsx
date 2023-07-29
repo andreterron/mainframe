@@ -1,26 +1,9 @@
 import { useState } from "react";
 import clsx from "clsx";
-import { NavLink, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
+import { NavLink, Outlet, useNavigate } from "@remix-run/react";
 import { usePouch, useFind } from "use-pouchdb";
-import { db } from "../lib/db";
-import { json } from "@remix-run/node";
 import { DBTypes, Dataset } from "../lib/types";
-import { getIntegrationForDataset } from "../lib/integrations";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
-
-export async function loader() {
-    const docs = (await db.find({
-        selector: {
-            type: "dataset",
-        },
-    })) as PouchDB.Find.FindResponse<Dataset>;
-    if (docs.warning) {
-        console.warn(docs.warning);
-    }
-    return json({
-        initialRows: docs.docs,
-    });
-}
 
 export function SidebarButton({
     dataset,
@@ -90,7 +73,6 @@ export function SidebarButton({
 }
 
 export default function Dashboard() {
-    const { initialRows } = useLoaderData<typeof loader>();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const navigate = useNavigate();
 
@@ -112,7 +94,7 @@ export default function Dashboard() {
 
     // const { rows, loading } = useAllDocs<DBTypes>({ include_docs: true });
 
-    const datasets = loading && !rows?.length ? initialRows : rows;
+    const datasets = loading && !rows?.length ? [] : rows;
 
     return (
         <div>
