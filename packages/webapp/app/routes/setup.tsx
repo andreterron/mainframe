@@ -1,5 +1,4 @@
 import { useNavigate, useSearchParams } from "@remix-run/react";
-import { useEffect, useState } from "react";
 import { apiBaseUrl } from "../lib/url";
 
 export default function AuthSignup() {
@@ -8,19 +7,7 @@ export default function AuthSignup() {
 
     const tokenInit = searchParams.get("token");
 
-    const [autoSetupFailed, setAutoSetupFailed] = useState(false);
-
-    async function setup(token: string) {
-        // TODO: Avoid dynamic import
-        const { customAlphabet } = await import("nanoid");
-
-        const nanoid = customAlphabet(
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
-        );
-
-        const username = nanoid(16);
-        const password = nanoid(32);
-
+    async function setup(token: string, username: string, password: string) {
         const res = await fetch(`${apiBaseUrl}/auth/create`, {
             method: "POST",
             headers: {
@@ -34,7 +21,6 @@ export default function AuthSignup() {
         });
 
         if (!res.ok) {
-            setAutoSetupFailed(true);
             console.error(
                 `Request failed with code ${res.status}\n\n`,
                 await res.text(),
@@ -49,20 +35,6 @@ export default function AuthSignup() {
         navigate("/");
     }
 
-    useEffect(() => {
-        if (tokenInit) {
-            setup(tokenInit).catch((e) => {
-                console.error(e);
-                setAutoSetupFailed(true);
-            });
-        }
-    }, []);
-
-    if (tokenInit && !autoSetupFailed) {
-        // Return null if the autoSetup is working
-        return null;
-    }
-
     return (
         <section className="flex justify-center items-center h-screen bg-gray-100">
             <form
@@ -70,9 +42,12 @@ export default function AuthSignup() {
                 onSubmit={async (e) => {
                     try {
                         e.preventDefault();
-                        const token = (e.target as HTMLFormElement).token.value;
+                        const form = e.target as HTMLFormElement;
+                        const token = form.token.value;
+                        const username = form.username.value;
+                        const password = form.password.value;
 
-                        await setup(token);
+                        await setup(token, username, password);
                     } catch (e) {
                         console.error(e);
                     }
@@ -85,7 +60,7 @@ export default function AuthSignup() {
                         command
                     </h2>
                 </div>
-                {/* <div>
+                <div>
                     <label
                         htmlFor="username"
                         className="block text-xs font-semibold text-gray-600 uppercase mb-1"
@@ -102,7 +77,7 @@ export default function AuthSignup() {
                 </div>
                 <div>
                     <label
-                        htmlFor="username"
+                        htmlFor="password"
                         className="block text-xs font-semibold text-gray-600 uppercase mb-1"
                     >
                         Password
@@ -115,10 +90,10 @@ export default function AuthSignup() {
                         autoComplete="new-password"
                         required
                     />
-                </div> */}
+                </div>
                 <div>
                     <label
-                        htmlFor="username"
+                        htmlFor="token"
                         className="block text-xs font-semibold text-gray-600 uppercase mb-1"
                     >
                         Token
