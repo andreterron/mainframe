@@ -4,7 +4,7 @@ import { apiBaseUrl } from "../lib/url";
 
 export default function AuthSignup() {
     const [searchParams] = useSearchParams();
-    const naivgate = useNavigate();
+    const navigate = useNavigate();
 
     const tokenInit = searchParams.get("token");
 
@@ -46,7 +46,7 @@ export default function AuthSignup() {
         localStorage.setItem("mainframe.password", password);
 
         // Redirect on success
-        naivgate("/");
+        navigate("/");
     }
 
     useEffect(() => {

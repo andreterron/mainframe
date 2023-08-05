@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { NavLink, Outlet, useNavigate } from "@remix-run/react";
 import { usePouch, useFind } from "use-pouchdb";
 import { DBTypes, Dataset } from "../lib/types";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
+import { DB_PASSWORD_KEY, DB_USERNAME_KEY } from "../lib/db";
 
 export function SidebarButton({
     dataset,
@@ -77,6 +78,24 @@ export default function Dashboard() {
     const navigate = useNavigate();
 
     const db = usePouch<DBTypes>();
+
+    // Redirect to auth screen if the DB is empty and there's no account
+    useEffect(() => {
+        db.info().then((result) => {
+            if (
+                typeof window === "undefined" ||
+                typeof localStorage === "undefined"
+            ) {
+                return;
+            }
+            const username = localStorage.getItem(DB_USERNAME_KEY);
+            const password = localStorage.getItem(DB_PASSWORD_KEY);
+            if (result.doc_count === 0 && (!username || !password)) {
+                // Redirect to setup
+                navigate("/setup");
+            }
+        });
+    }, []);
 
     const handleAddDataset = async () => {
         const id = Math.random().toString(36).substring(2, 8);
