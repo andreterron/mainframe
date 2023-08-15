@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
-import { NavLink, Outlet, useNavigate } from "@remix-run/react";
+import { Link, NavLink, Outlet, useNavigate } from "@remix-run/react";
 import { usePouch, useFind } from "use-pouchdb";
 import { DBTypes, Dataset } from "../lib/types";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
@@ -75,6 +75,7 @@ export function SidebarButton({
 
 export default function Dashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [showAuthWarning, setShowAuthWarning] = useState(false);
     const navigate = useNavigate();
 
     const db = usePouch<DBTypes>();
@@ -90,9 +91,13 @@ export default function Dashboard() {
             }
             const username = localStorage.getItem(DB_USERNAME_KEY);
             const password = localStorage.getItem(DB_PASSWORD_KEY);
-            if (result.doc_count === 0 && (!username || !password)) {
-                // Redirect to setup
-                navigate("/setup");
+            if (!username || !password) {
+                if (result.doc_count === 0) {
+                    // Redirect to setup
+                    navigate("/setup");
+                } else {
+                    setShowAuthWarning(true);
+                }
             }
         });
     }, []);
@@ -191,6 +196,17 @@ export default function Dashboard() {
                             </button>
                         </li>
                     </ul>
+                    {showAuthWarning && (
+                        <div className="p-2 rounded-md border-2 border-black bg-white m-2 flex flex-col gap-2 items-start">
+                            <p>Please login to sync your data</p>
+                            <Link
+                                className="self-end text-sky-600 hover:text-sky-500"
+                                to="/login"
+                            >
+                                Login
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </aside>
 

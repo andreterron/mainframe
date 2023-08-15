@@ -19,12 +19,35 @@ export const db =
 
 PouchDB.plugin(PouchDBFind);
 
-if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+let sync: undefined | PouchDB.Replication.Sync<DBTypes>;
+
+export async function checkDBCredentials(
+    username: string,
+    password: string,
+): Promise<boolean> {
+    const connString = `${baseUrl}:5984`;
+    const res = await fetch(connString, {
+        headers: {
+            Authorization: `Basic ${btoa(username + ":" + password)}`,
+        },
+    });
+    return res.ok;
+}
+
+export function stopDBSync() {
+    if (sync) {
+        sync.cancel();
+        sync = undefined;
+    }
+}
+
+export function setupDBSync() {
     const username = localStorage.getItem(DB_USERNAME_KEY);
     const password = localStorage.getItem(DB_PASSWORD_KEY);
     const connString = `${baseUrl}:5984/mainframe`;
     if (username && password) {
-        db.sync(
+        stopDBSync();
+        sync = db.sync(
             new PouchDB<DBTypes>(connString, {
                 auth: {
                     username,
@@ -39,4 +62,8 @@ if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
     } else {
         console.log("Missing username and password to sync DB");
     }
+}
+
+if (typeof window !== "undefined" && typeof localStorage !== "undefined") {
+    setupDBSync();
 }
