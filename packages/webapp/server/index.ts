@@ -15,8 +15,15 @@ import {
     IntegrationTable,
 } from "../app/lib/integration-types";
 import { json } from "body-parser";
+import { env } from "../app/lib/env";
+import { ZodError, z } from "zod";
+import { nanoid } from "nanoid";
+import PouchDB from "pouchdb";
+import cors from "cors";
+import type { Server } from "http";
+import { ADMIN_ROLE, ensureAdminRole } from "./admin-role";
 
-console.log("Server is up!");
+const port = env.SYNC_PORT;
 
 async function createIndexes() {
     db.createIndex({
@@ -307,7 +314,150 @@ process
         console.error(err, "Uncaught Exception thrown");
     });
 
+let generatedAuthCode: string | null;
+let creatingUserLock = false;
+
+const zAuthCodeBody = z.object({
+    token: z.string(),
+    username: z.string(),
+    password: z.string(),
+});
+
+// TODO: Review db URL
+const usersDb = new PouchDB("http://localhost:5984/_users", {
+    auth: {
+        username: env.COUCHDB_USER,
+        password: env.COUCHDB_PASSWORD,
+    },
+});
+
+async function printAuthURL() {
+    try {
+        const users = await usersDb.find({
+            selector: {},
+            limit: 100,
+        });
+
+        // Stop if we already have users
+        if (users.docs.length) {
+            return;
+        }
+
+        generatedAuthCode = nanoid(32);
+
+        // TODO: Review these logs, ensure Remix doesn't paste their URL as well.
+        console.log("\n\nTOKEN:", generatedAuthCode);
+        console.log(
+            "\n\nURL (local):",
+            `http://localhost:${env.PORT}/setup?token=${generatedAuthCode}`,
+        );
+        console.log("\n\n");
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+ensureAdminRole();
+
+app.use("/auth/create", cors());
+app.post("/auth/create", async (req, res, next) => {
+    try {
+        if (creatingUserLock) {
+            // HACK: Avoid creating 2 users when in React strict mode
+            return res.sendStatus(400);
+        }
+        creatingUserLock = true;
+
+        const users = await usersDb.find({
+            selector: {},
+        });
+
+        if (generatedAuthCode === null || users.docs.length) {
+            // Forbidden - We don't have a generated auth code
+            return res.sendStatus(403);
+        }
+
+        const { token, username, password } = zAuthCodeBody.parse(req.body);
+
+        if (!username || !password) {
+            return res.sendStatus(400);
+        }
+        if (token !== generatedAuthCode) {
+            return res.sendStatus(401);
+        }
+
+        // Create user
+        await usersDb.put({
+            _id: `org.couchdb.user:${username}`,
+            name: username,
+            type: "user",
+            roles: [ADMIN_ROLE],
+            password,
+        });
+
+        creatingUserLock = false;
+
+        res.sendStatus(204);
+    } catch (e) {
+        next(e);
+    }
+});
+
+app.use(
+    (
+        err: any,
+        req: express.Request,
+        res: express.Response,
+        next: express.NextFunction,
+    ) => {
+        if (err) {
+            console.error(err);
+            if (err instanceof ZodError) {
+                return res.sendStatus(400);
+            }
+            res.sendStatus(500);
+        }
+    },
+);
+
+let server: Server | undefined;
+
+function startListen() {
+    server = app
+        .listen(port, () => {
+            console.log(`Sync server listening on port ${port}`);
+            printAuthURL().catch((e) => console.error(e));
+        })
+        .on("error", function (err) {
+            if ((err as any).code === "EADDRINUSE") {
+                // port is currently in use
+                console.log(`Address in use, retry ${addrInUseRetries++}...`);
+                setTimeout(() => {
+                    addrInUseTimeout *= 2;
+                    startListen();
+                }, addrInUseTimeout);
+                return;
+            }
+        });
+}
+
+startListen();
+
+let addrInUseTimeout = 111;
+let addrInUseRetries = 1;
+
+process.on("uncaughtException", (err) => {
+    console.error(err);
+    process.exit(1);
+});
+
+process.on("unhandledRejection", (err) => {
+    console.error(err);
+    process.exit(1);
+});
+
 closeWithGrace(() => {
+    server?.close();
     task.stop();
     dbChangesSubscription.cancel();
 });

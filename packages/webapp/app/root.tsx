@@ -1,4 +1,4 @@
-import { json, type LinksFunction } from "@remix-run/node";
+import { type LinksFunction } from "@remix-run/node";
 import {
     Links,
     LiveReload,
@@ -6,12 +6,10 @@ import {
     Outlet,
     Scripts,
     ScrollRestoration,
-    useLoaderData,
     V2_MetaFunction,
 } from "@remix-run/react";
 
 import stylesheet from "~/tailwind.css";
-import { env } from "./lib/env";
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: stylesheet },
@@ -19,16 +17,7 @@ export const links: LinksFunction = () => [
 
 export const meta: V2_MetaFunction = () => [{ title: "Mainframe" }];
 
-export async function loader() {
-    return json({
-        ENV: {
-            ...env,
-        },
-    });
-}
-
 export default function App() {
-    const { ENV } = useLoaderData<typeof loader>();
     return (
         <html lang="en">
             <head>
@@ -43,11 +32,6 @@ export default function App() {
             <body>
                 <Outlet />
                 <ScrollRestoration />
-                <script
-                    dangerouslySetInnerHTML={{
-                        __html: `window.ENV = ${JSON.stringify(ENV)}`,
-                    }}
-                />
                 <Scripts />
                 <LiveReload />
             </body>

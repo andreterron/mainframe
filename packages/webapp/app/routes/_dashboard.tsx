@@ -1,26 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
-import { NavLink, Outlet, useLoaderData, useNavigate } from "@remix-run/react";
+import { Link, NavLink, Outlet, useNavigate } from "@remix-run/react";
 import { usePouch, useFind } from "use-pouchdb";
-import { db } from "../lib/db";
-import { json } from "@remix-run/node";
 import { DBTypes, Dataset } from "../lib/types";
-import { getIntegrationForDataset } from "../lib/integrations";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
-
-export async function loader() {
-    const docs = (await db.find({
-        selector: {
-            type: "dataset",
-        },
-    })) as PouchDB.Find.FindResponse<Dataset>;
-    if (docs.warning) {
-        console.warn(docs.warning);
-    }
-    return json({
-        initialRows: docs.docs,
-    });
-}
+import { DB_PASSWORD_KEY, DB_USERNAME_KEY } from "../lib/db";
 
 export function SidebarButton({
     dataset,
@@ -90,11 +74,33 @@ export function SidebarButton({
 }
 
 export default function Dashboard() {
-    const { initialRows } = useLoaderData<typeof loader>();
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [showAuthWarning, setShowAuthWarning] = useState(false);
     const navigate = useNavigate();
 
     const db = usePouch<DBTypes>();
+
+    // Redirect to auth screen if the DB is empty and there's no account
+    useEffect(() => {
+        db.info().then((result) => {
+            if (
+                typeof window === "undefined" ||
+                typeof localStorage === "undefined"
+            ) {
+                return;
+            }
+            const username = localStorage.getItem(DB_USERNAME_KEY);
+            const password = localStorage.getItem(DB_PASSWORD_KEY);
+            if (!username || !password) {
+                if (result.doc_count === 0) {
+                    // Redirect to setup
+                    navigate("/setup");
+                } else {
+                    setShowAuthWarning(true);
+                }
+            }
+        });
+    }, []);
 
     const handleAddDataset = async () => {
         const id = Math.random().toString(36).substring(2, 8);
@@ -112,7 +118,7 @@ export default function Dashboard() {
 
     // const { rows, loading } = useAllDocs<DBTypes>({ include_docs: true });
 
-    const datasets = loading && !rows?.length ? initialRows : rows;
+    const datasets = loading && !rows?.length ? [] : rows;
 
     return (
         <div>
@@ -190,6 +196,17 @@ export default function Dashboard() {
                             </button>
                         </li>
                     </ul>
+                    {showAuthWarning && (
+                        <div className="p-2 rounded-md border-2 border-black bg-white m-2 flex flex-col gap-2 items-start">
+                            <p>Please login to sync your data</p>
+                            <Link
+                                className="self-end text-sky-600 hover:text-sky-500"
+                                to="/login"
+                            >
+                                Login
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </aside>
 
