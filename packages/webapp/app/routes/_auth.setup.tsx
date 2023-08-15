@@ -1,6 +1,12 @@
 import { Link, useNavigate, useSearchParams } from "@remix-run/react";
 import { apiBaseUrl } from "../lib/url";
-import { setupDBSync } from "../lib/db";
+import {
+    DB_PASSWORD_KEY,
+    DB_USERNAME_KEY,
+    checkDBCredentials,
+    setupDBSync,
+} from "../lib/db";
+import { useEffect, useState } from "react";
 
 export default function AuthSignup() {
     const [searchParams] = useSearchParams();
@@ -29,14 +35,28 @@ export default function AuthSignup() {
             return;
         }
 
-        localStorage.setItem("mainframe.username", username);
-        localStorage.setItem("mainframe.password", password);
+        localStorage.setItem(DB_USERNAME_KEY, username);
+        localStorage.setItem(DB_PASSWORD_KEY, password);
 
         setupDBSync();
 
         // Redirect on success
         navigate("/");
     }
+
+    const [alreadyLoggedIn, setAlreadyLoggedIn] = useState(false);
+
+    useEffect(() => {
+        const username = localStorage.getItem(DB_USERNAME_KEY);
+        const password = localStorage.getItem(DB_PASSWORD_KEY);
+        if (username && password) {
+            checkDBCredentials(username, password).then((loggedIn) => {
+                if (loggedIn) {
+                    setAlreadyLoggedIn(true);
+                }
+            });
+        }
+    }, []);
 
     return (
         <form
@@ -82,6 +102,7 @@ export default function AuthSignup() {
                     name="username"
                     autoComplete="username"
                     type="text"
+                    disabled={alreadyLoggedIn}
                 />
             </div>
             <div>
@@ -98,6 +119,7 @@ export default function AuthSignup() {
                     name="password"
                     autoComplete="new-password"
                     required
+                    disabled={alreadyLoggedIn}
                 />
             </div>
             <div>
@@ -115,13 +137,32 @@ export default function AuthSignup() {
                     autoComplete="one-time-code"
                     defaultValue={tokenInit ?? ""}
                     required
+                    disabled={alreadyLoggedIn}
                 />
             </div>
             <div>
-                <button className="w-full py-4 bg-blue-600 hover:bg-blue-700 rounded text-sm font-bold text-gray-50 transition duration-200">
-                    Sign In
+                <button
+                    className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:text-gray-300 rounded text-sm font-bold text-gray-50 transition duration-200"
+                    disabled={alreadyLoggedIn}
+                >
+                    Sign up
                 </button>
             </div>
+            {alreadyLoggedIn && (
+                <div className="flex flex-col items-center">
+                    Already logged in!
+                    <Link className="text-sky-600 hover:text-sky-500" to="/">
+                        Open dashboard
+                    </Link>
+                    <span className="text-gray-400">or</span>
+                    <Link
+                        className="text-sky-600 hover:text-sky-500"
+                        to="/login"
+                    >
+                        Update username/password
+                    </Link>
+                </div>
+            )}
         </form>
     );
 }

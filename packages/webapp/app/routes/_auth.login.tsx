@@ -1,5 +1,10 @@
 import { Link, useNavigate } from "@remix-run/react";
-import { checkDBCredentials, setupDBSync } from "../lib/db";
+import {
+    DB_PASSWORD_KEY,
+    DB_USERNAME_KEY,
+    checkDBCredentials,
+    setupDBSync,
+} from "../lib/db";
 
 export default function AuthSignup() {
     const navigate = useNavigate();
@@ -10,8 +15,8 @@ export default function AuthSignup() {
             return;
         }
 
-        localStorage.setItem("mainframe.username", username);
-        localStorage.setItem("mainframe.password", password);
+        localStorage.setItem(DB_USERNAME_KEY, username);
+        localStorage.setItem(DB_PASSWORD_KEY, password);
 
         setupDBSync();
 
