@@ -15,11 +15,6 @@ const colHelper = createColumnHelper<PouchDB.Core.ExistingDocument<Row>>();
 
 const LIMIT = 50;
 
-// export const meta: V2_MetaFunction<typeof loader> = (args) => {
-//     const table = args.data?.initialTableValue;
-//     return [{ title: table?.name ? table.name : "Mainframe" }];
-// };
-
 export async function loader({ params }: LoaderArgs) {
     const datasetId = params.id;
     const tableId = params.table_id;

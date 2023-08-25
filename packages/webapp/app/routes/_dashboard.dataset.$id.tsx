@@ -9,11 +9,6 @@ import {
 } from "../lib/integrations";
 import { DatasetPage } from "../components/DatasetPage";
 
-// export const meta: V2_MetaFunction<typeof loader> = (args) => {
-//     const dataset = args.data?.initialDatasetValue;
-//     return [{ title: dataset?.name ? dataset.name : "Mainframe" }];
-// };
-
 export default function DatasetDetails() {
     const { id } = useParams();
     const db = usePouch();

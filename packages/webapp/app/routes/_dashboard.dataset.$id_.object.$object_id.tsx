@@ -6,11 +6,6 @@ import { apiBaseUrl } from "../lib/url";
 
 const LIMIT = 1;
 
-// export const meta: V2_MetaFunction<typeof loader> = (args) => {
-//     const obj = args.data?.initialObjectDefinitionValue;
-//     return [{ title: obj?.name ? obj.name : "Mainframe" }];
-// };
-
 export async function loader({ params }: LoaderArgs) {
     const datasetId = params.id;
     const objectId = params.object_id;

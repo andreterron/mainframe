@@ -1,7 +1,6 @@
-// This is not a generic CouchDB admin, it's just an admin of the `mainframe` database
-
 import { env } from "../app/lib/env";
 
+// This is not a generic CouchDB admin, it's just an admin of the `mainframe` database
 // They won't have access to the `_users` db for example
 export const ADMIN_ROLE = "mainframe_db_admin";
 
