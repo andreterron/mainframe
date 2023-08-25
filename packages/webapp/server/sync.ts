@@ -107,38 +107,6 @@ export async function syncTable(
         if (result) {
             updated++;
         }
-
-        // try {
-        //     const row = await db.get(id);
-
-        //     if (
-        //         row.type === "row" &&
-        //         isEqual(row.data, rowData) &&
-        //         row.datasetId
-        //     ) {
-        //         continue;
-        //     }
-
-        //     updated++;
-
-        //     await db.put({
-        //         ...row,
-        //         data: rowData,
-        //         table: table.id,
-        //         datasetId: dataset._id,
-        //     });
-        // } catch (e: any) {
-        //     if (e.error === "not_found") {
-        //         updated++;
-        //         await db.put({
-        //             _id: id,
-        //             type: "row",
-        //             data: rowData,
-        //             table: table.id,
-        //             datasetId: dataset._id,
-        //         });
-        //     }
-        // }
     }
 
     console.log(`Updated ${updated} rows`);
