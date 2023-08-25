@@ -18,6 +18,7 @@ export const env = envsafe(
         // TODO: Remove default once this file is only used in the server
         PORT: num({ default: 8744 }),
         SYNC_PORT: num({ default: 8745 }),
+        TUNNEL_BASE_API_URL: str({ default: "", allowEmpty: true }),
     },
     {
         env: typeof window !== "undefined" ? (window as any).ENV : process.env,
