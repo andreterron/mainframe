@@ -70,6 +70,12 @@ function isPingWebhookEvent(event: TogglWebhook): event is TogglWebhookPing {
 export const toggl: Integration = {
     name: "Toggl",
     setup: async (dataset: Dataset & { _id: string }) => {
+        if (!env.TUNNEL_BASE_API_URL) {
+            // No tunnel URL
+            console.log("Skipping Toggl webhooks: Missing tunnel URL");
+            return;
+        }
+
         // TODO: Add dependency on list of workspaces?
         const res = await fetch(
             "https://api.track.toggl.com/api/v9/me/workspaces",
