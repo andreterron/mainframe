@@ -4,17 +4,11 @@ import { db } from "../app/lib/db";
 import {
     getDatasetObject,
     getDatasetTable,
-    getObjectsForDataset,
-    getTablesForDataset,
+    getIntegrationForDataset,
 } from "../app/lib/integrations";
 import { Dataset } from "../app/lib/types";
-import { isEqual } from "lodash";
 import express from "express";
-import {
-    IntegrationObject,
-    IntegrationTable,
-} from "../app/lib/integration-types";
-import { json } from "body-parser";
+import { json, text } from "body-parser";
 import { env } from "../app/lib/env";
 import { ZodError, z } from "zod";
 import { nanoid } from "nanoid";
@@ -22,67 +16,27 @@ import PouchDB from "pouchdb";
 import cors from "cors";
 import type { Server } from "http";
 import { ADMIN_ROLE, ensureAdminRole } from "./admin-role";
+import { syncDataset, syncAll, syncObject, syncTable } from "./sync";
 
 const port = env.SYNC_PORT;
 
-async function createIndexes() {
-    db.createIndex({
-        index: {
-            fields: ["type"],
+async function setupIntegrations() {
+    // Get all datasets
+    const datasets = (await db.find({
+        selector: {
+            type: "dataset",
         },
-    });
-    db.createIndex({
-        index: {
-            fields: ["type", "datasetId", "table"],
-        },
-    });
-    db.createIndex({
-        index: {
-            fields: ["type", "datasetId", "objectType"],
-        },
-    });
-}
+    })) as PouchDB.Find.FindResponse<Dataset>;
 
-async function syncObject(
-    dataset: Dataset & { _id: string },
-    objectDefinition: IntegrationObject & { id: string },
-) {
-    if (!objectDefinition.get || !objectDefinition.objId) {
-        return;
+    if (datasets.warning) {
+        console.warn(datasets.warning);
     }
 
-    console.log(
-        `Loading data for object ${objectDefinition.name} from ${dataset.name}`,
-    );
-
-    // Call fetch for each object definition
-    const data = await objectDefinition.get(dataset);
-
-    // Save object to the DB
-    const id = objectDefinition.objId(dataset, data);
-
-    try {
-        const obj = await db.get(id);
-
-        if (obj.type === "object" && isEqual(obj.data, data) && obj.datasetId) {
-            return;
-        }
-
-        await db.put({
-            ...obj,
-            data: data,
-            objectType: objectDefinition.id,
-            datasetId: dataset._id,
-        });
-    } catch (e: any) {
-        if (e.error === "not_found") {
-            await db.put({
-                _id: id,
-                type: "object",
-                data: data,
-                objectType: objectDefinition.id,
-                datasetId: dataset._id,
-            });
+    // For each integration
+    for (let dataset of datasets.docs) {
+        const integration = getIntegrationForDataset(dataset);
+        if (integration?.setup) {
+            await integration.setup(dataset);
         }
     }
 }
@@ -104,106 +58,22 @@ const dbChangesSubscription = db
         console.error(error);
     });
 
-async function syncTable(
-    dataset: Dataset & { _id: string },
-    table: IntegrationTable & { id: string },
-) {
-    if (!table.get) {
-        return;
-    }
-
-    console.log(`Loading data for table ${table.name} from ${dataset.name}`);
-
-    // Call fetch on each table
-    const data = await table.get(dataset);
-
-    // Save the rows on the DB
-    if (!Array.isArray(data)) {
-        console.error("Data is not an array");
-        return;
-    }
-
-    if (!table.rowId) {
-        console.log("Find the id", data[0]);
-        return;
-    }
-
-    let updated = 0;
-
-    for (let rowData of data) {
-        const id = table.rowId(dataset, rowData);
-
-        try {
-            const row = await db.get(id);
-
-            if (
-                row.type === "row" &&
-                isEqual(row.data, rowData) &&
-                row.datasetId
-            ) {
-                continue;
-            }
-
-            updated++;
-
-            await db.put({
-                ...row,
-                data: rowData,
-                table: table.id,
-                datasetId: dataset._id,
-            });
-        } catch (e: any) {
-            if (e.error === "not_found") {
-                updated++;
-                await db.put({
-                    _id: id,
-                    type: "row",
-                    data: rowData,
-                    table: table.id,
-                    datasetId: dataset._id,
-                });
-            }
-        }
-    }
-
-    console.log(`Updated ${updated} rows`);
-}
-
-async function syncDataset(dataset: Dataset & { _id: string }) {
-    if (!dataset.integrationType || !dataset.token) {
-        return;
-    }
-
-    // Load all objects
-    const objects = getObjectsForDataset(dataset);
-
-    for (let object of objects) {
-        await syncObject(dataset, object);
-    }
-
-    // Load all tables
-    const tables = getTablesForDataset(dataset);
-
-    for (let table of tables) {
-        await syncTable(dataset, table);
-    }
-}
-
-async function syncAll() {
-    // Load all datasets
-    const datasets = (await db.find({
-        selector: {
-            type: "dataset",
+async function createIndexes() {
+    db.createIndex({
+        index: {
+            fields: ["type"],
         },
-    })) as PouchDB.Find.FindResponse<Dataset>;
-
-    if (datasets.warning) {
-        console.warn(datasets.warning);
-    }
-
-    for (let dataset of datasets.docs) {
-        await syncDataset(dataset);
-    }
+    });
+    db.createIndex({
+        index: {
+            fields: ["type", "datasetId", "table"],
+        },
+    });
+    db.createIndex({
+        index: {
+            fields: ["type", "datasetId", "objectType"],
+        },
+    });
 }
 
 createIndexes().catch((e) => console.error(e));
@@ -226,7 +96,7 @@ const task = cron.schedule(
 
 const app = express();
 
-app.use(json());
+app.use("/sync", json());
 
 app.post("/sync", async (_, res, next) => {
     try {
@@ -360,7 +230,7 @@ async function printAuthURL() {
 ensureAdminRole();
 
 app.use("/auth/create", cors());
-app.post("/auth/create", async (req, res, next) => {
+app.post("/auth/create", json(), async (req, res, next) => {
     try {
         if (creatingUserLock) {
             // HACK: Avoid creating 2 users when in React strict mode
@@ -402,6 +272,34 @@ app.post("/auth/create", async (req, res, next) => {
         next(e);
     }
 });
+
+app.all(
+    ["/webhooks/:dataset_id", "/webhooks/:dataset_id/*"],
+    // Text is used here so integrations can validate the webhook signature
+    text({ type: () => true }),
+    async (req, res, next) => {
+        try {
+            let dataset: (Dataset & { _id: string }) | undefined;
+            try {
+                dataset = await db.get(req.params.dataset_id);
+            } catch (getError) {
+                return res.sendStatus(404);
+            }
+            if (!dataset) {
+                return res.sendStatus(404);
+            }
+            const integration = getIntegrationForDataset(dataset);
+
+            if (!integration?.webhook) {
+                return res.sendStatus(404);
+            }
+
+            integration.webhook(dataset, req, res);
+        } catch (e) {
+            next(e);
+        }
+    },
+);
 
 app.use(
     (
@@ -445,6 +343,8 @@ startListen();
 
 let addrInUseTimeout = 111;
 let addrInUseRetries = 1;
+
+setupIntegrations();
 
 process.on("uncaughtException", (err) => {
     console.error(err);

@@ -1,4 +1,5 @@
 import { Dataset } from "./types";
+import { Request, Response } from "express";
 
 export interface IntegrationTable {
     name: string;
@@ -15,6 +16,13 @@ export interface IntegrationObject {
 // TODO: Merge `objects` and `tables` options
 export interface Integration {
     name: string;
+    setup?: (dataset: Dataset & { _id: string }) => Promise<any>;
+    webhook?: (
+        dataset: Dataset & { _id: string },
+        // TODO: Migrate away from express
+        req: Request,
+        res: Response,
+    ) => Promise<any>;
     objects?: {
         [key: string]: IntegrationObject;
     };
