@@ -37,15 +37,24 @@ export interface TogglWebhookPing extends TogglWebhookBase {
 
 export interface TogglWebhookEvent<T = any> extends TogglWebhookBase {
     metadata: {
-        action: "updated" | string; // TODO: Other types of action
+        action: "created" | "updated" | "deleted";
         event_user_id: string;
-        model: "time_entry" | string; // TODO: Other models
+        model:
+            | "client"
+            | "project"
+            | "project_group"
+            | "project_user"
+            | "tag"
+            | "task"
+            | "time_entry"
+            | "workspace"
+            | "workspace_user";
         model_owner_id: string;
         path: string;
         project_id: string;
         project_is_private: string;
         request_body: string;
-        request_type: "PUT" | "POST" | "DELETE" | string; // TODO: Validate which http methods are used
+        request_type: "PUT" | "POST" | "DELETE" | "PATCH";
         time_entry_id: string;
         workspace_id: string;
     };
@@ -75,10 +84,9 @@ export const toggl: Integration = {
         const workspaceIds: number[] = workspaces.map((row) => row.id);
 
         for (let id of workspaceIds) {
-            // TODO: Figure out the URL
             const callbackUrl = `${env.TUNNEL_BASE_API_URL}/webhooks/${dataset._id}`;
 
-            // Check if there's already a webhook for this workspace
+            // Check if this workspace already has a webhook subscription
             const res = await fetch(
                 `https://api.track.toggl.com/webhooks/api/v1/subscriptions/${id}`,
                 {
@@ -101,8 +109,6 @@ export const toggl: Integration = {
             );
 
             if (!webhookToThis) {
-                // If the webhook doesn't exist, create it
-
                 // Create a webhook if it doesn't exist
                 const createRes = await fetch(
                     `https://api.track.toggl.com/webhooks/api/v1/subscriptions/${id}`,
@@ -155,11 +161,12 @@ export const toggl: Integration = {
         ) {
             // Toggl only sends POST events with Content-Type: application/json
             // https://developers.track.toggl.com/docs/webhooks_start/validating_received_events#other-considerations
-            console.log("INVALID WEBHOOK RECEIVED");
+            console.log("Invalid Toggl webhook received");
             return res.sendStatus(400);
         }
 
         if (typeof req.body !== "string") {
+            console.log("Webhook body wasn't a string");
             return res.sendStatus(400);
         }
 
@@ -358,7 +365,6 @@ export const toggl: Integration = {
                             }
                             const json: any[] = await res.json();
                             if (!Array.isArray(json)) {
-                                console.error("NOT ARRAY", json);
                                 return [];
                             }
                             return json;
