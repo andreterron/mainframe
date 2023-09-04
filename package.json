@@ -7,9 +7,9 @@
         "packages/*"
     ],
     "scripts": {
-        "dev": "yarn workspaces run dev",
-        "build": "yarn workspaces run build",
-        "start": "node scripts/generate-env.mjs && yarn run docker:up && yarn workspaces run dev",
+        "dev": "yarn workspace @mainframe-so/webapp run dev",
+        "build": "yarn workspace @mainframe-so/webapp run build",
+        "start": "node scripts/generate-env.mjs && yarn run docker:up && yarn workspace @mainframe-so/webapp run dev",
         "docker:up": "docker compose up -d",
         "docker:down": "docker compose down -v --rmi=local"
     },
