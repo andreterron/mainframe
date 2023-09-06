@@ -146,7 +146,7 @@ export const toggl: Integration = {
                     continue;
                 }
 
-                await syncTable(dataset, table);
+                await syncTable(db, dataset, table);
             }
 
             if (webhookToThis && !webhookToThis.validated_at) {
@@ -219,6 +219,7 @@ export const toggl: Integration = {
             const table = getDatasetTable(dataset, "timeEntries");
             if (table?.rowId) {
                 await updateObject(
+                    db,
                     dataset,
                     json.payload,
                     table.rowId(dataset, json.payload),
@@ -248,6 +249,7 @@ export const toggl: Integration = {
                     currentEntryRow?.data.id === json.payload.id)
             ) {
                 await updateObject(
+                    db,
                     dataset,
                     json.payload,
                     object.objId(dataset, json.payload),

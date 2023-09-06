@@ -10,7 +10,7 @@ if (typeof window === "undefined") {
 export const env = envsafe(
     {
         COUCHDB_SERVER_CONNECTION_STRING: str({
-            default: "http://localhost:5984/mainframe",
+            default: "http://127.0.0.1:5984/mainframe",
         }),
         COUCHDB_USER: str({ default: "mainframe" }),
         // TODO: Remove default once this file is only used in the server

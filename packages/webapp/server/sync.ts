@@ -1,9 +1,8 @@
-import { db } from "../app/lib/db";
 import {
     getObjectsForDataset,
     getTablesForDataset,
 } from "../app/lib/integrations";
-import { Dataset } from "../app/lib/types";
+import { DBTypes, Dataset } from "../app/lib/types";
 import { isEqual } from "lodash";
 import {
     IntegrationObject,
@@ -11,6 +10,7 @@ import {
 } from "../app/lib/integration-types";
 
 export async function updateObject(
+    db: PouchDB.Database<DBTypes>,
     dataset: Dataset & { _id: string },
     data: any,
     id: string,
@@ -51,6 +51,7 @@ export async function updateObject(
 }
 
 export async function syncObject(
+    db: PouchDB.Database<DBTypes>,
     dataset: Dataset & { _id: string },
     objectDefinition: IntegrationObject & { id: string },
 ) {
@@ -65,13 +66,20 @@ export async function syncObject(
     // Call fetch for each object definition
     const data = await objectDefinition.get(dataset);
 
-    await updateObject(dataset, data, objectDefinition.objId(dataset, data), {
-        type: "object",
-        objectType: objectDefinition.id,
-    });
+    await updateObject(
+        db,
+        dataset,
+        data,
+        objectDefinition.objId(dataset, data),
+        {
+            type: "object",
+            objectType: objectDefinition.id,
+        },
+    );
 }
 
 export async function syncTable(
+    db: PouchDB.Database<DBTypes>,
     dataset: Dataset & { _id: string },
     table: IntegrationTable & { id: string },
 ) {
@@ -100,7 +108,7 @@ export async function syncTable(
     for (let rowData of data) {
         const id = table.rowId(dataset, rowData);
 
-        const result = await updateObject(dataset, rowData, id, {
+        const result = await updateObject(db, dataset, rowData, id, {
             type: "row",
             table: table.id,
         });
@@ -112,7 +120,10 @@ export async function syncTable(
     console.log(`Updated ${updated} rows`);
 }
 
-export async function syncDataset(dataset: Dataset & { _id: string }) {
+export async function syncDataset(
+    db: PouchDB.Database<DBTypes>,
+    dataset: Dataset & { _id: string },
+) {
     if (!dataset.integrationType || !dataset.token) {
         return;
     }
@@ -121,18 +132,18 @@ export async function syncDataset(dataset: Dataset & { _id: string }) {
     const objects = getObjectsForDataset(dataset);
 
     for (let object of objects) {
-        await syncObject(dataset, object);
+        await syncObject(db, dataset, object);
     }
 
     // Load all tables
     const tables = getTablesForDataset(dataset);
 
     for (let table of tables) {
-        await syncTable(dataset, table);
+        await syncTable(db, dataset, table);
     }
 }
 
-export async function syncAll() {
+export async function syncAll(db: PouchDB.Database<DBTypes>) {
     // Load all datasets
     const datasets = (await db.find({
         selector: {
@@ -145,6 +156,6 @@ export async function syncAll() {
     }
 
     for (let dataset of datasets.docs) {
-        await syncDataset(dataset);
+        await syncDataset(db, dataset);
     }
 }

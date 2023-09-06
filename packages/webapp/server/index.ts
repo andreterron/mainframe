@@ -1,6 +1,6 @@
 import cron from "node-cron";
 import closeWithGrace from "close-with-grace";
-import { db } from "../app/lib/db";
+import { db } from "../app/lib/db.api";
 import {
     getDatasetObject,
     getDatasetTable,
@@ -17,8 +17,42 @@ import cors from "cors";
 import type { Server } from "http";
 import { ADMIN_ROLE, ensureAdminRole } from "./admin-role";
 import { syncDataset, syncAll, syncObject, syncTable } from "./sync";
+import { dbBaseUrl } from "../app/lib/url";
+import expressPouchDB from "express-pouchdb";
+import { startPouchDBServer } from "./pouchdb-server";
 
 const port = env.SYNC_PORT;
+
+// await new Promise<void>((resolve) => {
+//     // TODO: ensure we can access the db
+//     console.log("INSIDE");
+//     resolve();
+// });
+// console.log("OUTSIDE");
+
+// void (async () => {
+//     for (let i = 0; i < 10; i++) {
+//         try {
+//             // console.log(await db.info());
+//             console.log(`fetching ${dbBaseUrl}/mainframe`);
+//             console.log(
+//                 await (
+//                     await fetch(`${dbBaseUrl}/mainframe`, {
+//                         headers: {
+//                             Accept: "*/*",
+//                         },
+//                     })
+//                 ).json(),
+//             );
+//             console.log("got info");
+//             return;
+//         } catch (e) {
+//             console.log("Error getting info");
+//             console.log(e);
+//         }
+//         await new Promise<void>((resolve) => setTimeout(() => resolve(), 1000));
+//     }
+// })();
 
 async function setupIntegrations() {
     // Get all datasets
@@ -51,7 +85,7 @@ const dbChangesSubscription = db
     })
     .on("change", (change) => {
         if (change.doc?.type === "dataset") {
-            syncDataset(change.doc).catch((e) => console.error(e));
+            syncDataset(db, change.doc).catch((e) => console.error(e));
         }
     })
     .on("error", (error) => {
@@ -76,21 +110,21 @@ async function createIndexes() {
     });
 }
 
-createIndexes().catch((e) => console.error(e));
-
 // Create cron
 const task = cron.schedule(
     "*/10 * * * *",
     async (now) => {
         try {
             // TODO: Ensure index exists
-            await syncAll();
+            console.log("Sync");
+            await syncAll(db);
         } catch (e) {
             console.error(e);
         }
     },
     {
-        runOnInit: true,
+        // runOnInit: true,
+        scheduled: false,
     },
 );
 
@@ -100,7 +134,7 @@ app.use("/sync", json());
 
 app.post("/sync", async (_, res, next) => {
     try {
-        await syncAll();
+        await syncAll(db);
         res.send({ result: "success" });
     } catch (e) {
         next(e);
@@ -116,7 +150,7 @@ app.post("/sync/dataset/:datasetId", async (req, res, next) => {
             return;
         }
 
-        await syncDataset(dataset);
+        await syncDataset(db, dataset);
         res.send({ result: "success" });
     } catch (e) {
         next(e);
@@ -141,7 +175,7 @@ app.post(
                 return;
             }
 
-            await syncObject(dataset, object);
+            await syncObject(db, dataset, object);
             res.send({ result: "success" });
         } catch (e) {
             next(e);
@@ -165,7 +199,7 @@ app.post("/sync/dataset/:datasetId/table/:tableId", async (req, res, next) => {
             return;
         }
 
-        await syncTable(dataset, table);
+        await syncTable(db, dataset, table);
         res.send({ result: "success" });
     } catch (e) {
         next(e);
@@ -193,41 +227,38 @@ const zAuthCodeBody = z.object({
     password: z.string(),
 });
 
-// TODO: Review db URL
-const usersDb = new PouchDB("http://localhost:5984/_users", {
-    auth: {
-        username: env.COUCHDB_USER,
-        password: env.COUCHDB_PASSWORD,
-    },
-});
+// TODO: Review db connection string
+// const usersDb = new PouchDB(`${dbBaseUrl}/_users`, {
+//     auth: {
+//         username: env.COUCHDB_USER,
+//         password: env.COUCHDB_PASSWORD,
+//     },
+// });
 
-async function printAuthURL() {
-    try {
-        const users = await usersDb.find({
-            selector: {},
-            limit: 100,
-        });
+// async function printAuthURL() {
+//     try {
+//         const users = await usersDb.find({
+//             selector: {},
+//             limit: 100,
+//         });
+//         // Stop if we already have users
+//         if (users.docs.length) {
+//             return;
+//         }
+//         generatedAuthCode = nanoid(32);
+//         // TODO: Review these logs, ensure Remix doesn't paste their URL as well.
+//         console.log("\n\nTOKEN:", generatedAuthCode);
+//         console.log(
+//             "\n\nURL (local):",
+//             `http://localhost:${env.PORT}/setup?token=${generatedAuthCode}`,
+//         );
+//         console.log("\n\n");
+//     } catch (e) {
+//         console.error(e);
+//     }
+// }
 
-        // Stop if we already have users
-        if (users.docs.length) {
-            return;
-        }
-
-        generatedAuthCode = nanoid(32);
-
-        // TODO: Review these logs, ensure Remix doesn't paste their URL as well.
-        console.log("\n\nTOKEN:", generatedAuthCode);
-        console.log(
-            "\n\nURL (local):",
-            `http://localhost:${env.PORT}/setup?token=${generatedAuthCode}`,
-        );
-        console.log("\n\n");
-    } catch (e) {
-        console.error(e);
-    }
-}
-
-ensureAdminRole();
+// ensureAdminRole();
 
 app.use("/auth/create", cors());
 app.post("/auth/create", json(), async (req, res, next) => {
@@ -238,32 +269,32 @@ app.post("/auth/create", json(), async (req, res, next) => {
         }
         creatingUserLock = true;
 
-        const users = await usersDb.find({
-            selector: {},
-        });
+        // const users = await usersDb.find({
+        //     selector: {},
+        // });
 
-        if (generatedAuthCode === null || users.docs.length) {
-            // Forbidden - We don't have a generated auth code
-            return res.sendStatus(403);
-        }
+        // if (generatedAuthCode === null || users.docs.length) {
+        //     // Forbidden - We don't have a generated auth code
+        //     return res.sendStatus(403);
+        // }
 
-        const { token, username, password } = zAuthCodeBody.parse(req.body);
+        // const { token, username, password } = zAuthCodeBody.parse(req.body);
 
-        if (!username || !password) {
-            return res.sendStatus(400);
-        }
-        if (token !== generatedAuthCode) {
-            return res.sendStatus(401);
-        }
+        // if (!username || !password) {
+        //     return res.sendStatus(400);
+        // }
+        // if (token !== generatedAuthCode) {
+        //     return res.sendStatus(401);
+        // }
 
-        // Create user
-        await usersDb.put({
-            _id: `org.couchdb.user:${username}`,
-            name: username,
-            type: "user",
-            roles: [ADMIN_ROLE],
-            password,
-        });
+        // // Create user
+        // await usersDb.put({
+        //     _id: `org.couchdb.user:${username}`,
+        //     name: username,
+        //     type: "user",
+        //     roles: [ADMIN_ROLE],
+        //     password,
+        // });
 
         creatingUserLock = false;
 
@@ -319,32 +350,50 @@ app.use(
 );
 
 let server: Server | undefined;
+let pouchDBServer: Server | undefined;
 
-function startListen() {
-    server = app
-        .listen(port, () => {
-            console.log(`Sync server listening on port ${port}`);
-            printAuthURL().catch((e) => console.error(e));
-        })
-        .on("error", function (err) {
-            if ((err as any).code === "EADDRINUSE") {
-                // port is currently in use
-                console.log(`Address in use, retry ${addrInUseRetries++}...`);
-                setTimeout(() => {
-                    addrInUseTimeout *= 2;
-                    startListen();
-                }, addrInUseTimeout);
-                return;
-            }
-        });
+async function startListen() {
+    new Promise<void>((resolve) => {
+        server = app
+            .listen(port, () => {
+                console.log(`Sync server listening on port ${port}`);
+                resolve();
+            })
+            .on("error", function (err) {
+                if ((err as any).code === "EADDRINUSE") {
+                    // port is currently in use
+                    console.log(
+                        `Address in use, retry ${addrInUseRetries++}...`,
+                    );
+                    setTimeout(() => {
+                        addrInUseTimeout *= 2;
+                        startListen();
+                    }, addrInUseTimeout);
+                    return;
+                }
+            });
+    });
 }
 
-startListen();
+async function main() {
+    const startResult = await startPouchDBServer();
+    pouchDBServer = startResult.server;
+
+    createIndexes().catch((e) => console.error(e));
+
+    await startListen();
+
+    // printAuthURL().catch((e) => console.error(e));
+    task.start();
+    task.now();
+}
+
+main().catch((e) => console.error(e));
 
 let addrInUseTimeout = 111;
 let addrInUseRetries = 1;
 
-setupIntegrations();
+// setupIntegrations();
 
 process.on("uncaughtException", (err) => {
     console.error(err);
@@ -357,7 +406,8 @@ process.on("unhandledRejection", (err) => {
 });
 
 closeWithGrace(() => {
+    pouchDBServer?.close();
     server?.close();
     task.stop();
-    dbChangesSubscription.cancel();
+    // dbChangesSubscription.cancel();
 });

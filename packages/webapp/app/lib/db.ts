@@ -2,7 +2,7 @@ import PouchDB from "pouchdb";
 import PouchDBFind from "pouchdb-find";
 import { env } from "./env";
 import { DBTypes } from "./types";
-import { baseUrl } from "./url";
+import { dbBaseUrl } from "./url";
 
 export const DB_USERNAME_KEY = "mainframe.username";
 export const DB_PASSWORD_KEY = "mainframe.password";
@@ -25,7 +25,7 @@ export async function checkDBCredentials(
     username: string,
     password: string,
 ): Promise<boolean> {
-    const connString = `${baseUrl}:5984`;
+    const connString = dbBaseUrl;
     const res = await fetch(connString, {
         headers: {
             Authorization: `Basic ${btoa(username + ":" + password)}`,
@@ -44,15 +44,15 @@ export function stopDBSync() {
 export function setupDBSync() {
     const username = localStorage.getItem(DB_USERNAME_KEY);
     const password = localStorage.getItem(DB_PASSWORD_KEY);
-    const connString = `${baseUrl}:5984/mainframe`;
+    const connString = `${dbBaseUrl}/mainframe`;
     if (username && password) {
         stopDBSync();
         sync = db.sync(
             new PouchDB<DBTypes>(connString, {
-                auth: {
-                    username,
-                    password,
-                },
+                // auth: {
+                //     username,
+                //     password,
+                // },
             }),
             {
                 live: true,

@@ -8,7 +8,18 @@ interface PouchDBSecurityObject {
     admins: { names: string[]; roles: string[] };
 }
 
+function createPouchDBServerAdmin() {
+    const name = "admin";
+    let URL = `http://localhost:5984/_node/node1@127.0.0.1/_config/admins/${name}`;
+    let method = "PUT";
+    let body = JSON.stringify("password");
+    let contentType = "application/json";
+}
+
 export async function ensureAdminRole() {
+    console.log("Skipped ensuring admin role");
+    return;
+
     // Ensure the DB has admin role
     try {
         const getRes = await fetch(
