@@ -1,4 +1,25 @@
 import { Outlet } from "@remix-run/react";
+import { destroySession, getSession } from "../sessions.server";
+import { LoaderArgs, json } from "@remix-run/node";
+
+export async function loader({ request }: LoaderArgs) {
+    const session = await getSession(request.headers.get("Cookie"));
+
+    if (session.get("error") === "not_found") {
+        // If the session has null data, it means it wasn't found,
+        // so we destroy it from the client as well
+        return json(
+            {},
+            {
+                headers: {
+                    "Set-Cookie": await destroySession(session),
+                },
+            },
+        );
+    }
+
+    return json({});
+}
 
 export default function AuthLogin() {
     return (

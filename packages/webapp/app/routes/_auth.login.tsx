@@ -29,7 +29,8 @@ export async function action({ request }: ActionArgs) {
         return json({ error: "Invalid username/password" }, { status: 401 });
     }
 
-    const session = await getSession(request.headers.get("Cookie"));
+    // Don't pass the cookie header here, because we always want a fresh session
+    const session = await getSession();
 
     session.set("userId", account.id);
 

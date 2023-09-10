@@ -12,6 +12,7 @@ import { z } from "zod";
 
 export const zSessionData = z.object({
     userId: z.string().optional(),
+    error: z.enum(["not_found"]).optional(),
 });
 
 export type MainframeSessionData = z.infer<typeof zSessionData>;
@@ -46,7 +47,7 @@ function createDatabaseSessionStorage({
                 .from(sessionsTable)
                 .where(eq(sessionsTable.id, id));
 
-            if (!row) return null;
+            if (!row) return { error: "not_found" };
 
             return {
                 userId: row.userId ?? undefined,

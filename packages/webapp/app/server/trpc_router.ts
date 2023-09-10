@@ -69,6 +69,8 @@ export const appRouter = router({
                 throw new TRPCError({ code: "NOT_FOUND" });
             }
 
+            void syncDataset(dataset).catch((e) => console.error(e));
+
             return dataset;
         }),
     datasetsDelete: protectedProcedure

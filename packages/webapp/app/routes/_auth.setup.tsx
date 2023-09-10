@@ -26,7 +26,8 @@ export async function action({ request }: ActionArgs) {
     // TODO: This can fail if the username already exists
     const account = await createUserAccount(username, password);
 
-    const session = await getSession(request.headers.get("Cookie"));
+    // Don't pass the cookie header here, because we always want a fresh session
+    const session = await getSession();
 
     session.set("userId", account.id);
 

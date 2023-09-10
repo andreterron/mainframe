@@ -9,7 +9,7 @@
     "scripts": {
         "dev": "yarn workspace @mainframe-so/webapp run dev",
         "build": "yarn workspace @mainframe-so/webapp run build",
-        "start": "node scripts/generate-env.mjs && yarn workspace @mainframe-so/webapp run dev"
+        "start": "node scripts/generate-env.mjs && yarn workspace @mainframe-so/webapp run db:migrate && yarn workspace @mainframe-so/webapp run dev"
     },
     "devDependencies": {
         "concurrently": "^8.2.0",
