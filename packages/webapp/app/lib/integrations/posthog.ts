@@ -63,7 +63,7 @@ export const posthog: Integration = {
                 return res.json();
             },
             objId: (dataset: Dataset) => {
-                return `${dataset.id}_currentUser`;
+                return `currentUser`;
             },
         },
     },
@@ -83,7 +83,7 @@ export const posthog: Integration = {
                 return json.results;
             },
             rowId(dataset, row) {
-                return `${dataset.id}_projects_${row.id}`;
+                return `${row.id}`;
             },
         },
         dashboards: {
@@ -92,7 +92,7 @@ export const posthog: Integration = {
                 return getProjectChildren(dataset, "dashboards");
             },
             rowId(dataset, row) {
-                return `${dataset.id}_dashboards_${row.id}`;
+                return `${row.id}`;
             },
         },
         insights: {
@@ -101,7 +101,7 @@ export const posthog: Integration = {
                 return getProjectChildren(dataset, "insights");
             },
             rowId(dataset, row) {
-                return `${dataset.id}_insights_${row.id}`;
+                return `${row.id}`;
             },
         },
     },

@@ -19,8 +19,8 @@ export const peloton: Integration = {
                 });
                 return res.json();
             },
-            objId: (dataset: Dataset) => {
-                return `${dataset.id}_me`;
+            objId: (dataset: Dataset, obj) => {
+                return `${obj.id}`;
             },
         },
     },
@@ -69,7 +69,7 @@ export const peloton: Integration = {
                     return [];
                 }
             },
-            rowId: (dataset: Dataset, row: any) => `${dataset.id}_${row.id}`,
+            rowId: (dataset: Dataset, row: any) => `${row.id}`,
         },
     },
 };

@@ -9,7 +9,7 @@ export const network: Integration = {
             name: "Network Devices",
             // TODO: Delete or update the status of any devices not currently found
             get: async () => find(),
-            rowId: (dataset: Dataset, row: any) => `${dataset.id}_${row.mac}`,
+            rowId: (dataset: Dataset, row: any) => `${row.mac}`,
         },
     },
 };

@@ -201,15 +201,17 @@ export const toggl: Integration = {
                 .where(
                     and(
                         eq(tablesTable.datasetId, dataset.id),
-                        eq(tablesTable.key, "webhook"),
+                        eq(tablesTable.key, "webhooks"),
                         eq(rowsTable.sourceId, `${json.subscription_id}`),
                     ),
                 )
                 .limit(1);
         } catch (e) {
+            console.log("Error getting webhook", e);
             return res.sendStatus(200);
         }
         if (!webhook) {
+            console.log("Webhook not found");
             return res.sendStatus(200);
         }
 
@@ -233,6 +235,7 @@ export const toggl: Integration = {
         // Valid HMAC
 
         if (isPingWebhookEvent(json)) {
+            console.log("Toggl Webhook Ping event");
             return res.send({ validation_code: json.validation_code });
         }
 
@@ -250,31 +253,22 @@ export const toggl: Integration = {
             }
 
             // Update currentTimeEntry if needed
-            let currentEntryRow: DatasetObject | undefined;
-            try {
-                // currentEntryRow = await db.get(`${dataset.id}_currentEntry`);
-                [currentEntryRow] = await db
-                    .select({
-                        id: objectsTable.id,
-                        sourceId: objectsTable.sourceId,
-                        objectType: objectsTable.objectType,
-                        datasetId: objectsTable.datasetId,
-                        data: objectsTable.data,
-                    })
-                    .from(objectsTable)
-                    .where(
-                        and(
-                            eq(objectsTable.datasetId, dataset.id),
-                            eq(objectsTable.objectType, "currentEntry"),
-                        ),
-                    )
-                    .limit(1);
-            } catch (e: any) {
-                if (e.error !== "not_found") {
-                    throw e;
-                }
-                // We might not have a currentEntry, but we can still check if the received time entry is active
-            }
+            let [currentEntryRow] = await db
+                .select({
+                    id: objectsTable.id,
+                    sourceId: objectsTable.sourceId,
+                    objectType: objectsTable.objectType,
+                    datasetId: objectsTable.datasetId,
+                    data: objectsTable.data,
+                })
+                .from(objectsTable)
+                .where(
+                    and(
+                        eq(objectsTable.datasetId, dataset.id),
+                        eq(objectsTable.objectType, "currentEntry"),
+                    ),
+                )
+                .limit(1);
 
             const object = getDatasetObject(dataset, "currentEntry");
 
@@ -315,8 +309,8 @@ export const toggl: Integration = {
                 );
                 return null;
             },
-            objId: (dataset: Dataset) => {
-                return `${dataset.id}_currentEntry`;
+            objId: (dataset: Dataset, obj) => {
+                return `${obj.id}`;
             },
         },
     },
@@ -340,7 +334,7 @@ export const toggl: Integration = {
                 );
                 return null;
             },
-            rowId: (dataset: Dataset, row: any) => `${dataset.id}_${row.id}`,
+            rowId: (dataset: Dataset, row: any) => `${row.id}`,
         },
         // projects: {
         //     name: "Projects",
@@ -364,8 +358,7 @@ export const toggl: Integration = {
                 );
                 return null;
             },
-            rowId: (dataset: Dataset, row: any) =>
-                `${dataset.id}_workspace_${row.id}`,
+            rowId: (dataset: Dataset, row: any) => `${row.id}`,
         },
         // clients: {
         //     name: "Clients",
@@ -430,8 +423,7 @@ export const toggl: Integration = {
                     return [];
                 }
             },
-            rowId: (dataset: Dataset, row: any) =>
-                `${dataset.id}_webhook_${row.subscription_id}`,
+            rowId: (dataset: Dataset, row: any) => `${row.subscription_id}`,
         },
     },
 };

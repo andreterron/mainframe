@@ -15,8 +15,8 @@ export const github: Integration = {
                 });
                 return res.json();
             },
-            objId: (dataset: Dataset) => {
-                return `${dataset.id}_me`;
+            objId: (dataset: Dataset, obj) => {
+                return `me`;
             },
         },
     },
@@ -33,7 +33,7 @@ export const github: Integration = {
                 return res.json();
             },
             rowId(dataset, row) {
-                return `${dataset.id}_repos_${row.id}`;
+                return `${row.id}`;
             },
         },
     },
