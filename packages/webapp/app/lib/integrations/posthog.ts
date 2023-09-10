@@ -1,20 +1,30 @@
-import { db } from "../db";
+import { deserialize } from "../../utils/serialization";
+import { db } from "../../db/db.server";
 import { Integration } from "../integration-types";
-import { Dataset, Row } from "../types";
+import { Dataset } from "../types";
+import { rowsTable, tablesTable } from "../../db/schema";
+import { and, eq } from "drizzle-orm";
 
-async function getProjectChildren(
-    dataset: Dataset & { _id: string },
-    urlPath: string,
-) {
+async function getProjectChildren(dataset: Dataset, urlPath: string) {
     try {
-        const rows = (await db.find({
-            selector: {
-                type: "row",
-                table: "projects",
-                datasetId: dataset._id,
-            },
-        })) as PouchDB.Find.FindResponse<Row>;
-        const projectIds: string[] = rows.docs.map((row) => row.data.id);
+        const rows = await db
+            .select({
+                id: rowsTable.id,
+                sourceId: rowsTable.sourceId,
+                tableId: rowsTable.tableId,
+                data: rowsTable.data,
+            })
+            .from(rowsTable)
+            .innerJoin(tablesTable, eq(tablesTable.id, rowsTable.tableId))
+            .where(
+                and(
+                    eq(tablesTable.datasetId, dataset.id),
+                    eq(tablesTable.key, "projects"),
+                ),
+            );
+        const projectIds: string[] = rows.map(
+            (row) => deserialize(row.data).id,
+        );
         const projectItems = await Promise.all(
             projectIds.map(async (id): Promise<any[]> => {
                 const res = await fetch(
@@ -52,8 +62,8 @@ export const posthog: Integration = {
                 );
                 return res.json();
             },
-            objId: (dataset: Dataset & { _id: string }) => {
-                return `${dataset._id}_currentUser`;
+            objId: (dataset: Dataset) => {
+                return `${dataset.id}_currentUser`;
             },
         },
     },
@@ -73,7 +83,7 @@ export const posthog: Integration = {
                 return json.results;
             },
             rowId(dataset, row) {
-                return `${dataset._id}_projects_${row.id}`;
+                return `${dataset.id}_projects_${row.id}`;
             },
         },
         dashboards: {
@@ -82,7 +92,7 @@ export const posthog: Integration = {
                 return getProjectChildren(dataset, "dashboards");
             },
             rowId(dataset, row) {
-                return `${dataset._id}_dashboards_${row.id}`;
+                return `${dataset.id}_dashboards_${row.id}`;
             },
         },
         insights: {
@@ -91,7 +101,7 @@ export const posthog: Integration = {
                 return getProjectChildren(dataset, "insights");
             },
             rowId(dataset, row) {
-                return `${dataset._id}_insights_${row.id}`;
+                return `${dataset.id}_insights_${row.id}`;
             },
         },
     },

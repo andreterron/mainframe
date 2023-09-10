@@ -1,16 +1,9 @@
 import { Link } from "@remix-run/react";
-import { Integration } from "../lib/integration-types";
 import { Dataset } from "../lib/types";
 import { getObjectsForDataset, getTablesForDataset } from "../lib/integrations";
 import { DatasetHeader } from "./DatasetHeader";
 
-export function DatasetPage({
-    dataset,
-    integration,
-}: {
-    dataset: Dataset & PouchDB.Core.RemoveDocument;
-    integration: Integration;
-}) {
+export function DatasetPage({ dataset }: { dataset: Dataset }) {
     const tables = getTablesForDataset(dataset);
     const objects = getObjectsForDataset(dataset);
 
@@ -20,7 +13,7 @@ export function DatasetPage({
             <div className="flex flex-col gap-1">
                 {objects.map((obj) => (
                     <Link
-                        to={`/dataset/${dataset._id}/object/${obj.id}`}
+                        to={`/dataset/${dataset.id}/object/${obj.id}`}
                         key={obj.id}
                         className="flex items-center gap-3 cursor-pointer select-none text-gray-900 bg-white focus:outline-none hover:bg-gray-100 active:bg-gray-200 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg px-4 py-2 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
                     >
@@ -45,7 +38,7 @@ export function DatasetPage({
                 ))}
                 {tables.map((table) => (
                     <Link
-                        to={`/dataset/${dataset._id}/table/${table.id}`}
+                        to={`/dataset/${dataset.id}/table/${table.id}`}
                         key={table.id}
                         className="flex items-center gap-3 cursor-pointer select-none text-gray-900 bg-white focus:outline-none hover:bg-gray-100 active:bg-gray-200 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg px-4 py-2 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
                     >

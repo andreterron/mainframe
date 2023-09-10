@@ -1,56 +1,50 @@
-import { Link, useNavigate } from "@remix-run/react";
-import {
-    DB_PASSWORD_KEY,
-    DB_USERNAME_KEY,
-    checkDBCredentials,
-    setupDBSync,
-} from "../lib/db";
+import { ActionArgs, json, redirect } from "@remix-run/node";
+import { Link } from "@remix-run/react";
+import { z } from "zod";
+import { validateUserAccount } from "../lib/auth.server";
+import { getSession, commitSession } from "../sessions.server";
 
-export default function AuthSignup() {
-    const navigate = useNavigate();
+const zForm = z.object({
+    username: z.string().nonempty(),
+    password: z.string().nonempty(),
+});
 
-    async function login(username: string, password: string) {
-        if (!(await checkDBCredentials(username, password))) {
-            alert("Invalid credentials");
-            return;
-        }
+export async function action({ request }: ActionArgs) {
+    const data = await request.formData();
 
-        localStorage.setItem(DB_USERNAME_KEY, username);
-        localStorage.setItem(DB_PASSWORD_KEY, password);
+    const parsed = zForm.safeParse({
+        username: data.get("username"),
+        password: data.get("password"),
+    });
 
-        setupDBSync();
-
-        // Redirect on success
-        navigate("/");
+    if (!parsed.success) {
+        return json({ error: "Missing username/password" }, { status: 400 });
     }
 
-    return (
-        <form
-            className="space-y-4"
-            onSubmit={async (e) => {
-                try {
-                    e.preventDefault();
-                    const form = e.target as HTMLFormElement;
-                    const username = form.username.value;
-                    const password = form.password.value;
+    const { username, password } = parsed.data;
 
-                    await login(username, password);
-                } catch (e) {
-                    console.error(e);
-                }
-            }}
-        >
+    const account = await validateUserAccount(username, password);
+
+    if (!account) {
+        return json({ error: "Invalid username/password" }, { status: 401 });
+    }
+
+    const session = await getSession(request.headers.get("Cookie"));
+
+    session.set("userId", account.id);
+
+    return redirect("/", {
+        headers: {
+            "Set-Cookie": await commitSession(session),
+        },
+    });
+}
+
+export default function AuthSignup() {
+    return (
+        <form className="space-y-4" method="post">
             <div className="mb-4">
-                <p className="text-gray-600 font-bold">Login</p>
-                <h2 className="text-sm">
-                    Don't have an account yet?{" "}
-                    <Link
-                        className="text-sky-600 hover:text-sky-500"
-                        to="/setup"
-                    >
-                        Setup your account
-                    </Link>
-                </h2>
+                <h2 className="text-gray-600 font-bold">Login</h2>
             </div>
             <div>
                 <label
@@ -87,6 +81,12 @@ export default function AuthSignup() {
                 <button className="w-full py-4 bg-blue-600 hover:bg-blue-700 rounded text-sm font-bold text-gray-50 transition duration-200">
                     Sign In
                 </button>
+            </div>
+            <div className="mt-2 text-sm text-gray-400">
+                Don't have an account yet?{" "}
+                <Link className="text-sky-600 hover:text-sky-500" to="/setup">
+                    Setup your account
+                </Link>
             </div>
         </form>
     );

@@ -9,9 +9,7 @@
     "scripts": {
         "dev": "yarn workspace @mainframe-so/webapp run dev",
         "build": "yarn workspace @mainframe-so/webapp run build",
-        "start": "node scripts/generate-env.mjs && yarn run docker:up && yarn workspace @mainframe-so/webapp run dev",
-        "docker:up": "docker compose up -d",
-        "docker:down": "docker compose down -v --rmi=local"
+        "start": "node scripts/generate-env.mjs && yarn workspace @mainframe-so/webapp run dev"
     },
     "devDependencies": {
         "concurrently": "^8.2.0",

@@ -1,37 +1,17 @@
-export interface Dataset {
-    type: "dataset";
-    name?: string | undefined;
-    integrationType?: string;
-    token?: string;
-}
+import { InferSelectModel } from "drizzle-orm";
+import type {
+    datasetsTable,
+    objectsTable,
+    rowsTable,
+    tablesTable,
+} from "../db/schema";
 
-export interface Table {
-    type: "table";
-    name: string;
+export type Dataset = InferSelectModel<typeof datasetsTable>;
 
-    dataset: string; // Ref -> Dataset
-}
+export type Table = InferSelectModel<typeof tablesTable>;
 
-export interface Row {
-    type: "row";
+export type Row = InferSelectModel<typeof rowsTable>;
 
-    table: string; // Ref -> Table
-    datasetId?: string; // Ref -> Dataset
-
-    data: {
-        [key: string]: any;
-    };
-}
-
-export interface DatasetObject {
-    type: "object";
-
-    objectType: string; // Ref -> ObjectDefinition
-    datasetId?: string; // Ref -> Dataset
-
-    data: {
-        [key: string]: any;
-    };
-}
+export type DatasetObject = InferSelectModel<typeof objectsTable>;
 
 export type DBTypes = Dataset | Row | DatasetObject;

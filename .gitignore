@@ -1,3 +1,5 @@
 node_modules/
 
 .env
+
+packages/webapp/app/db/mainframe.db

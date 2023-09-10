@@ -32,7 +32,7 @@ export function getIntegrationFromType(
 }
 
 export function getIntegrationForDataset(dataset: Dataset): Integration | null {
-    return getIntegrationFromType(dataset.integrationType);
+    return getIntegrationFromType(dataset.integrationType ?? undefined);
 }
 
 export function getObjectsForDataset(dataset: Dataset) {

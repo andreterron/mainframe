@@ -1,11 +1,18 @@
 import { Request, Response } from "express";
-import { db } from "../db";
+import { db } from "../../db/db.server";
 import { Integration } from "../integration-types";
 import { Dataset, DatasetObject, Row } from "../types";
-import { syncTable, updateObject } from "../../../server/sync";
+import {
+    syncTable,
+    updateObject,
+    updateRowFromTableType,
+} from "../../../server/sync";
 import { getDatasetObject, getDatasetTable } from "../integrations";
 import crypto from "crypto";
-import { env } from "../env";
+import { env } from "../env.server";
+import { objectsTable, rowsTable, tablesTable } from "../../db/schema";
+import { and, eq } from "drizzle-orm";
+import { deserialize } from "../../utils/serialization";
 
 function togglHeaders(dataset: Dataset) {
     return {
@@ -69,7 +76,7 @@ function isPingWebhookEvent(event: TogglWebhook): event is TogglWebhookPing {
 
 export const toggl: Integration = {
     name: "Toggl",
-    setup: async (dataset: Dataset & { _id: string }) => {
+    setup: async (dataset: Dataset) => {
         if (!env.TUNNEL_BASE_API_URL) {
             // No tunnel URL
             console.log("Skipping Toggl webhooks: Missing tunnel URL");
@@ -90,7 +97,7 @@ export const toggl: Integration = {
         const workspaceIds: number[] = workspaces.map((row) => row.id);
 
         for (let id of workspaceIds) {
-            const callbackUrl = `${env.TUNNEL_BASE_API_URL}/webhooks/${dataset._id}`;
+            const callbackUrl = `${env.TUNNEL_BASE_API_URL}/webhooks/${dataset.id}`;
 
             // Check if this workspace already has a webhook subscription
             const res = await fetch(
@@ -182,9 +189,23 @@ export const toggl: Integration = {
         // The reason is that we'll get a "ping" event before saving the subscription to the DB
         let webhook: Row | undefined;
         try {
-            webhook = await db.get<Row>(
-                `${dataset._id}_webhook_${json.subscription_id}`,
-            );
+            [webhook] = await db
+                .select({
+                    id: rowsTable.id,
+                    sourceId: rowsTable.sourceId,
+                    tableId: rowsTable.tableId,
+                    data: rowsTable.data,
+                })
+                .from(rowsTable)
+                .innerJoin(tablesTable, eq(tablesTable.id, rowsTable.tableId))
+                .where(
+                    and(
+                        eq(tablesTable.datasetId, dataset.id),
+                        eq(tablesTable.key, "webhook"),
+                        eq(rowsTable.sourceId, `${json.subscription_id}`),
+                    ),
+                )
+                .limit(1);
         } catch (e) {
             return res.sendStatus(200);
         }
@@ -194,7 +215,7 @@ export const toggl: Integration = {
 
         const message = req.body;
         const signature = req.header("x-webhook-signature-256");
-        const secret = webhook.data.secret;
+        const secret = deserialize(webhook.data).secret;
 
         const hmac = crypto.createHmac("sha256", secret).setEncoding("hex");
         hmac.update(message);
@@ -218,11 +239,10 @@ export const toggl: Integration = {
         if (json.metadata.model === "time_entry") {
             const table = getDatasetTable(dataset, "timeEntries");
             if (table?.rowId) {
-                await updateObject(
-                    dataset,
+                await updateRowFromTableType(
                     json.payload,
                     table.rowId(dataset, json.payload),
-                    { type: "row", table: table.id },
+                    json.payload,
                 );
             } else {
                 console.error("Failed to find timeEntries definition");
@@ -232,7 +252,23 @@ export const toggl: Integration = {
             // Update currentTimeEntry if needed
             let currentEntryRow: DatasetObject | undefined;
             try {
-                currentEntryRow = await db.get(`${dataset._id}_currentEntry`);
+                // currentEntryRow = await db.get(`${dataset.id}_currentEntry`);
+                [currentEntryRow] = await db
+                    .select({
+                        id: objectsTable.id,
+                        sourceId: objectsTable.sourceId,
+                        objectType: objectsTable.objectType,
+                        datasetId: objectsTable.datasetId,
+                        data: objectsTable.data,
+                    })
+                    .from(objectsTable)
+                    .where(
+                        and(
+                            eq(objectsTable.datasetId, dataset.id),
+                            eq(objectsTable.objectType, "currentEntry"),
+                        ),
+                    )
+                    .limit(1);
             } catch (e: any) {
                 if (e.error !== "not_found") {
                     throw e;
@@ -245,13 +281,14 @@ export const toggl: Integration = {
             if (
                 object?.objId &&
                 (json.payload.stop === null ||
-                    currentEntryRow?.data.id === json.payload.id)
+                    deserialize(currentEntryRow?.data ?? null).id ===
+                        json.payload.id)
             ) {
                 await updateObject(
                     dataset,
                     json.payload,
                     object.objId(dataset, json.payload),
-                    { type: "object", objectType: object.id },
+                    object.id,
                 );
             }
         }
@@ -278,8 +315,8 @@ export const toggl: Integration = {
                 );
                 return null;
             },
-            objId: (dataset: Dataset & { _id: string }) => {
-                return `${dataset._id}_currentEntry`;
+            objId: (dataset: Dataset) => {
+                return `${dataset.id}_currentEntry`;
             },
         },
     },
@@ -303,8 +340,7 @@ export const toggl: Integration = {
                 );
                 return null;
             },
-            rowId: (dataset: Dataset & { _id: string }, row: any) =>
-                `${dataset._id}_${row.id}`,
+            rowId: (dataset: Dataset, row: any) => `${dataset.id}_${row.id}`,
         },
         // projects: {
         //     name: "Projects",
@@ -328,8 +364,8 @@ export const toggl: Integration = {
                 );
                 return null;
             },
-            rowId: (dataset: Dataset & { _id: string }, row: any) =>
-                `${dataset._id}_workspace_${row.id}`,
+            rowId: (dataset: Dataset, row: any) =>
+                `${dataset.id}_workspace_${row.id}`,
         },
         // clients: {
         //     name: "Clients",
@@ -339,17 +375,29 @@ export const toggl: Integration = {
         // },
         webhooks: {
             name: "Webhook Subscriptions",
-            get: async (dataset: Dataset & { _id: string }) => {
+            get: async (dataset: Dataset) => {
                 try {
-                    const rows = (await db.find({
-                        selector: {
-                            type: "row",
-                            table: "workspaces",
-                            datasetId: dataset._id,
-                        },
-                    })) as PouchDB.Find.FindResponse<Row>;
-                    const workspaceIds: string[] = rows.docs.map(
-                        (row) => row.data.id,
+                    const rows = await db
+                        .select({
+                            id: rowsTable.id,
+                            sourceId: rowsTable.sourceId,
+                            tableId: rowsTable.tableId,
+                            data: rowsTable.data,
+                        })
+                        .from(rowsTable)
+                        .innerJoin(
+                            tablesTable,
+                            eq(tablesTable.id, rowsTable.tableId),
+                        )
+                        .where(
+                            and(
+                                eq(tablesTable.datasetId, dataset.id),
+                                eq(tablesTable.key, "workspaces"),
+                            ),
+                        );
+
+                    const workspaceIds: string[] = rows.map(
+                        (row) => deserialize(row.data).id,
                     );
 
                     const workspaceSubscriptions = await Promise.all(
@@ -382,8 +430,8 @@ export const toggl: Integration = {
                     return [];
                 }
             },
-            rowId: (dataset: Dataset & { _id: string }, row: any) =>
-                `${dataset._id}_webhook_${row.subscription_id}`,
+            rowId: (dataset: Dataset, row: any) =>
+                `${dataset.id}_webhook_${row.subscription_id}`,
         },
     },
 };

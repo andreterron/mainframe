@@ -15,15 +15,15 @@ export const github: Integration = {
                 });
                 return res.json();
             },
-            objId: (dataset: Dataset & { _id: string }) => {
-                return `${dataset._id}_me`;
+            objId: (dataset: Dataset) => {
+                return `${dataset.id}_me`;
             },
         },
     },
     tables: {
         repos: {
             name: "Repos",
-            get: async (dataset: Dataset & { _id: string }) => {
+            get: async (dataset: Dataset) => {
                 const res = await fetch(`https://api.github.com/user/repos`, {
                     headers: {
                         Authorization: `Bearer ${dataset.token}`,
@@ -33,7 +33,7 @@ export const github: Integration = {
                 return res.json();
             },
             rowId(dataset, row) {
-                return `${dataset._id}_repos_${row.id}`;
+                return `${dataset.id}_repos_${row.id}`;
             },
         },
     },

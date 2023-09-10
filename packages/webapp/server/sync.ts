@@ -1,5 +1,5 @@
-import { db } from "../app/lib/db";
 import {
+    getDatasetTable,
     getObjectsForDataset,
     getTablesForDataset,
 } from "../app/lib/integrations";
@@ -9,51 +9,107 @@ import {
     IntegrationObject,
     IntegrationTable,
 } from "../app/lib/integration-types";
+import {
+    datasetsTable,
+    objectsTable,
+    rowsTable,
+    tablesTable,
+} from "../app/db/schema";
+import { db } from "../app/db/db.server";
+import { and, eq } from "drizzle-orm";
+import { deserialize, serialize } from "../app/utils/serialization";
+
+export async function updateRowFromTableType(
+    dataset: Dataset,
+    tableKey: string,
+    data: any,
+) {
+    const table = getDatasetTable(dataset, tableKey);
+    if (!table) {
+        return;
+    }
+
+    // Upsert table
+    const [dbTable] = await db
+        .insert(tablesTable)
+        .values({ datasetId: dataset.id, name: table.name, key: table.id })
+        .onConflictDoUpdate({
+            target: [tablesTable.datasetId, tablesTable.key],
+            set: { name: table.name },
+        })
+        .returning();
+
+    if (!table.rowId || !dbTable) {
+        console.log("Find the id", data);
+        return;
+    }
+
+    const id = table.rowId(dataset, data);
+
+    await updateRow(data, id, dbTable.id);
+}
+
+export async function updateRow(data: any, id: string, tableId: string) {
+    const [existing] = await db
+        .select()
+        .from(rowsTable)
+        .where(and(eq(rowsTable.tableId, tableId), eq(rowsTable.sourceId, id)))
+        .limit(1);
+    if (existing && isEqual(deserialize(existing.data), data)) {
+        return false;
+    }
+    const [upserted] = await db
+        .insert(rowsTable)
+        .values({ tableId, sourceId: id, data: serialize(data) })
+        .onConflictDoUpdate({
+            target: [rowsTable.tableId, rowsTable.sourceId],
+            set: { data: serialize(data), sourceId: id },
+        })
+        .returning();
+    return !!upserted;
+}
 
 export async function updateObject(
-    dataset: Dataset & { _id: string },
+    dataset: Dataset,
     data: any,
     id: string,
-    metadata:
-        | { type: "object"; objectType: string }
-        | { type: "row"; table: string },
+    objectType: string,
 ) {
-    try {
-        const obj = await db.get(id);
-
-        if (
-            (obj.type === "object" || obj.type === "row") &&
-            isEqual(obj.data, data) &&
-            obj.datasetId
-        ) {
-            return false;
-        }
-
-        await db.put({
-            ...obj,
-            data: data,
-            datasetId: dataset._id,
-            ...metadata,
-        });
-        return true;
-    } catch (e: any) {
-        if (e.error === "not_found") {
-            await db.put({
-                _id: id,
-                data: data,
-                datasetId: dataset._id,
-                ...metadata,
-            });
-            return true;
-        }
+    const [existing] = await db
+        .select()
+        .from(objectsTable)
+        .where(
+            and(
+                eq(objectsTable.objectType, objectType),
+                eq(objectsTable.datasetId, dataset.id),
+            ),
+        )
+        .limit(1);
+    if (existing && isEqual(deserialize(existing.data), data)) {
+        return false;
     }
-    return false;
+    const [upserted] = await db
+        .insert(objectsTable)
+        .values({
+            objectType: objectType,
+            // Do we need sourceId here?
+            sourceId: id,
+            data: serialize(data),
+            datasetId: dataset.id,
+        })
+        .onConflictDoUpdate({
+            target: [objectsTable.objectType, objectsTable.datasetId],
+            set: { data: serialize(data), sourceId: id },
+        })
+        .returning();
+    return !!upserted;
 }
 
 export async function syncObject(
-    dataset: Dataset & { _id: string },
+    dataset: Dataset,
     objectDefinition: IntegrationObject & { id: string },
 ) {
+    console.log("Syncing");
     if (!objectDefinition.get || !objectDefinition.objId) {
         return;
     }
@@ -65,14 +121,16 @@ export async function syncObject(
     // Call fetch for each object definition
     const data = await objectDefinition.get(dataset);
 
-    await updateObject(dataset, data, objectDefinition.objId(dataset, data), {
-        type: "object",
-        objectType: objectDefinition.id,
-    });
+    await updateObject(
+        dataset,
+        data,
+        objectDefinition.objId(dataset, data),
+        objectDefinition.id,
+    );
 }
 
 export async function syncTable(
-    dataset: Dataset & { _id: string },
+    dataset: Dataset,
     table: IntegrationTable & { id: string },
 ) {
     if (!table.get) {
@@ -90,7 +148,17 @@ export async function syncTable(
         return;
     }
 
-    if (!table.rowId) {
+    // Upsert table
+    let [dbTable] = await db
+        .insert(tablesTable)
+        .values({ datasetId: dataset.id, name: table.name, key: table.id })
+        .onConflictDoUpdate({
+            target: [tablesTable.datasetId, tablesTable.key],
+            set: { name: table.name },
+        })
+        .returning();
+
+    if (!table.rowId || !dbTable) {
         console.log("Find the id", data[0]);
         return;
     }
@@ -100,10 +168,7 @@ export async function syncTable(
     for (let rowData of data) {
         const id = table.rowId(dataset, rowData);
 
-        const result = await updateObject(dataset, rowData, id, {
-            type: "row",
-            table: table.id,
-        });
+        const result = await updateRow(rowData, id, dbTable.id);
         if (result) {
             updated++;
         }
@@ -112,7 +177,7 @@ export async function syncTable(
     console.log(`Updated ${updated} rows`);
 }
 
-export async function syncDataset(dataset: Dataset & { _id: string }) {
+export async function syncDataset(dataset: Dataset) {
     if (!dataset.integrationType || !dataset.token) {
         return;
     }
@@ -134,17 +199,9 @@ export async function syncDataset(dataset: Dataset & { _id: string }) {
 
 export async function syncAll() {
     // Load all datasets
-    const datasets = (await db.find({
-        selector: {
-            type: "dataset",
-        },
-    })) as PouchDB.Find.FindResponse<Dataset>;
+    const datasets = await db.select().from(datasetsTable);
 
-    if (datasets.warning) {
-        console.warn(datasets.warning);
-    }
-
-    for (let dataset of datasets.docs) {
+    for (let dataset of datasets) {
         await syncDataset(dataset);
     }
 }
