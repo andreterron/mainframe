@@ -7,9 +7,6 @@ const dbPath = __dirname.replace(
     "/packages/webapp/app/db/mainframe.db",
 );
 
-console.log("__dirname", __dirname);
-console.log("DB Path", dbPath);
-
 const sqlite = new Database(dbPath);
 
 export const db: BetterSQLite3Database = drizzle(sqlite);
