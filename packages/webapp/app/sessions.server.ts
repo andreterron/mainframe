@@ -74,7 +74,9 @@ export const sessionCooke = createCookie("__session", {
     // https://developer.chrome.com/blog/cookie-max-age-expires/
     maxAge: 400 * 24 * 60 * 60,
     secrets: [env.COOKIE_SECRET],
-    secure: true,
+    // TODO: secure is false since the default scenario is to use it over
+    //       localhostor or over a home network
+    secure: false,
 });
 
 const { getSession, commitSession, destroySession } =
