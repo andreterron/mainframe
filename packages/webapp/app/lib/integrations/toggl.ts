@@ -281,7 +281,7 @@ export const toggl: Integration = {
                 await updateObject(
                     dataset,
                     json.payload,
-                    object.objId(dataset, json.payload),
+                    json.payload ? object.objId(dataset, json.payload) : null,
                     object.id,
                 );
             }

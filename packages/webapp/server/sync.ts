@@ -72,7 +72,7 @@ export async function updateRow(data: any, id: string, tableId: string) {
 export async function updateObject(
     dataset: Dataset,
     data: any,
-    id: string,
+    id: string | null,
     objectType: string,
 ) {
     const [existing] = await db
@@ -124,7 +124,7 @@ export async function syncObject(
     await updateObject(
         dataset,
         data,
-        objectDefinition.objId(dataset, data),
+        data ? objectDefinition.objId(dataset, data) : null,
         objectDefinition.id,
     );
 }
