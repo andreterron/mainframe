@@ -6,7 +6,7 @@ export default function DatasetSetup({
     dataset,
 }: {
     onIntegrationSelected: (type: string) => void;
-    dataset: Dataset & PouchDB.Core.RemoveDocument;
+    dataset: Dataset;
 }) {
     return (
         <div className="flex flex-col items-start gap-4">
@@ -36,12 +36,12 @@ export default function DatasetSetup({
                 >
                     Peloton
                 </button>
-                <button
+                {/* <button
                     className="block border shadow rounded-lg py-2 px-4"
                     onClick={() => onIntegrationSelected("network")}
                 >
                     Network
-                </button>
+                </button> */}
             </div>
         </div>
     );

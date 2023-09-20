@@ -1,16 +1,25 @@
 import { PropsWithChildren } from "react";
-import { db } from "../lib/db";
-import { useNavigate } from "@remix-run/react";
+import { useNavigate, useRevalidator } from "@remix-run/react";
+import { trpc } from "../lib/trpc_client";
+import { Dataset } from "../lib/types";
 
 export function DatasetHeader({
     children,
     dataset,
-}: PropsWithChildren<{ dataset: PouchDB.Core.RemoveDocument }>) {
+}: PropsWithChildren<{ dataset: Pick<Dataset, "id"> }>) {
     const navigate = useNavigate();
+
+    const { revalidate } = useRevalidator();
+
+    const datasetsDelete = trpc.datasetsDelete.useMutation({
+        onSettled() {
+            revalidate();
+        },
+    });
 
     const handleDelete = async () => {
         if (confirm("Delete dataset?")) {
-            await db.remove(dataset);
+            await datasetsDelete.mutateAsync({ id: dataset.id });
             // TODO: Change this to be a route effect depending on (location,dataset)
             navigate("/");
         }

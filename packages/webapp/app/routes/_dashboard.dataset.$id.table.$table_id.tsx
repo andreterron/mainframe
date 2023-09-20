@@ -1,7 +1,5 @@
 import { type LoaderArgs, json } from "@remix-run/node";
-import { useDoc, useFind } from "use-pouchdb";
-import { Link, useParams } from "@remix-run/react";
-import { DBTypes, Row } from "../lib/types";
+import { Link, useLoaderData, useParams } from "@remix-run/react";
 import { useMemo } from "react";
 import {
     createColumnHelper,
@@ -9,37 +7,70 @@ import {
     getCoreRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import { apiBaseUrl } from "../lib/url";
+import { db } from "../db/db.server";
+import { datasetsTable, rowsTable, tablesTable } from "../db/schema";
+import { and, eq } from "drizzle-orm";
+import { deserializeData } from "../utils/serialization";
+import { getDatasetTable } from "../lib/integrations";
+import { syncTable } from "../../server/sync";
+import { notFound } from "remix-utils";
 
-const colHelper = createColumnHelper<PouchDB.Core.ExistingDocument<Row>>();
+const colHelper = createColumnHelper<Record<string, any>>();
 
 const LIMIT = 50;
 
 export async function loader({ params }: LoaderArgs) {
     const datasetId = params.id;
     const tableId = params.table_id;
-    if (datasetId && tableId) {
-        // Trigger sync of this table
-        void fetch(`${apiBaseUrl}/sync/dataset/${datasetId}/table/${tableId}`, {
-            method: "POST",
-        }).catch((e) => console.error(e));
+    if (!datasetId || !tableId) {
+        throw notFound({});
     }
-    return json({});
+
+    const [dataset] = await db
+        .select()
+        .from(datasetsTable)
+        .where(eq(datasetsTable.id, datasetId))
+        .limit(1);
+
+    if (!dataset) {
+        throw notFound({});
+    }
+
+    const table = getDatasetTable(dataset, tableId);
+
+    if (!table) {
+        throw notFound({});
+    }
+
+    // Upsert table
+    await db
+        .insert(tablesTable)
+        .values({ datasetId: dataset.id, name: table.name, key: tableId })
+        .onConflictDoNothing({
+            target: [tablesTable.datasetId, tablesTable.key],
+        })
+        .returning();
+
+    const rows = await db
+        .select({ id: rowsTable.id, data: rowsTable.data })
+        .from(rowsTable)
+        .innerJoin(tablesTable, eq(tablesTable.id, rowsTable.tableId))
+        .where(
+            and(
+                eq(tablesTable.datasetId, datasetId),
+                eq(tablesTable.key, tableId),
+            ),
+        )
+        .limit(LIMIT);
+
+    // Trigger sync of this table in the background
+    void syncTable(dataset, table).catch((e) => console.error(e));
+
+    return json({ dataset, rows: rows.map(deserializeData) });
 }
 
 export default function DatasetTableDetails() {
-    const { id, table_id } = useParams();
-    const { doc, error } = useDoc<DBTypes>(id ?? "", {});
-    const { docs, loading: rowsLoading } = useFind<Row>({
-        selector: {
-            type: "row",
-            table: table_id,
-            datasetId: id,
-        },
-        limit: LIMIT,
-    });
-    const dataset = doc;
-    const rows = rowsLoading ? undefined : docs;
+    const { dataset, rows } = useLoaderData<typeof loader>();
 
     let columns = useMemo(() => {
         const columnsSet = new Set<string>();
@@ -98,18 +129,9 @@ export default function DatasetTableDetails() {
         data: rows ?? [],
         getCoreRowModel: getCoreRowModel(),
         getRowId(originalRow) {
-            return originalRow._id;
+            return originalRow.id;
         },
     });
-
-    // Early return
-
-    if (!dataset || error || dataset.type !== "dataset") {
-        // TODO: If we get an error, we might want to throw
-        if (error) console.log("useDoc error", error);
-        // TODO: Loading UI if we need to
-        return null;
-    }
 
     return (
         <div className="flex flex-col relative max-h-screen overflow-y-auto">

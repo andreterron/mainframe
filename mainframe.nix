@@ -5,13 +5,8 @@
     wantedBy = [ "multi-user.target" ];
     after = [
         "network.target"
-        "docker.service"
-        "docker.socket"
     ];
     description = "Start Mainframe";
-    path = [
-        pkgs.docker
-    ];
     serviceConfig = {
       WorkingDirectory = ./.;
       ExecStart = "${pkgs.yarn}/bin/yarn start";

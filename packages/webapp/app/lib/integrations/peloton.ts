@@ -1,6 +1,9 @@
-import { db } from "../db";
+import { and, eq } from "drizzle-orm";
+import { db } from "../../db/db.server";
+import { objectsTable } from "../../db/schema";
 import { Integration } from "../integration-types";
-import { Dataset, Row } from "../types";
+import { Dataset } from "../types";
+import { deserialize } from "../../utils/serialization";
 
 export const peloton: Integration = {
     name: "Peloton",
@@ -16,8 +19,8 @@ export const peloton: Integration = {
                 });
                 return res.json();
             },
-            objId: (dataset: Dataset & { _id: string }) => {
-                return `${dataset._id}_me`;
+            objId: (dataset: Dataset, obj) => {
+                return `${obj.id}`;
             },
         },
     },
@@ -26,10 +29,19 @@ export const peloton: Integration = {
             name: "Workouts",
             async get(dataset) {
                 try {
-                    const user: Row = await db.get(`${dataset._id}_me`);
+                    const [user] = await db
+                        .select()
+                        .from(objectsTable)
+                        .where(
+                            and(
+                                eq(objectsTable.datasetId, dataset.id),
+                                eq(objectsTable.objectType, "me"),
+                            ),
+                        )
+                        .limit(1);
 
                     // const session_id = '';
-                    const user_id = user.data.id;
+                    const user_id = deserialize(user.data).id;
                     let workouts = await fetch(
                         `https://api.onepeloton.com/api/user/${user_id}/workouts?joins=ride,ride.instructor&limit=20&page=0&sort_by=-created`,
                         {
@@ -57,8 +69,7 @@ export const peloton: Integration = {
                     return [];
                 }
             },
-            rowId: (dataset: Dataset & { _id: string }, row: any) =>
-                `${dataset._id}_${row.id}`,
+            rowId: (dataset: Dataset, row: any) => `${row.id}`,
         },
     },
 };

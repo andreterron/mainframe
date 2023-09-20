@@ -11,8 +11,6 @@ import { Response } from "@remix-run/node";
 import { RemixServer } from "@remix-run/react";
 import isbot from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
-import { Provider as PouchDBProvider } from "use-pouchdb";
-import { db } from "./lib/db";
 
 const ABORT_DELAY = 5_000;
 
@@ -96,13 +94,11 @@ function handleBrowserRequest(
     return new Promise((resolve, reject) => {
         let shellRendered = false;
         const { pipe, abort } = renderToPipeableStream(
-            <PouchDBProvider pouchdb={db}>
-                <RemixServer
-                    context={remixContext}
-                    url={request.url}
-                    abortDelay={ABORT_DELAY}
-                />
-            </PouchDBProvider>,
+            <RemixServer
+                context={remixContext}
+                url={request.url}
+                abortDelay={ABORT_DELAY}
+            />,
             {
                 onShellReady() {
                     shellRendered = true;

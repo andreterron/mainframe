@@ -6,7 +6,7 @@ export default function DatasetTokenInput({
     dataset,
 }: {
     onSubmit: (type: string) => void;
-    dataset: Dataset & PouchDB.Core.RemoveDocument;
+    dataset: Dataset;
 }) {
     return (
         <div className="flex flex-col gap-8 items-start">

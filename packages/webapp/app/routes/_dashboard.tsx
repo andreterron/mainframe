@@ -1,20 +1,44 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import clsx from "clsx";
-import { Link, NavLink, Outlet, useNavigate } from "@remix-run/react";
-import { usePouch, useFind } from "use-pouchdb";
-import { DBTypes, Dataset } from "../lib/types";
+import {
+    NavLink,
+    Outlet,
+    useLoaderData,
+    useNavigate,
+    useRevalidator,
+} from "@remix-run/react";
+import { Dataset } from "../lib/types";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
-import { DB_PASSWORD_KEY, DB_USERNAME_KEY } from "../lib/db";
+import { trpc } from "../lib/trpc_client";
+import { LoaderArgs, json, redirect } from "@remix-run/node";
+import { getSession } from "../sessions.server";
+import { db } from "../db/db.server";
+import { datasetsTable, usersTable } from "../db/schema";
 
-export function SidebarButton({
-    dataset,
-}: {
-    dataset: Dataset & { _id: string };
-}) {
+export async function loader({ request }: LoaderArgs) {
+    // Force authentication for every /dashboard route
+    const session = await getSession(request.headers.get("Cookie"));
+
+    const userId = session.get("userId");
+
+    if (!userId) {
+        const users = await db
+            .select({ id: usersTable })
+            .from(usersTable)
+            .limit(1);
+        throw redirect(users.length ? "/login" : "/setup");
+    }
+
+    const datasets = await db.select().from(datasetsTable);
+
+    return json({ datasets });
+}
+
+export function SidebarButton({ dataset }: { dataset: Dataset }) {
     const type = dataset.integrationType;
     const icon = type ? datasetIcon(type) : undefined;
     return (
-        <NavLink to={`/dataset/${dataset._id}`} className={"block group py-1"}>
+        <NavLink to={`/dataset/${dataset.id}`} className={"block group py-1"}>
             {({ isActive }) => (
                 <span
                     className={clsx([
@@ -75,50 +99,21 @@ export function SidebarButton({
 
 export default function Dashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [showAuthWarning, setShowAuthWarning] = useState(false);
     const navigate = useNavigate();
 
-    const db = usePouch<DBTypes>();
+    const { datasets } = useLoaderData<typeof loader>();
+    const { revalidate } = useRevalidator();
 
-    // Redirect to auth screen if the DB is empty and there's no account
-    useEffect(() => {
-        db.info().then((result) => {
-            if (
-                typeof window === "undefined" ||
-                typeof localStorage === "undefined"
-            ) {
-                return;
-            }
-            const username = localStorage.getItem(DB_USERNAME_KEY);
-            const password = localStorage.getItem(DB_PASSWORD_KEY);
-            if (!username || !password) {
-                if (result.doc_count === 0) {
-                    // Redirect to setup
-                    navigate("/setup");
-                } else {
-                    setShowAuthWarning(true);
-                }
-            }
-        });
-    }, []);
-
-    const handleAddDataset = async () => {
-        const id = Math.random().toString(36).substring(2, 8);
-        const doc = { _id: id, type: "dataset" as const, name: "" };
-
-        const dataset = await db.put(doc);
-        navigate(`/dataset/${dataset.id}`);
-    };
-
-    const { docs: rows, loading } = useFind<Dataset>({
-        selector: {
-            type: "dataset",
+    const datasetsCreate = trpc.datasetsCreate.useMutation({
+        onSettled() {
+            revalidate();
         },
     });
 
-    // const { rows, loading } = useAllDocs<DBTypes>({ include_docs: true });
-
-    const datasets = loading && !rows?.length ? [] : rows;
+    const handleAddDataset = async () => {
+        const dataset = await datasetsCreate.mutateAsync({});
+        navigate(`/dataset/${dataset.id}`);
+    };
 
     return (
         <div>
@@ -158,7 +153,7 @@ export default function Dashboard() {
                     <ul className="w-full font-medium flex-shrink">
                         {datasets.map((dataset) => {
                             return (
-                                <li key={dataset._id}>
+                                <li key={dataset.id}>
                                     <SidebarButton dataset={dataset} />
                                 </li>
                             );
@@ -196,17 +191,6 @@ export default function Dashboard() {
                             </button>
                         </li>
                     </ul>
-                    {showAuthWarning && (
-                        <div className="p-2 rounded-md border-2 border-black bg-white m-2 flex flex-col gap-2 items-start">
-                            <p>Please login to sync your data</p>
-                            <Link
-                                className="self-end text-sky-600 hover:text-sky-500"
-                                to="/login"
-                            >
-                                Login
-                            </Link>
-                        </div>
-                    )}
                 </div>
             </aside>
 
