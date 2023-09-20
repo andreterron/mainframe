@@ -2,6 +2,8 @@
 
 Mainframe is a database to sync data from third-party services.
 
+<img width="832" alt="Mainframe Screenshot" src="./assets/Mainframe_Screenshot.png">
+
 ## Get started
 
 #### Setup
