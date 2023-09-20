@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "10dab9fd-018c-47a0-861b-631b0e7e9b25",
+  "id": "807a03d9-ca7d-4a8a-9a2a-5facd14ecce6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "datasets": {
@@ -302,6 +302,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "single_user_key": {
+          "name": "single_user_key",
+          "type": "text check(`single_user_key` == 'admin')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'admin'"
         }
       },
       "indexes": {
@@ -309,6 +317,13 @@
           "name": "users_username_unique",
           "columns": [
             "username"
+          ],
+          "isUnique": true
+        },
+        "users_single_user_key_unique": {
+          "name": "users_single_user_key_unique",
+          "columns": [
+            "single_user_key"
           ],
           "isUnique": true
         }

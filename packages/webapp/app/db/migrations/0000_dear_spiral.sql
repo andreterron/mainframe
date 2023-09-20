@@ -40,10 +40,12 @@ CREATE TABLE `tables` (
 CREATE TABLE `users` (
 	`id` text PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))) NOT NULL,
 	`username` text NOT NULL,
-	`password` text NOT NULL
+	`password` text NOT NULL,
+	`single_user_key` text check(`single_user_key` == 'admin') DEFAULT 'admin' NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `objects_object_type_dataset_id_unique` ON `objects` (`object_type`,`dataset_id`);--> statement-breakpoint
 CREATE UNIQUE INDEX `rows_table_id_source_id_unique` ON `rows` (`table_id`,`source_id`);--> statement-breakpoint
 CREATE UNIQUE INDEX `tables_dataset_id_key_unique` ON `tables` (`dataset_id`,`key`);--> statement-breakpoint
-CREATE UNIQUE INDEX `users_username_unique` ON `users` (`username`);
+CREATE UNIQUE INDEX `users_username_unique` ON `users` (`username`);--> statement-breakpoint
+CREATE UNIQUE INDEX `users_single_user_key_unique` ON `users` (`single_user_key`);

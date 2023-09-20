@@ -3,6 +3,9 @@ import { ActionArgs, json, redirect } from "@remix-run/node";
 import { z } from "zod";
 import { createUserAccount } from "../lib/auth.server";
 import { commitSession, getSession } from "../sessions.server";
+import { db } from "../db/db.server";
+import { sql } from "drizzle-orm";
+import { usersTable } from "../db/schema";
 
 const zForm = z.object({
     username: z.string().nonempty(),
@@ -10,6 +13,17 @@ const zForm = z.object({
 });
 
 export async function action({ request }: ActionArgs) {
+    const [{ count }] = await db
+        .select({ count: sql<number>`COUNT(*)` })
+        .from(usersTable);
+
+    if (count > 0) {
+        throw json(
+            { message: "Only one user can be created, please login" },
+            { status: 401 },
+        );
+    }
+
     const data = await request.formData();
 
     const parsed = zForm.safeParse({

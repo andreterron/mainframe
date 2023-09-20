@@ -1,5 +1,23 @@
-import { sqliteTable, text, unique, integer } from "drizzle-orm/sqlite-core";
+import {
+    sqliteTable,
+    text,
+    unique,
+    integer,
+    customType,
+} from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
+
+// TODO: This only exists to ensure there's only one active user. This type can
+//       be removed once admins can create other users, and we have permissions
+const singleUserKey = (name: string) =>
+    customType<{
+        data: "admin";
+        driverData: string;
+    }>({
+        dataType() {
+            return `text check(\`${name}\` == 'admin')`;
+        },
+    })(name);
 
 export const datasetsTable = sqliteTable("datasets", {
     id: text("id")
@@ -88,9 +106,13 @@ export const usersTable = sqliteTable(
             .primaryKey(),
         username: text("username").notNull(),
         password: text("password").notNull(),
+        singleUserKey: singleUserKey("single_user_key")
+            .notNull()
+            .default("admin"),
     },
     (usersTable) => ({
         uniqueUsername: unique().on(usersTable.username),
+        singleUserConstraint: unique().on(usersTable.singleUserKey),
     }),
 );
 
