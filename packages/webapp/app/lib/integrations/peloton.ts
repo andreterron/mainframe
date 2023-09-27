@@ -35,7 +35,7 @@ export const peloton: Integration = {
                         .where(
                             and(
                                 eq(objectsTable.datasetId, dataset.id),
-                                eq(objectsTable.objectType, "me"),
+                                eq(objectsTable.objectType, "currentUser"),
                             ),
                         )
                         .limit(1);
