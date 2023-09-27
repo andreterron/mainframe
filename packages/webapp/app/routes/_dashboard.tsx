@@ -14,6 +14,7 @@ import { LoaderArgs, json, redirect } from "@remix-run/node";
 import { getSession } from "../sessions.server";
 import { db } from "../db/db.server";
 import { datasetsTable, usersTable } from "../db/schema";
+import { checkIfUserExists } from "../db/helpers";
 
 export async function loader({ request }: LoaderArgs) {
     // Force authentication for every /dashboard route
@@ -22,11 +23,8 @@ export async function loader({ request }: LoaderArgs) {
     const userId = session.get("userId");
 
     if (!userId) {
-        const users = await db
-            .select({ id: usersTable })
-            .from(usersTable)
-            .limit(1);
-        throw redirect(users.length ? "/login" : "/setup");
+        const hasUsers = await checkIfUserExists();
+        throw redirect(hasUsers ? "/login" : "/setup");
     }
 
     const datasets = await db.select().from(datasetsTable);

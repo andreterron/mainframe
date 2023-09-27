@@ -23,7 +23,7 @@ export async function validateUserAccount(
         .select({ id: usersTable.id, password: usersTable.password })
         .from(usersTable)
         .where(eq(usersTable.username, username));
-    return user.password === (await hash(password, user.password))
+    return user && user.password === (await hash(password, user.password))
         ? { id: user.id }
         : null;
 }
