@@ -252,7 +252,6 @@ export default function DatasetTableDetails() {
                         {dataset?.name}
                     </h1>
                     <Popover>
-                        {/* className="ml-2 inline-flex justify-center rounded-md text-gray-400 bg-black bg-opacity-0 p-1.5 text-sm font-medium hover:bg-opacity-5 data-[state=open]:bg-opacity-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-opacity-75" */}
                         <PopoverTrigger>
                             <MoreVerticalIcon className="h-4 w-4" />
                         </PopoverTrigger>
@@ -290,29 +289,7 @@ export default function DatasetTableDetails() {
                                 ))}
                         </DropdownMenuContent>
                     </DropdownMenu> */}
-                    {/* <button
-                        className="flex grow-0 shrink-0 gap-1 p-2 rounded hover:bg-gray-200"
-                        // onClick={handleDelete}
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            className="humbleicons hi-trash text-black w-5 h-5"
-                        >
-                            <path
-                                xmlns="http://www.w3.org/2000/svg"
-                                stroke="currentColor"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M6 6l.934 13.071A1 1 0 007.93 20h8.138a1 1 0 00.997-.929L18 6m-6 5v4m8-9H4m4.5 0l.544-1.632A2 2 0 0110.941 3h2.117a2 2 0 011.898 1.368L15.5 6"
-                            />
-                        </svg>
-                    </button> */}
                 </div>
-                {/* <h1 className="text-2xl m-4 font-medium">{dataset?.name}</h1> */}
                 <div></div>
                 <div className="max-w-full overflow-auto">
                     <table className="text-sm text-left text-gray-500 dark:text-gray-400 border-separate border-spacing-0 border-t">
