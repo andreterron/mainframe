@@ -8,7 +8,7 @@ import {
     ScrollRestoration,
     V2_MetaFunction,
 } from "@remix-run/react";
-import stylesheet from "~/tailwind.css";
+import stylesheet from "~/globals.css";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { trpc } from "./lib/trpc_client";

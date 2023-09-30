@@ -42,6 +42,7 @@ export const tablesTable = sqliteTable(
             onUpdate: "cascade",
             onDelete: "cascade",
         }),
+        view: text("view"),
     },
     (tablesTable) => ({
         uniqueTableSourceId: unique().on(
