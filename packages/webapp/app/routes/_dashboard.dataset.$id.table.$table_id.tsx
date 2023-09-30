@@ -314,8 +314,8 @@ export default function DatasetTableDetails() {
                 </div>
                 {/* <h1 className="text-2xl m-4 font-medium">{dataset?.name}</h1> */}
                 <div></div>
-                <div className="">
-                    <table className="w-full text-sm text-left text-gray-500 dark:text-gray-400 border-separate border-spacing-0 border-t">
+                <div className="max-w-full overflow-auto">
+                    <table className="text-sm text-left text-gray-500 dark:text-gray-400 border-separate border-spacing-0 border-t">
                         <thead className="text-sm text-gray-700 font-mono">
                             {table.getHeaderGroups().map((headerGroup) => (
                                 <tr key={headerGroup.id} className="">
