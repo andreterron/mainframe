@@ -252,7 +252,7 @@ export default function DatasetTableDetails() {
                         {dataset?.name}
                     </h1>
                     <Popover>
-                        <PopoverTrigger>
+                        <PopoverTrigger className="ml-2 inline-flex justify-center rounded-md bg-black bg-opacity-0 p-1.5 text-sm font-medium hover:bg-opacity-5 data-[state=open]:bg-opacity-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-opacity-75">
                             <MoreVerticalIcon className="h-4 w-4" />
                         </PopoverTrigger>
                         <PopoverContent className="w-auto">
