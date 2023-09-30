@@ -35,6 +35,7 @@ import {
 } from "../components/ui/popover";
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { Label } from "../components/ui/label";
+import { cn } from "../lib/utils";
 
 const colHelper = createColumnHelper<Record<string, any>>();
 
@@ -137,7 +138,14 @@ function ColumnMenuItem({
                 column.toggleVisibility();
             }}
         >
-            <span className="flex-1 min-w-0">{name}</span>
+            <span
+                className={cn(
+                    "flex-1 min-w-0",
+                    column.getIsVisible() ? "" : "text-muted-foreground italic",
+                )}
+            >
+                {name}
+            </span>
             <Button variant="ghost" size="icon" className="h-7 w-7">
                 {column.getIsVisible() ? (
                     <EyeIcon className="w-4 h-4" />
@@ -255,10 +263,10 @@ export default function DatasetTableDetails() {
                         <PopoverTrigger className="ml-2 inline-flex justify-center rounded-md bg-black bg-opacity-0 p-1.5 text-sm font-medium hover:bg-opacity-5 data-[state=open]:bg-opacity-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-opacity-75">
                             <MoreVerticalIcon className="h-4 w-4" />
                         </PopoverTrigger>
-                        <PopoverContent className="w-auto">
-                            <Label>Columns</Label>
-                            <Separator />
-                            <div className="flex flex-col gap-1">
+                        <PopoverContent className="w-auto px-0 py-1">
+                            <Label className="px-4 py-3 block">Columns</Label>
+                            <Separator className="w-full h-px bg-border" />
+                            <div className="flex flex-col gap-1 px-4 py-2">
                                 {table.getVisibleLeafColumns().map((column) => (
                                     <ColumnMenuItem column={column} />
                                 ))}
