@@ -10,6 +10,7 @@
     serviceConfig = {
       WorkingDirectory = ./.;
       ExecStart = "${pkgs.yarn}/bin/yarn start";
+      # TODO: Configure service to run as user, not root
     };
   };
 
