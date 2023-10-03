@@ -10,6 +10,7 @@ import type { Server } from "http";
 import { syncAll } from "./sync";
 import { datasetsTable } from "../app/db/schema";
 import { eq } from "drizzle-orm";
+import { startCloudflared } from "./cloudflared";
 
 const port = env.SYNC_PORT;
 
@@ -124,6 +125,8 @@ function startListen() {
 }
 
 startListen();
+
+startCloudflared();
 
 let addrInUseTimeout = 111;
 let addrInUseRetries = 1;
