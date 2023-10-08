@@ -1,22 +1,32 @@
-import { spawn } from "node:child_process";
+import { bin, install, tunnel } from "cloudflared";
+import { stat } from "node:fs/promises";
 import { env } from "../app/lib/env.server";
 
-export function startCloudflared() {
-    // TODO: Download the correct cloudflared binary. Look at the npm package.
-    //       Auto-update if needed.
-    const token = env.CLOUDFLARED_TOKEN;
-    // TODO: Get the correct path to the cloudflared executable
-    const bin = `cloudflared`;
-    if (!token) {
-        console.log("Missing Cloudflare Tunnel token");
-        return undefined;
+async function ensureCloudflaredInstalled() {
+    // TODO: Auto-update
+    try {
+        await stat(bin);
+    } catch (e: unknown) {
+        if (e && typeof e === "object" && "code" in e && e.code === "ENOENT") {
+            // install cloudflared binary
+            await install(bin);
+        }
     }
-    const process = spawn(bin, [
-        "tunnel",
-        "--no-autoupdate",
-        "run",
-        `--token="${token}"`,
-    ]);
+}
 
-    return process;
+export async function startCloudflared() {
+    const token = env.CLOUDFLARED_TOKEN;
+    if (!token) {
+        throw new Error("Missing Cloudflare Tunnel token");
+    }
+
+    await ensureCloudflaredInstalled();
+
+    const { child, connections, url } = tunnel({
+        "--no-autoupdate": null,
+        run: null,
+        [`--token=${token}`]: null,
+    });
+
+    return { child, url, connections };
 }

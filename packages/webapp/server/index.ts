@@ -11,18 +11,19 @@ import { syncAll } from "./sync";
 import { datasetsTable } from "../app/db/schema";
 import { eq } from "drizzle-orm";
 import { startCloudflared } from "./cloudflared";
+import type { ChildProcess } from "node:child_process";
 
 const port = env.SYNC_PORT;
 
-async function setupIntegrations() {
+async function setupWebhooks(baseApiUrl: string) {
     // Get all datasets
     const datasets = await db.select().from(datasetsTable);
 
     // For each integration
     for (let dataset of datasets) {
         const integration = getIntegrationForDataset(dataset);
-        if (integration?.setup) {
-            await integration.setup(dataset);
+        if (integration?.setupWebhooks) {
+            await integration.setupWebhooks(dataset, baseApiUrl);
         }
     }
 }
@@ -107,31 +108,50 @@ app.use(
 let server: Server | undefined;
 
 function startListen() {
-    server = app
-        .listen(port, () => {
-            console.log(`Sync server listening on port ${port}`);
-        })
-        .on("error", function (err) {
-            if ((err as any).code === "EADDRINUSE") {
-                // port is currently in use
-                console.log(`Address in use, retry ${addrInUseRetries++}...`);
-                setTimeout(() => {
-                    addrInUseTimeout *= 2;
-                    startListen();
-                }, addrInUseTimeout);
-                return;
-            }
-        });
+    return new Promise<void>((resolve, reject) => {
+        server = app
+            .listen(port, () => {
+                console.log(`Sync server listening on port ${port}`);
+                resolve();
+            })
+            .on("error", function (err) {
+                if ((err as any).code === "EADDRINUSE") {
+                    // port is currently in use
+                    console.log(
+                        `Address in use, retry ${addrInUseRetries++}...`,
+                    );
+                    setTimeout(() => {
+                        addrInUseTimeout *= 2;
+                        startListen().then(resolve, reject);
+                    }, addrInUseTimeout);
+                    return;
+                }
+            });
+    });
 }
 
-startListen();
+const serverPromise = startListen();
 
-startCloudflared();
+let cloudflaredProcess: ChildProcess | undefined;
 
-let addrInUseTimeout = 111;
+startCloudflared()
+    .then(async ({ child, url, connections }) => {
+        cloudflaredProcess = child;
+
+        const baseApiUrl = env.TUNNEL_BASE_API_URL;
+
+        // Ensure tunnel is connected before setting up webhooks
+        await Promise.all(connections);
+
+        // Wait for the API to be ready
+        await serverPromise;
+
+        await setupWebhooks(baseApiUrl);
+    })
+    .catch((e) => console.error(e));
+
+let addrInUseTimeout = 100;
 let addrInUseRetries = 1;
-
-setupIntegrations();
 
 process.on("uncaughtException", (err) => {
     console.error(err);
@@ -143,7 +163,14 @@ process.on("unhandledRejection", (err) => {
     process.exit(1);
 });
 
-closeWithGrace(() => {
-    server?.close();
+closeWithGrace(async ({ signal }) => {
     task.stop();
+    cloudflaredProcess?.kill(signal);
+    if (server) {
+        await new Promise<void>((resolve, reject) =>
+            server?.close((e) => {
+                e ? reject(e) : resolve();
+            }),
+        );
+    }
 });

@@ -9,7 +9,6 @@ import {
 } from "../../../server/sync";
 import { getDatasetObject, getDatasetTable } from "../integrations";
 import crypto from "crypto";
-import { env } from "../env.server";
 import { objectsTable, rowsTable, tablesTable } from "../../db/schema";
 import { and, eq } from "drizzle-orm";
 import { deserialize } from "../../utils/serialization";
@@ -76,10 +75,12 @@ function isPingWebhookEvent(event: TogglWebhook): event is TogglWebhookPing {
 
 export const toggl: Integration = {
     name: "Toggl",
-    setup: async (dataset: Dataset) => {
-        if (!env.TUNNEL_BASE_API_URL) {
-            // No tunnel URL
-            console.log("Skipping Toggl webhooks: Missing tunnel URL");
+    setupWebhooks: async (dataset: Dataset, baseApiUrl: string) => {
+        // Remove trailing slashes
+        const normalizedBaseApiUrl = baseApiUrl.replace(/\/+$/, "");
+        if (!normalizedBaseApiUrl) {
+            // Empty baseApiUrl
+            console.log("Skipping Toggl webhooks: Empty baseApiUrl");
             return;
         }
 
@@ -97,7 +98,7 @@ export const toggl: Integration = {
         const workspaceIds: number[] = workspaces.map((row) => row.id);
 
         for (let id of workspaceIds) {
-            const callbackUrl = `${env.TUNNEL_BASE_API_URL}/webhooks/${dataset.id}`;
+            const callbackUrl = `${normalizedBaseApiUrl}/webhooks/${dataset.id}`;
 
             // Check if this workspace already has a webhook subscription
             const res = await fetch(
