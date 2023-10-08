@@ -1,4 +1,4 @@
-import { useLoaderData, useParams, useRevalidator } from "@remix-run/react";
+import { useParams } from "@remix-run/react";
 import DatasetSetup from "../components/DatasetSetup";
 import DatasetTokenInput from "../components/DatasetTokenInput";
 import {
@@ -7,44 +7,25 @@ import {
 } from "../lib/integrations";
 import { DatasetPage } from "../components/DatasetPage";
 import { trpc } from "../lib/trpc_client";
-import { LoaderArgs, json } from "@remix-run/node";
-import { db } from "../db/db.server";
-import { datasetsTable } from "../db/schema";
-import { eq } from "drizzle-orm";
-import { notFound } from "remix-utils";
-
-export async function loader({ params }: LoaderArgs) {
-    const id = params.id;
-
-    if (!id) {
-        throw notFound({});
-    }
-
-    const [dataset] = await db
-        .select()
-        .from(datasetsTable)
-        .where(eq(datasetsTable.id, id))
-        .limit(1);
-
-    if (!dataset) {
-        throw notFound({});
-    }
-
-    return json({ dataset });
-}
 
 export default function DatasetDetails() {
     const { id } = useParams();
 
-    const { dataset } = useLoaderData<typeof loader>();
-
-    const { revalidate } = useRevalidator();
+    // TODO: handle undefined/empty id
+    const { data: dataset, refetch } = trpc.datasetsGet.useQuery({
+        id: id ?? "",
+    });
 
     const datasetsUpdate = trpc.datasetsUpdate.useMutation({
         onSettled() {
-            revalidate();
+            refetch();
         },
     });
+
+    if (!dataset) {
+        // TODO: Handle loading, error or not found
+        return null;
+    }
 
     // Functions
 

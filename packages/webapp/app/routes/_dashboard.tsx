@@ -13,8 +13,9 @@ import { trpc } from "../lib/trpc_client";
 import { LoaderArgs, json, redirect } from "@remix-run/node";
 import { getSession } from "../sessions.server";
 import { db } from "../db/db.server";
-import { datasetsTable, usersTable } from "../db/schema";
+import { datasetsTable } from "../db/schema";
 import { checkIfUserExists } from "../db/helpers";
+import { ClientOnly } from "remix-utils";
 
 export async function loader({ request }: LoaderArgs) {
     // Force authentication for every /dashboard route
@@ -203,7 +204,8 @@ export default function Dashboard() {
             />
 
             <div className="sm:ml-64">
-                <Outlet />
+                {/* TODO: Remove <ClientOnly> when we disable SSR */}
+                <ClientOnly>{() => <Outlet />}</ClientOnly>
             </div>
         </div>
     );

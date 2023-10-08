@@ -1,5 +1,4 @@
-import { type LoaderArgs, json, ActionArgs } from "@remix-run/node";
-import { Link, useFetcher, useLoaderData } from "@remix-run/react";
+import { Link, useParams } from "@remix-run/react";
 import { useEffect, useMemo, useState } from "react";
 import {
     Column,
@@ -10,13 +9,6 @@ import {
     getCoreRowModel,
     useReactTable,
 } from "@tanstack/react-table";
-import { db } from "../db/db.server";
-import { datasetsTable, rowsTable, tablesTable } from "../db/schema";
-import { and, eq } from "drizzle-orm";
-import { deserializeData } from "../utils/serialization";
-import { getDatasetTable } from "../lib/integrations";
-import { syncTable } from "../../server/sync";
-import { badRequest, notFound } from "remix-utils";
 import { ColumnMenu } from "../components/ColumnMenu";
 import {
     DropdownMenu,
@@ -36,93 +28,9 @@ import {
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { Label } from "../components/ui/label";
 import { cn } from "../lib/utils";
+import { trpc } from "../lib/trpc_client";
 
 const colHelper = createColumnHelper<Record<string, any>>();
-
-const LIMIT = 50;
-
-export async function loader({ params }: LoaderArgs) {
-    const datasetId = params.id;
-    const tableId = params.table_id;
-    if (!datasetId || !tableId) {
-        throw notFound({});
-    }
-
-    const [dataset] = await db
-        .select()
-        .from(datasetsTable)
-        .where(eq(datasetsTable.id, datasetId))
-        .limit(1);
-
-    if (!dataset) {
-        throw notFound({});
-    }
-
-    const table = getDatasetTable(dataset, tableId);
-
-    if (!table) {
-        throw notFound({});
-    }
-
-    // Upsert table
-    const tableRows = await db
-        .insert(tablesTable)
-        .values({ datasetId: dataset.id, name: table.name, key: tableId })
-        .onConflictDoUpdate({
-            target: [tablesTable.datasetId, tablesTable.key],
-            set: { key: tableId },
-        })
-        .returning({ view: tablesTable.view });
-
-    const rows = await db
-        .select({ id: rowsTable.id, data: rowsTable.data })
-        .from(rowsTable)
-        .innerJoin(tablesTable, eq(tablesTable.id, rowsTable.tableId))
-        .where(
-            and(
-                eq(tablesTable.datasetId, datasetId),
-                eq(tablesTable.key, tableId),
-            ),
-        )
-        .limit(LIMIT);
-
-    // Trigger sync of this table in the background
-    void syncTable(dataset, table).catch((e) => console.error(e));
-
-    return json({
-        dataset,
-        rows: rows.map(deserializeData),
-        table: tableRows.at(0),
-    });
-}
-
-export async function action({ request, params }: ActionArgs) {
-    if (request.method === "PUT") {
-        const body = await request.formData();
-        const view = body.get("view");
-        const datasetId = params.id;
-        const tableId = params.table_id;
-        // TODO: Check if this tableId is correct
-        if (typeof view === "string" && datasetId && tableId) {
-            // TODO: Make sure view is what we expect before saving
-            console.log("table_id:", params.table_id);
-            const returned = await db
-                .update(tablesTable)
-                .set({ view: view })
-                .where(
-                    and(
-                        eq(tablesTable.datasetId, datasetId),
-                        eq(tablesTable.key, tableId),
-                    ),
-                )
-                .returning();
-            console.log("RETURNED", returned);
-            return json({ success: true });
-        }
-        return badRequest({ message: "Invalid view or tableId" });
-    }
-    return json({ message: "Method not allowed" }, { status: 405 });
-}
 
 function ColumnMenuItem({
     column,
@@ -158,9 +66,13 @@ function ColumnMenuItem({
 }
 
 export default function DatasetTableDetails() {
-    const { dataset, rows, table: dbTable } = useLoaderData<typeof loader>();
-    const fetcher = useFetcher<typeof action>();
-    console.log;
+    const params = useParams();
+    const datasetId = params.id;
+    const tableId = params.table_id;
+    const { data } = trpc.tablesPageLoader.useQuery({ datasetId, tableId });
+    const dataset = data?.dataset,
+        rows = data?.rows,
+        dbTable = data?.table;
     const view = dbTable?.view ? JSON.parse(dbTable.view) ?? {} : {};
     const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
         view.columnVisibility ?? {},
@@ -169,15 +81,20 @@ export default function DatasetTableDetails() {
         view.columnOrder ?? [],
     );
 
-    useEffect(() => {
-        // TODO: Avoid writing this too many times
-        fetcher.submit(
-            { view: JSON.stringify({ columnVisibility, columnOrder }) },
-            { method: "PUT" },
-        );
-    }, [columnVisibility, columnOrder]);
+    const updateTableView = trpc.tablesUpdateView.useMutation();
 
-    // fetcher.submit({ serialized: "values" }, { method: "PUT" });
+    useEffect(() => {
+        if (!datasetId || !tableId) {
+            console.error("Invalid dataset or table ID");
+            return;
+        }
+        // TODO: Avoid writing this too many times
+        updateTableView.mutate({
+            datasetId,
+            tableId,
+            view: JSON.stringify({ columnVisibility, columnOrder }),
+        });
+    }, [columnVisibility, columnOrder, datasetId, tableId]);
 
     let columns = useMemo(() => {
         const columnsSet = new Set<string>();
@@ -251,6 +168,11 @@ export default function DatasetTableDetails() {
             return originalRow.id;
         },
     });
+
+    if (!dataset || !dbTable) {
+        // TODO: Not found / Loading / Error
+        return null;
+    }
 
     return (
         <div className="flex flex-col relative max-h-screen overflow-y-auto">
