@@ -3,7 +3,6 @@ import { Dataset } from "../lib/types";
 import { DatasetHeader } from "./DatasetHeader";
 import type { ClientIntegration } from "../lib/integration-types";
 
-// TODO: integration type
 export function DatasetPage({
     dataset,
     integration,

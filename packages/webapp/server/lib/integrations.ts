@@ -11,8 +11,6 @@ import { posthog } from "./integrations/posthog";
 import { toggl } from "./integrations/toggl";
 import { Dataset } from "../../app/lib/types";
 
-// NEXT UP: Separate this between server and client
-
 export function getIntegrationFromType(
     type: string | undefined,
 ): Integration | null {

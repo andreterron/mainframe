@@ -104,7 +104,6 @@ export default function AuthSignup() {
                         Go to dashboard
                     </Link>{" "}
                     <span className="text-gray-400">•</span>{" "}
-                    {/* TODO: Review logout */}
                     <Link
                         className="text-sky-600 hover:text-sky-500"
                         to="/logout"

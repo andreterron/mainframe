@@ -20,7 +20,7 @@ function App() {
     return (
         <trpc.Provider client={trpcClient} queryClient={queryClient}>
             <QueryClientProvider client={queryClient}>
-                <RouterProvider router={router!} />
+                <RouterProvider router={router} />
             </QueryClientProvider>
         </trpc.Provider>
     );

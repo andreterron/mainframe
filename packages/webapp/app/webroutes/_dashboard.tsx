@@ -169,7 +169,16 @@ export default function Dashboard() {
                             </button>
                         </li>
                     </ul>
-                    <Link to="/logout">Logout</Link>
+                    <Link
+                        to="/logout"
+                        className={clsx([
+                            "flex w-full items-center gap-1.5 p-2 rounded-lg",
+                            "text-slate-600 hover:text-sky-600",
+                            "hover:bg-sky-300/40",
+                        ])}
+                    >
+                        Logout
+                    </Link>
                 </div>
             </aside>
 
