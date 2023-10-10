@@ -13,6 +13,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { trpc } from "./lib/trpc_client";
 import { httpBatchLink } from "@trpc/client";
+import { ClientOnly } from "remix-utils";
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: stylesheet },
@@ -45,7 +46,8 @@ export default function App() {
                         <Links />
                     </head>
                     <body>
-                        <Outlet />
+                        {/* TODO: Remove <ClientOnly> when we disable SSR */}
+                        <ClientOnly>{() => <Outlet />}</ClientOnly>
                         <ScrollRestoration />
                         <Scripts />
                         <LiveReload />

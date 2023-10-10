@@ -11,10 +11,12 @@ import { Context } from "./trpc_context";
 import { zDatasetInsert, zDatasetPatch } from "../db/validation";
 import { and, eq } from "drizzle-orm";
 import { syncDataset, syncObject, syncTable } from "../../server/sync";
-import { getSession } from "../sessions.server";
+import { commitSession, destroySession, getSession } from "../sessions.server";
 import { getDatasetObject, getDatasetTable } from "../lib/integrations";
 import { deserializeData } from "../utils/serialization";
 import { ROW_LIMIT } from "../utils/constants";
+import { createUserAccount, validateUserAccount } from "../lib/auth.server";
+import { checkIfUserExists } from "../db/helpers";
 
 /**
  * Initialization of tRPC backend
@@ -30,7 +32,7 @@ const isAuthed = t.middleware(async (opts) => {
 
     const session = await getSession(ctx.req.headers.get("cookie"));
 
-    const userId = session.get("userId");
+    const userId = session.data.userId;
 
     if (!userId) {
         throw new TRPCError({ code: "UNAUTHORIZED" });
@@ -48,6 +50,101 @@ export const protectedProcedure = t.procedure.use(isAuthed);
  * that can be used throughout the router
  */
 export const appRouter = router({
+    // Auth
+    authInfo: t.procedure.query(async ({ input, ctx }) => {
+        console.log("TRPC AUTH INFO");
+        const hasUsers = await checkIfUserExists();
+
+        const session = await getSession(ctx.req.headers.get("Cookie"));
+        const userId = session.data.userId;
+        console.log("TRPC AUTH INFO DATA", userId);
+
+        return {
+            hasUsers,
+            isLoggedIn: !!userId,
+        };
+    }),
+    login: t.procedure
+        .input(
+            z.object({
+                username: z.string().nonempty(),
+                password: z.string().nonempty(),
+            }),
+        )
+        .mutation(async ({ input, ctx }) => {
+            const { username, password } = input;
+
+            const account = await validateUserAccount(username, password);
+
+            if (!account) {
+                throw new TRPCError({
+                    code: "UNAUTHORIZED",
+                    message: "Invalid username/password",
+                });
+            }
+
+            // Don't pass the cookie header here, because we always want a fresh session
+            const session = await getSession();
+
+            session.data.userId = account.id;
+
+            ctx.resHeaders.append("Set-Cookie", await commitSession(session));
+
+            console.log("TRPC ALMOST DONE LOGIN");
+            return {
+                redirect: "/",
+            };
+        }),
+    signup: t.procedure
+        .input(
+            z.object({
+                username: z.string().nonempty(),
+                password: z.string().nonempty(),
+            }),
+        )
+        .mutation(async ({ input, ctx }) => {
+            const hasUsers = await checkIfUserExists();
+
+            if (hasUsers) {
+                throw new TRPCError({
+                    code: "BAD_REQUEST",
+                    message: "Only one user can be created, please login",
+                });
+            }
+
+            const { username, password } = input;
+
+            // TODO: This can fail if the username already exists
+            const account = await createUserAccount(username, password);
+
+            // Don't pass the cookie header here, because we always want a fresh session
+            const session = await getSession();
+
+            session.data.userId = account.id;
+
+            ctx.resHeaders.append("Set-Cookie", await commitSession(session));
+
+            return {
+                redirect: "/",
+            };
+        }),
+    logout: t.procedure.mutation(async ({ ctx }) => {
+        const session = await getSession(ctx.req.headers.get("Cookie"));
+
+        const hasUsers = await checkIfUserExists();
+
+        ctx.resHeaders.append("Set-Cookie", await destroySession(session));
+
+        return {
+            redirect: hasUsers ? "/login" : "/setup",
+        };
+    }),
+
+    // Dataset
+    datasetsAll: protectedProcedure.query(async () => {
+        const datasets = await db.select().from(datasetsTable);
+        return datasets;
+    }),
     datasetsGet: protectedProcedure
         .input(z.object({ id: z.string().nonempty() }))
         .query(async ({ input }) => {

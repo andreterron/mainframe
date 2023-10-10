@@ -1,5 +1,5 @@
 import { PropsWithChildren } from "react";
-import { useNavigate, useRevalidator } from "@remix-run/react";
+import { useNavigate } from "@remix-run/react";
 import { trpc } from "../lib/trpc_client";
 import { Dataset } from "../lib/types";
 
@@ -9,11 +9,11 @@ export function DatasetHeader({
 }: PropsWithChildren<{ dataset: Pick<Dataset, "id"> }>) {
     const navigate = useNavigate();
 
-    const { revalidate } = useRevalidator();
+    const utils = trpc.useContext();
 
     const datasetsDelete = trpc.datasetsDelete.useMutation({
         onSettled() {
-            revalidate();
+            utils.datasetsAll.invalidate();
         },
     });
 

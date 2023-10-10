@@ -1,74 +1,51 @@
-import { Link, useFetcher, useLoaderData } from "@remix-run/react";
-import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
-import { z } from "zod";
-import { createUserAccount } from "../lib/auth.server";
-import { commitSession, getSession } from "../sessions.server";
-import { checkIfUserExists } from "../db/helpers";
-
-const zForm = z.object({
-    username: z.string().nonempty(),
-    password: z.string().nonempty(),
-});
-
-export async function loader({ request }: LoaderArgs) {
-    const hasUsers = await checkIfUserExists();
-
-    const session = await getSession(request.headers.get("Cookie"));
-    const userId = session.get("userId");
-
-    return json({
-        hasUsers,
-        isLoggedIn: !!userId,
-    });
-}
-
-export async function action({ request }: ActionArgs) {
-    const hasUsers = await checkIfUserExists();
-
-    if (hasUsers) {
-        return json(
-            { error: "Only one user can be created, please login" },
-            { status: 401 },
-        );
-    }
-
-    const data = await request.formData();
-
-    const parsed = zForm.safeParse({
-        username: data.get("username"),
-        password: data.get("password"),
-    });
-
-    if (!parsed.success) {
-        return json({ error: "Missing username/password" }, { status: 400 });
-    }
-
-    const { username, password } = parsed.data;
-
-    // TODO: This can fail if the username already exists
-    const account = await createUserAccount(username, password);
-
-    // Don't pass the cookie header here, because we always want a fresh session
-    const session = await getSession();
-
-    session.set("userId", account.id);
-
-    return redirect("/", {
-        headers: {
-            "Set-Cookie": await commitSession(session),
-        },
-    });
-}
+import { Link, useNavigate } from "@remix-run/react";
+import { trpc } from "../lib/trpc_client";
+import { TRPCClientError } from "@trpc/client";
+import { useState } from "react";
 
 export default function AuthSignup() {
-    const fetcher = useFetcher<typeof action>();
-    const { hasUsers, isLoggedIn } = useLoaderData<typeof loader>();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string>();
 
-    const error = fetcher.data?.error;
+    const { data: authInfo } = trpc.authInfo.useQuery();
+    const hasUsers = authInfo?.hasUsers ?? false;
+    const isLoggedIn = authInfo?.isLoggedIn ?? false;
+
+    const signup = trpc.signup.useMutation();
+
+    const navigate = useNavigate();
+    async function handleSubmit(username: string, password: string) {
+        setLoading(true);
+        try {
+            const result = await signup.mutateAsync({
+                username,
+                password,
+            });
+            navigate(result.redirect);
+        } catch (e) {
+            console.error(e);
+            if (e instanceof TRPCClientError) {
+                setError(e.message);
+            }
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <div className="space-y-4">
-            <fetcher.Form className="space-y-4" method="post">
+            <form
+                className="space-y-4"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    if (e.target instanceof HTMLFormElement) {
+                        handleSubmit(
+                            e.target.username.value,
+                            e.target.password.value,
+                        );
+                    }
+                }}
+            >
                 <div className="mb-4">
                     <h2 className="text-gray-600 font-bold">Create account</h2>
                     <p className="text-sm">
@@ -107,14 +84,17 @@ export default function AuthSignup() {
                     />
                 </div>
                 <div>
-                    <button className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:text-gray-300 rounded text-sm font-bold text-gray-50 transition duration-200">
+                    <button
+                        disabled={loading}
+                        className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-500 disabled:text-gray-300 rounded text-sm font-bold text-gray-50 transition duration-200"
+                    >
                         Sign up
                     </button>
                 </div>
                 {error ? (
                     <div className="mt-2 text-sm text-rose-700">{error}</div>
                 ) : null}
-            </fetcher.Form>
+            </form>
             {isLoggedIn ? (
                 <div className="mt-2 text-sm">
                     <span className="font-semibold">
@@ -124,6 +104,7 @@ export default function AuthSignup() {
                         Go to dashboard
                     </Link>{" "}
                     <span className="text-gray-400">•</span>{" "}
+                    {/* TODO: Review logout */}
                     <Link
                         className="text-sky-600 hover:text-sky-500"
                         to="/logout"

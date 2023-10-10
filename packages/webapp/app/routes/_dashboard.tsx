@@ -1,37 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import clsx from "clsx";
-import {
-    NavLink,
-    Outlet,
-    useLoaderData,
-    useNavigate,
-    useRevalidator,
-} from "@remix-run/react";
+import { Link, NavLink, Outlet, useNavigate } from "@remix-run/react";
 import { Dataset } from "../lib/types";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 import { trpc } from "../lib/trpc_client";
-import { LoaderArgs, json, redirect } from "@remix-run/node";
-import { getSession } from "../sessions.server";
-import { db } from "../db/db.server";
-import { datasetsTable } from "../db/schema";
-import { checkIfUserExists } from "../db/helpers";
-import { ClientOnly } from "remix-utils";
-
-export async function loader({ request }: LoaderArgs) {
-    // Force authentication for every /dashboard route
-    const session = await getSession(request.headers.get("Cookie"));
-
-    const userId = session.get("userId");
-
-    if (!userId) {
-        const hasUsers = await checkIfUserExists();
-        throw redirect(hasUsers ? "/login" : "/setup");
-    }
-
-    const datasets = await db.select().from(datasetsTable);
-
-    return json({ datasets });
-}
 
 export function SidebarButton({ dataset }: { dataset: Dataset }) {
     const type = dataset.integrationType;
@@ -100,12 +72,19 @@ export default function Dashboard() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const navigate = useNavigate();
 
-    const { datasets } = useLoaderData<typeof loader>();
-    const { revalidate } = useRevalidator();
+    const { data: authInfo, isFetching } = trpc.authInfo.useQuery();
+    const { data: datasets, refetch } = trpc.datasetsAll.useQuery();
+
+    useEffect(() => {
+        if (!isFetching && authInfo && !authInfo.isLoggedIn) {
+            console.log("AUTH INFO", authInfo);
+            navigate(authInfo.hasUsers ? "/login" : "/setup");
+        }
+    }, [authInfo]);
 
     const datasetsCreate = trpc.datasetsCreate.useMutation({
         onSettled() {
-            revalidate();
+            refetch();
         },
     });
 
@@ -150,7 +129,7 @@ export default function Dashboard() {
             >
                 <div className="h-full flex flex-col justify-between px-3 py-4 overflow-y-auto bg-gradient-to-b from-sky-100 to-sky-200">
                     <ul className="w-full font-medium flex-shrink">
-                        {datasets.map((dataset) => {
+                        {(datasets ?? []).map((dataset) => {
                             return (
                                 <li key={dataset.id}>
                                     <SidebarButton dataset={dataset} />
@@ -190,6 +169,7 @@ export default function Dashboard() {
                             </button>
                         </li>
                     </ul>
+                    <Link to="/logout">Logout</Link>
                 </div>
             </aside>
 
@@ -204,8 +184,7 @@ export default function Dashboard() {
             />
 
             <div className="sm:ml-64">
-                {/* TODO: Remove <ClientOnly> when we disable SSR */}
-                <ClientOnly>{() => <Outlet />}</ClientOnly>
+                <Outlet />
             </div>
         </div>
     );

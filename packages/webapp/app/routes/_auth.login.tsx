@@ -1,68 +1,51 @@
-import { ActionArgs, LoaderArgs, json, redirect } from "@remix-run/node";
-import { Link, useFetcher, useLoaderData } from "@remix-run/react";
-import { z } from "zod";
-import { validateUserAccount } from "../lib/auth.server";
-import { getSession, commitSession } from "../sessions.server";
-import { checkIfUserExists } from "../db/helpers";
+import { Link, useNavigate } from "@remix-run/react";
+import { useState } from "react";
+import { trpc } from "../lib/trpc_client";
+import { TRPCClientError } from "@trpc/client";
 
-const zForm = z.object({
-    username: z.string().nonempty(),
-    password: z.string().nonempty(),
-});
+export default function AuthLogin() {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string>();
+    const { data: authInfo } = trpc.authInfo.useQuery();
+    const hasUsers = authInfo?.hasUsers ?? false;
+    const isLoggedIn = authInfo?.isLoggedIn ?? false;
 
-export async function loader({ request }: LoaderArgs) {
-    const hasUsers = await checkIfUserExists();
+    const navigate = useNavigate();
 
-    const session = await getSession(request.headers.get("Cookie"));
-    const userId = session.get("userId");
+    const login = trpc.login.useMutation();
 
-    return json({
-        hasUsers,
-        isLoggedIn: !!userId,
-    });
-}
-
-export async function action({ request }: ActionArgs) {
-    const data = await request.formData();
-
-    const parsed = zForm.safeParse({
-        username: data.get("username"),
-        password: data.get("password"),
-    });
-
-    if (!parsed.success) {
-        return json({ error: "Missing username/password" }, { status: 400 });
+    async function handleSubmit(username: string, password: string) {
+        setLoading(true);
+        try {
+            const result = await login.mutateAsync({
+                username,
+                password,
+            });
+            navigate(result.redirect);
+        } catch (e) {
+            console.error(e);
+            if (e instanceof TRPCClientError) {
+                setError(e.message);
+            }
+        } finally {
+            setLoading(false);
+        }
     }
-
-    const { username, password } = parsed.data;
-
-    const account = await validateUserAccount(username, password);
-
-    if (!account) {
-        return json({ error: "Invalid username/password" }, { status: 401 });
-    }
-
-    // Don't pass the cookie header here, because we always want a fresh session
-    const session = await getSession();
-
-    session.set("userId", account.id);
-
-    return redirect("/", {
-        headers: {
-            "Set-Cookie": await commitSession(session),
-        },
-    });
-}
-
-export default function AuthSignup() {
-    const fetcher = useFetcher<typeof action>();
-    const { hasUsers, isLoggedIn } = useLoaderData<typeof loader>();
-
-    const error = fetcher.data?.error;
 
     return (
         <div className="space-y-4">
-            <fetcher.Form className="space-y-4" method="post">
+            <form
+                className="space-y-4"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    if (e.target instanceof HTMLFormElement) {
+                        handleSubmit(
+                            e.target.username.value,
+                            e.target.password.value,
+                        );
+                    }
+                }}
+            >
                 <div className="mb-4">
                     <h2 className="text-gray-600 font-bold">Login</h2>
                 </div>
@@ -98,14 +81,17 @@ export default function AuthSignup() {
                     />
                 </div>
                 <div>
-                    <button className="w-full py-4 bg-blue-600 hover:bg-blue-700 rounded text-sm font-bold text-gray-50 transition duration-200">
+                    <button
+                        disabled={loading}
+                        className="w-full py-4 bg-blue-600 hover:bg-blue-700 rounded text-sm font-bold text-gray-50 transition duration-200"
+                    >
                         Sign In
                     </button>
                 </div>
                 {error ? (
                     <div className="mt-2 text-sm text-rose-700">{error}</div>
                 ) : null}
-            </fetcher.Form>
+            </form>
             {isLoggedIn ? (
                 <div className="mt-2 text-sm">
                     <span className="font-semibold">
@@ -115,6 +101,7 @@ export default function AuthSignup() {
                         Go to dashboard
                     </Link>{" "}
                     <span className="text-gray-400">•</span>{" "}
+                    {/* TODO: Review logout */}
                     <Link
                         className="text-sky-600 hover:text-sky-500"
                         to="/logout"
