@@ -28,7 +28,9 @@ export default function App() {
         trpc.createClient({
             links: [
                 httpBatchLink({
-                    url: "/trpc",
+                    // TODO: Update to `/trpc` once everything is hosted
+                    //       on the same endpoint
+                    url: "http://localhost:8745/trpc",
                 }),
             ],
         }),

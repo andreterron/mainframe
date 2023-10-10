@@ -10,6 +10,13 @@ import type { Server } from "http";
 import { syncAll } from "./sync";
 import { datasetsTable } from "../app/db/schema";
 import { eq } from "drizzle-orm";
+import { initTRPC } from "@trpc/server";
+import * as trpcExpress from "@trpc/server/adapters/express";
+import { Context, createContext } from "../app/server/trpc_context";
+import { appRouter } from "../app/server/trpc_router";
+import cors from "cors";
+
+const t = initTRPC.context<Context>().create();
 
 const port = env.SYNC_PORT;
 
@@ -84,6 +91,15 @@ app.all(
             next(e);
         }
     },
+);
+
+app.use(
+    "/trpc",
+    cors(),
+    trpcExpress.createExpressMiddleware({
+        router: appRouter,
+        createContext,
+    }),
 );
 
 app.use(

@@ -30,7 +30,7 @@ const router = t.router;
 const isAuthed = t.middleware(async (opts) => {
     const { ctx } = opts;
 
-    const session = await getSession(ctx.req.headers.get("cookie"));
+    const session = await getSession(ctx.req.header("cookie"));
 
     const userId = session.data.userId;
 
@@ -55,7 +55,7 @@ export const appRouter = router({
         console.log("TRPC AUTH INFO");
         const hasUsers = await checkIfUserExists();
 
-        const session = await getSession(ctx.req.headers.get("Cookie"));
+        const session = await getSession(ctx.req.header("cookie"));
         const userId = session.data.userId;
         console.log("TRPC AUTH INFO DATA", userId);
 
@@ -88,7 +88,7 @@ export const appRouter = router({
 
             session.data.userId = account.id;
 
-            ctx.resHeaders.append("Set-Cookie", await commitSession(session));
+            ctx.res.appendHeader("Set-Cookie", await commitSession(session));
 
             console.log("TRPC ALMOST DONE LOGIN");
             return {
@@ -122,18 +122,18 @@ export const appRouter = router({
 
             session.data.userId = account.id;
 
-            ctx.resHeaders.append("Set-Cookie", await commitSession(session));
+            ctx.res.appendHeader("Set-Cookie", await commitSession(session));
 
             return {
                 redirect: "/",
             };
         }),
     logout: t.procedure.mutation(async ({ ctx }) => {
-        const session = await getSession(ctx.req.headers.get("Cookie"));
+        const session = await getSession(ctx.req.header("Cookie"));
 
         const hasUsers = await checkIfUserExists();
 
-        ctx.resHeaders.append("Set-Cookie", await destroySession(session));
+        ctx.res.appendHeader("Set-Cookie", await destroySession(session));
 
         return {
             redirect: hasUsers ? "/login" : "/setup",
