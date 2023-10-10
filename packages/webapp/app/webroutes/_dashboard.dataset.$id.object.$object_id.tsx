@@ -1,4 +1,4 @@
-import { useParams } from "@remix-run/react";
+import { useParams } from "react-router-dom";
 import { trpc } from "../lib/trpc_client";
 
 export default function DatasetObjectDetails() {

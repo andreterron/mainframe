@@ -1,4 +1,4 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router-dom";
 import { Dataset } from "../lib/types";
 import { getObjectsForDataset, getTablesForDataset } from "../lib/integrations";
 import { DatasetHeader } from "./DatasetHeader";

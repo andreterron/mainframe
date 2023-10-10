@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { trpc } from "../lib/trpc_client";
-import { useNavigate } from "@remix-run/react";
+import { useNavigate } from "react-router-dom";
 
 export default function AuthLogout() {
     const logout = trpc.logout.useMutation();

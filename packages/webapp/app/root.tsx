@@ -3,7 +3,6 @@ import {
     Links,
     LiveReload,
     Meta,
-    Outlet,
     Scripts,
     ScrollRestoration,
     V2_MetaFunction,
@@ -14,6 +13,8 @@ import { useState } from "react";
 import { trpc } from "./lib/trpc_client";
 import { httpBatchLink } from "@trpc/client";
 import { ClientOnly } from "remix-utils";
+import { RouterProvider } from "react-router-dom";
+import { router } from "./router";
 
 export const links: LinksFunction = () => [
     { rel: "stylesheet", href: stylesheet },
@@ -47,7 +48,9 @@ export default function App() {
                     </head>
                     <body>
                         {/* TODO: Remove <ClientOnly> when we disable SSR */}
-                        <ClientOnly>{() => <Outlet />}</ClientOnly>
+                        <ClientOnly>
+                            {() => <RouterProvider router={router!} />}
+                        </ClientOnly>
                         <ScrollRestoration />
                         <Scripts />
                         <LiveReload />

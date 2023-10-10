@@ -1,4 +1,4 @@
-import { Link, useParams } from "@remix-run/react";
+import { Link, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import {
     Column,

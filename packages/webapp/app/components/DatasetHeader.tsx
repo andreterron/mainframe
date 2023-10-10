@@ -1,5 +1,5 @@
 import { PropsWithChildren } from "react";
-import { useNavigate } from "@remix-run/react";
+import { useNavigate } from "react-router-dom";
 import { trpc } from "../lib/trpc_client";
 import { Dataset } from "../lib/types";
 
