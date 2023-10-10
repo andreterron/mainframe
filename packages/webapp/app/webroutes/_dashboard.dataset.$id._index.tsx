@@ -1,10 +1,6 @@
 import { useParams } from "react-router-dom";
 import DatasetSetup from "../components/DatasetSetup";
 import DatasetTokenInput from "../components/DatasetTokenInput";
-import {
-    getIntegrationForDataset,
-    getIntegrationFromType,
-} from "../lib/integrations";
 import { DatasetPage } from "../components/DatasetPage";
 import { trpc } from "../lib/trpc_client";
 
@@ -15,6 +11,7 @@ export default function DatasetDetails() {
     const { data: dataset, refetch } = trpc.datasetsGet.useQuery({
         id: id ?? "",
     });
+    const { data: integrations } = trpc.integrationsAll.useQuery();
 
     const datasetsUpdate = trpc.datasetsUpdate.useMutation({
         onSettled() {
@@ -34,7 +31,11 @@ export default function DatasetDetails() {
             console.error("No doc to set integration type");
             return;
         }
-        const integration = getIntegrationFromType(integrationType);
+        const integration = integrations?.[integrationType];
+        if (!integration) {
+            console.error("Integration not found for type", integrationType);
+            return;
+        }
         datasetsUpdate.mutate({
             id,
             patch: {
@@ -52,8 +53,6 @@ export default function DatasetDetails() {
         datasetsUpdate.mutate({ id, patch: { token } });
     }
 
-    const integration = getIntegrationForDataset(dataset);
-
     return (
         <div className="flex flex-col p-4">
             {!dataset.integrationType ? (
@@ -66,8 +65,11 @@ export default function DatasetDetails() {
                     onSubmit={(token) => setToken(token)}
                     dataset={dataset}
                 />
-            ) : integration ? (
-                <DatasetPage dataset={dataset} />
+            ) : integrations?.[dataset.integrationType] ? (
+                <DatasetPage
+                    dataset={dataset}
+                    integration={integrations[dataset.integrationType]}
+                />
             ) : (
                 <span>Error: Integration not found</span>
             )}

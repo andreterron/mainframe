@@ -1,5 +1,5 @@
 import { db } from "./db.server";
-import { usersTable } from "./schema";
+import { usersTable } from "../../app/db/schema";
 
 export async function checkIfUserExists() {
     const [user] = await db

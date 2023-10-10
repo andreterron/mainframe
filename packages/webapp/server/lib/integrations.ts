@@ -1,14 +1,17 @@
 import {
+    ClientIntegration,
     Integration,
     IntegrationObject,
     IntegrationTable,
-} from "./integration-types";
+} from "../../app/lib/integration-types";
 import { github } from "./integrations/github";
 import { network } from "./integrations/network";
 import { peloton } from "./integrations/peloton";
 import { posthog } from "./integrations/posthog";
 import { toggl } from "./integrations/toggl";
-import { Dataset } from "./types";
+import { Dataset } from "../../app/lib/types";
+
+// NEXT UP: Separate this between server and client
 
 export function getIntegrationFromType(
     type: string | undefined,
@@ -29,6 +32,22 @@ export function getIntegrationFromType(
         return network;
     }
     return null;
+}
+
+export function createClientIntegration(
+    integration: Integration,
+): ClientIntegration {
+    return {
+        name: integration.name,
+        objects: Object.entries(integration.objects ?? {}).map(([k, v]) => ({
+            id: k,
+            name: v.name,
+        })),
+        tables: Object.entries(integration.tables ?? {}).map(([k, v]) => ({
+            id: k,
+            name: v.name,
+        })),
+    };
 }
 
 export function getIntegrationForDataset(dataset: Dataset): Integration | null {

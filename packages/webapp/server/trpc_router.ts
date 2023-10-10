@@ -4,19 +4,29 @@ import {
     objectsTable,
     rowsTable,
     tablesTable,
-} from "../db/schema";
-import { db } from "../db/db.server";
+} from "../app/db/schema";
+import { db } from "./db/db.server";
 import { z } from "zod";
 import { Context } from "./trpc_context";
-import { zDatasetInsert, zDatasetPatch } from "../db/validation";
+import { zDatasetInsert, zDatasetPatch } from "../app/db/validation";
 import { and, eq } from "drizzle-orm";
-import { syncDataset, syncObject, syncTable } from "../../server/sync";
-import { commitSession, destroySession, getSession } from "../sessions.server";
-import { getDatasetObject, getDatasetTable } from "../lib/integrations";
-import { deserializeData } from "../utils/serialization";
-import { ROW_LIMIT } from "../utils/constants";
-import { createUserAccount, validateUserAccount } from "../lib/auth.server";
-import { checkIfUserExists } from "../db/helpers";
+import { syncDataset, syncObject, syncTable } from "./sync";
+import { commitSession, destroySession, getSession } from "./sessions.server";
+import {
+    createClientIntegration,
+    getDatasetObject,
+    getDatasetTable,
+} from "./lib/integrations";
+import { deserializeData } from "../app/utils/serialization";
+import { ROW_LIMIT } from "../app/utils/constants";
+import { createUserAccount, validateUserAccount } from "./lib/auth.server";
+import { checkIfUserExists } from "./db/helpers";
+import { github } from "./lib/integrations/github";
+import { network } from "./lib/integrations/network";
+import { peloton } from "./lib/integrations/peloton";
+import { posthog } from "./lib/integrations/posthog";
+import { toggl } from "./lib/integrations/toggl";
+import { ClientIntegration } from "../app/lib/integration-types";
 
 /**
  * Initialization of tRPC backend
@@ -381,6 +391,19 @@ export const appRouter = router({
             }
             return deserializeData(row);
         }),
+
+    // Integrations
+    integrationsAll: t.procedure.query(
+        (): Record<string, ClientIntegration> => {
+            return {
+                toggl: createClientIntegration(toggl),
+                posthog: createClientIntegration(posthog),
+                github: createClientIntegration(github),
+                peloton: createClientIntegration(peloton),
+                network: createClientIntegration(network),
+            };
+        },
+    ),
 });
 
 // Export type router type signature,

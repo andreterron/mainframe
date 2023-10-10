@@ -1,6 +1,6 @@
 import { hash } from "bcryptjs";
 import { db } from "../db/db.server";
-import { usersTable } from "../db/schema";
+import { usersTable } from "../../app/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function createUserAccount(username: string, password: string) {

@@ -1,7 +1,5 @@
 import { createBrowserRouter } from "react-router-dom";
 
-//   import Root, { rootLoader } from "./routes/root";
-//   import Team, { teamLoader } from "./routes/team";
 import AuthPage from "./webroutes/_auth";
 import AuthLogin from "./webroutes/_auth.login";
 import AuthLogout from "./webroutes/_auth.logout";

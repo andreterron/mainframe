@@ -1,18 +1,14 @@
 import { Request, Response } from "express";
 import { db } from "../../db/db.server";
-import { Integration } from "../integration-types";
-import { Dataset, DatasetObject, Row } from "../types";
-import {
-    syncTable,
-    updateObject,
-    updateRowFromTableType,
-} from "../../../server/sync";
+import { Integration } from "../../../app/lib/integration-types";
+import { Dataset, DatasetObject, Row } from "../../../app/lib/types";
+import { syncTable, updateObject, updateRowFromTableType } from "../../sync";
 import { getDatasetObject, getDatasetTable } from "../integrations";
 import crypto from "crypto";
 import { env } from "../env.server";
-import { objectsTable, rowsTable, tablesTable } from "../../db/schema";
+import { objectsTable, rowsTable, tablesTable } from "../../../app/db/schema";
 import { and, eq } from "drizzle-orm";
-import { deserialize } from "../../utils/serialization";
+import { deserialize } from "../../../app/utils/serialization";
 
 function togglHeaders(dataset: Dataset) {
     return {

@@ -1,9 +1,9 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "../../db/db.server";
-import { objectsTable } from "../../db/schema";
-import { Integration } from "../integration-types";
-import { Dataset } from "../types";
-import { deserialize } from "../../utils/serialization";
+import { objectsTable } from "../../../app/db/schema";
+import { Integration } from "../../../app/lib/integration-types";
+import { Dataset } from "../../../app/lib/types";
+import { deserialize } from "../../../app/utils/serialization";
 
 export const peloton: Integration = {
     name: "Peloton",

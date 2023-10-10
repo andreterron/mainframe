@@ -1,10 +1,10 @@
 import cron from "node-cron";
 import closeWithGrace from "close-with-grace";
-import { db } from "../app/db/db.server";
-import { getIntegrationForDataset } from "../app/lib/integrations";
+import { db } from "./db/db.server";
+import { getIntegrationForDataset } from "./lib/integrations";
 import express from "express";
 import { text } from "body-parser";
-import { env } from "../app/lib/env.server";
+import { env } from "./lib/env.server";
 import { ZodError } from "zod";
 import type { Server } from "http";
 import { syncAll } from "./sync";
@@ -12,8 +12,8 @@ import { datasetsTable } from "../app/db/schema";
 import { eq } from "drizzle-orm";
 import { initTRPC } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
-import { Context, createContext } from "../app/server/trpc_context";
-import { appRouter } from "../app/server/trpc_router";
+import { Context, createContext } from "./trpc_context";
+import { appRouter } from "./trpc_router";
 import cors from "cors";
 
 const t = initTRPC.context<Context>().create();

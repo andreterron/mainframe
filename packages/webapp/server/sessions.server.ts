@@ -1,5 +1,5 @@
 import { db } from "./db/db.server";
-import { sessionsTable } from "./db/schema";
+import { sessionsTable } from "../app/db/schema";
 import { eq } from "drizzle-orm";
 import { env } from "./lib/env.server";
 import { CookieSerializeOptions, parse, serialize } from "cookie";
