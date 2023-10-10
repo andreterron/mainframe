@@ -1,14 +1,9 @@
 import { drizzle, BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 import { mkdirSync } from "fs";
-import { join } from "path";
+import { join, resolve } from "path";
 
-// TODO: Improve how this path is obtained
-//       We're using replace because remix runs this from the build folder
-const dbDirname = __dirname.replace(
-    /([\/\\])packages[\/\\]webapp[\/\\].*/,
-    "$1database",
-);
+const dbDirname = resolve(__dirname, "..", "..", "..", "..", "database");
 const dbPath = join(dbDirname, "mainframe.db");
 
 // Ensure that the database folder exists

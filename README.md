@@ -16,12 +16,7 @@ cd mainframe
 yarn start
 ```
 
-This will run 2 services:
-
-1. A sync server to pull your data from different sources
-2. And a [remix](http://remix.run/) server to host the front-end dashboard
-
-To open the dashboard, navigate to <http://localhost:8744>
+Then, to open the dashboard, navigate to <http://localhost:8744>
 
 ## License
 
