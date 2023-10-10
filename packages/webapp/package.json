@@ -6,10 +6,8 @@
     "sideEffects": false,
     "scripts": {
         "build": "vite build",
-        "dev": "concurrently yarn:dev:*",
-        "dev:vite": "vite",
-        "dev:sync": "tsx watch --clear-screen=false server/index.ts",
-        "db:migrate": "tsx app/db/migrate.ts",
+        "dev": "tsx watch --clear-screen=false server/index.ts",
+        "db:migrate": "tsx server/db/migrate.ts",
         "db:generate": "drizzle-kit generate:sqlite",
         "db:drop": "drizzle-kit drop",
         "typecheck": "tsc"
@@ -53,6 +51,7 @@
         "tailwind-merge": "^1.14.0",
         "tailwindcss": "^3.3.3",
         "tailwindcss-animate": "^1.0.7",
+        "vite-express": "^0.10.0",
         "zod": "^3.21.4"
     },
     "devDependencies": {

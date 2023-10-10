@@ -6,7 +6,7 @@ if (typeof window === "undefined") {
 }
 
 export const env = envsafe({
-    SYNC_PORT: num({ default: 8745 }),
+    PORT: num({ default: 8744 }),
     TUNNEL_BASE_API_URL: str({ default: "", allowEmpty: true }),
     COOKIE_SECRET: str({ default: "" }),
 });

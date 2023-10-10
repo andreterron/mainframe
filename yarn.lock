@@ -4053,6 +4053,13 @@ vary@^1, vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
   integrity sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==
 
+vite-express@^0.10.0:
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/vite-express/-/vite-express-0.10.0.tgz#34ccf74cfb35ad8dfb57f6eb21b81e50c065ead4"
+  integrity sha512-DtJEJ6dw5sZdH5i1hmjNPjdxcy+spHLhFSSgrQ7vESwZLZ8FnB3jbXqsWTvuKU9OIBXH7vLdmP57wQvQQTkpXA==
+  dependencies:
+    picocolors "^1.0.0"
+
 vite@^4.4.5:
   version "4.4.11"
   resolved "https://registry.yarnpkg.com/vite/-/vite-4.4.11.tgz#babdb055b08c69cfc4c468072a2e6c9ca62102b0"

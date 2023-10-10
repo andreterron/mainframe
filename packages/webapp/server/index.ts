@@ -15,10 +15,11 @@ import * as trpcExpress from "@trpc/server/adapters/express";
 import { Context, createContext } from "./trpc_context";
 import { appRouter } from "./trpc_router";
 import cors from "cors";
+import ViteExpress from "vite-express";
 
 const t = initTRPC.context<Context>().create();
 
-const port = env.SYNC_PORT;
+const port = env.PORT;
 
 async function setupIntegrations() {
     // Get all datasets
@@ -122,21 +123,19 @@ app.use(
 let server: Server | undefined;
 
 function startListen() {
-    server = app
-        .listen(port, () => {
-            console.log(`Sync server listening on port ${port}`);
-        })
-        .on("error", function (err) {
-            if ((err as any).code === "EADDRINUSE") {
-                // port is currently in use
-                console.log(`Address in use, retry ${addrInUseRetries++}...`);
-                setTimeout(() => {
-                    addrInUseTimeout *= 2;
-                    startListen();
-                }, addrInUseTimeout);
-                return;
-            }
-        });
+    server = ViteExpress.listen(app, port, () => {
+        console.log(`Sync server listening on port ${port}`);
+    }).on("error", function (err) {
+        if ((err as any).code === "EADDRINUSE") {
+            // port is currently in use
+            console.log(`Address in use, retry ${addrInUseRetries++}...`);
+            setTimeout(() => {
+                addrInUseTimeout *= 2;
+                startListen();
+            }, addrInUseTimeout);
+            return;
+        }
+    });
 }
 
 startListen();
