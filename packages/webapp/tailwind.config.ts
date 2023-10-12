@@ -69,10 +69,15 @@ export default {
                     from: { height: "var(--radix-accordion-content-height)" },
                     to: { height: "0" },
                 },
+                "loading-fade-in": {
+                    "0%, 75%": { opacity: "0%" },
+                    "100%": { opacity: "100%" },
+                },
             },
             animation: {
                 "accordion-down": "accordion-down 0.2s ease-out",
                 "accordion-up": "accordion-up 0.2s ease-out",
+                "loading-fade-in": "0.25s loading-fade-in linear",
             },
         },
     },

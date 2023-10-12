@@ -3,15 +3,27 @@ import DatasetSetup from "../components/DatasetSetup";
 import DatasetTokenInput from "../components/DatasetTokenInput";
 import { DatasetPage } from "../components/DatasetPage";
 import { trpc } from "../lib/trpc_client";
+import { SadPath } from "../components/SadPath";
 
 export default function DatasetDetails() {
     const { id } = useParams();
 
-    // TODO: handle undefined/empty id
-    const { data: dataset, refetch } = trpc.datasetsGet.useQuery({
-        id: id ?? "",
-    });
-    const { data: integrations } = trpc.integrationsAll.useQuery();
+    const {
+        data: dataset,
+        refetch,
+        error: datasetError,
+        isLoading: isDatasetLoading,
+    } = trpc.datasetsGet.useQuery(
+        {
+            id: id ?? "",
+        },
+        { enabled: !!id },
+    );
+    const {
+        data: integrations,
+        error: integrationsError,
+        isLoading: isIntegrationsLoading,
+    } = trpc.integrationsAll.useQuery();
 
     const datasetsUpdate = trpc.datasetsUpdate.useMutation({
         onSettled() {
@@ -19,9 +31,14 @@ export default function DatasetDetails() {
         },
     });
 
-    if (!dataset) {
-        // TODO: Handle loading, error or not found
-        return null;
+    if (!dataset || !integrations) {
+        return (
+            <SadPath
+                className="p-4"
+                error={datasetError ?? integrationsError ?? undefined}
+                isLoading={isDatasetLoading || isIntegrationsLoading}
+            />
+        );
     }
 
     // Functions

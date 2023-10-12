@@ -1,13 +1,19 @@
 import { useParams } from "react-router-dom";
 import { trpc } from "../lib/trpc_client";
+import { SadPath } from "../components/SadPath";
 
 export default function DatasetRowDetails() {
     const { row_id: rowId } = useParams();
-    const { data: row } = trpc.getRow.useQuery({ rowId });
+    const { data: row, error, isLoading } = trpc.getRow.useQuery({ rowId });
 
     if (!row) {
-        // TODO: Loading / Not Found / Error
-        return null;
+        return (
+            <SadPath
+                className="p-4"
+                error={error ?? undefined}
+                isLoading={isLoading}
+            />
+        );
     }
 
     return (

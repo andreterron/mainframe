@@ -10,14 +10,6 @@ import {
     useReactTable,
 } from "@tanstack/react-table";
 import { ColumnMenu } from "../components/ColumnMenu";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "../components/ui/dropdown-menu";
 import { EyeIcon, EyeOffIcon, MoreVerticalIcon } from "lucide-react";
 import { Button } from "../components/ui/button";
 import {
@@ -29,6 +21,7 @@ import { Separator } from "@radix-ui/react-dropdown-menu";
 import { Label } from "../components/ui/label";
 import { cn } from "../lib/utils";
 import { trpc } from "../lib/trpc_client";
+import { SadPath } from "../components/SadPath";
 
 const colHelper = createColumnHelper<Record<string, any>>();
 
@@ -69,7 +62,10 @@ export default function DatasetTableDetails() {
     const params = useParams();
     const datasetId = params.id;
     const tableId = params.table_id;
-    const { data } = trpc.tablesPageLoader.useQuery({ datasetId, tableId });
+    const { data, error, isLoading } = trpc.tablesPageLoader.useQuery({
+        datasetId,
+        tableId,
+    });
     const dataset = data?.dataset,
         rows = data?.rows,
         dbTable = data?.table;
@@ -170,8 +166,13 @@ export default function DatasetTableDetails() {
     });
 
     if (!dataset || !dbTable) {
-        // TODO: Not found / Loading / Error
-        return null;
+        return (
+            <SadPath
+                className="p-4"
+                error={error ?? undefined}
+                isLoading={isLoading}
+            />
+        );
     }
 
     return (

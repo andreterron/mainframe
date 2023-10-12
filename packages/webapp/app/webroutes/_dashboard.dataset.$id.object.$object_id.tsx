@@ -1,17 +1,23 @@
 import { useParams } from "react-router-dom";
 import { trpc } from "../lib/trpc_client";
+import { SadPath } from "../components/SadPath";
 
 export default function DatasetObjectDetails() {
     const { id: datasetId, object_id: objectId } = useParams();
 
-    const { data, error } = trpc.getObjectAndDataset.useQuery({
+    const { data, error, isLoading } = trpc.getObjectAndDataset.useQuery({
         datasetId,
         objectId,
     });
 
     if (!data) {
-        // TODO: Loading/Error/Not found
-        return null;
+        return (
+            <SadPath
+                className="p-4"
+                error={error ?? undefined}
+                isLoading={isLoading}
+            />
+        );
     }
 
     const { dataset, object: objectData } = data;
