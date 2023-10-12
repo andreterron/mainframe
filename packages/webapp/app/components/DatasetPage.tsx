@@ -1,11 +1,16 @@
-import { Link } from "@remix-run/react";
+import { Link } from "react-router-dom";
 import { Dataset } from "../lib/types";
-import { getObjectsForDataset, getTablesForDataset } from "../lib/integrations";
 import { DatasetHeader } from "./DatasetHeader";
+import type { ClientIntegration } from "../lib/integration-types";
 
-export function DatasetPage({ dataset }: { dataset: Dataset }) {
-    const tables = getTablesForDataset(dataset);
-    const objects = getObjectsForDataset(dataset);
+export function DatasetPage({
+    dataset,
+    integration,
+}: {
+    dataset: Dataset;
+    integration: ClientIntegration;
+}) {
+    const { tables, objects } = integration;
 
     return (
         <div className="flex flex-col gap-8 items-start">

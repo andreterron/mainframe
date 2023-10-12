@@ -1,6 +1,18 @@
 import { Dataset } from "./types";
 import { Request, Response } from "express";
 
+export interface ClientIntegration {
+    name: string;
+    objects: {
+        id: string;
+        name: string;
+    }[];
+    tables: {
+        id: string;
+        name: string;
+    }[];
+}
+
 export interface IntegrationTable {
     name: string;
     get?: (dataset: Dataset) => Promise<any>;
