@@ -1,24 +1,33 @@
 {
-    "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
+    "include": ["app/**/*.ts", "app/**/*.tsx", "server/**/*.ts"],
     "compilerOptions": {
-        "lib": ["DOM", "DOM.Iterable", "ES2019"],
+        "lib": ["DOM", "DOM.Iterable", "ES2020"],
         "isolatedModules": true,
         "esModuleInterop": true,
         "jsx": "react-jsx",
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "resolveJsonModule": true,
-        "target": "ES2019",
+        "target": "ES2020",
         "strict": true,
         "allowJs": true,
-        "module": "es2022",
+        "module": "ESNext",
         "forceConsistentCasingInFileNames": true,
         "baseUrl": ".",
         "paths": {
             "~/*": ["./app/*"]
         },
         "allowSyntheticDefaultImports": true,
+        "useDefineForClassFields": true,
+        "skipLibCheck": true,
 
-        // Remix takes care of building everything in `remix build`.
+        /* Bundler mode */
+        "allowImportingTsExtensions": true,
+
+        /* Linting */
+        "noFallthroughCasesInSwitch": true,
+
+        // Vite handles building
         "noEmit": true
-    }
+    },
+    "references": [{ "path": "./tsconfig.node.json" }]
 }

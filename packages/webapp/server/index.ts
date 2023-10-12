@@ -1,17 +1,25 @@
 import cron from "node-cron";
 import closeWithGrace from "close-with-grace";
-import { db } from "../app/db/db.server";
-import { getIntegrationForDataset } from "../app/lib/integrations";
+import { db } from "./db/db.server";
+import { getIntegrationForDataset } from "./lib/integrations";
 import express from "express";
 import { text } from "body-parser";
-import { env } from "../app/lib/env.server";
+import { env } from "./lib/env.server";
 import { ZodError } from "zod";
 import type { Server } from "http";
 import { syncAll } from "./sync";
 import { datasetsTable } from "../app/db/schema";
 import { eq } from "drizzle-orm";
+import { initTRPC } from "@trpc/server";
+import * as trpcExpress from "@trpc/server/adapters/express";
+import { Context, createContext } from "./trpc_context";
+import { appRouter } from "./trpc_router";
+import cors from "cors";
+import ViteExpress from "vite-express";
 
-const port = env.SYNC_PORT;
+const t = initTRPC.context<Context>().create();
+
+const port = env.PORT;
 
 async function setupIntegrations() {
     // Get all datasets
@@ -87,6 +95,15 @@ app.all(
 );
 
 app.use(
+    "/trpc",
+    cors(),
+    trpcExpress.createExpressMiddleware({
+        router: appRouter,
+        createContext,
+    }),
+);
+
+app.use(
     (
         err: any,
         req: express.Request,
@@ -106,21 +123,19 @@ app.use(
 let server: Server | undefined;
 
 function startListen() {
-    server = app
-        .listen(port, () => {
-            console.log(`Sync server listening on port ${port}`);
-        })
-        .on("error", function (err) {
-            if ((err as any).code === "EADDRINUSE") {
-                // port is currently in use
-                console.log(`Address in use, retry ${addrInUseRetries++}...`);
-                setTimeout(() => {
-                    addrInUseTimeout *= 2;
-                    startListen();
-                }, addrInUseTimeout);
-                return;
-            }
-        });
+    server = ViteExpress.listen(app, port, () => {
+        console.log(`Sync server listening on port ${port}`);
+    }).on("error", function (err) {
+        if ((err as any).code === "EADDRINUSE") {
+            // port is currently in use
+            console.log(`Address in use, retry ${addrInUseRetries++}...`);
+            setTimeout(() => {
+                addrInUseTimeout *= 2;
+                startListen();
+            }, addrInUseTimeout);
+            return;
+        }
+    });
 }
 
 startListen();
