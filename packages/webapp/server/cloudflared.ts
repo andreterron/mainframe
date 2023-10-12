@@ -1,6 +1,6 @@
 import { bin, install, tunnel } from "cloudflared";
 import { stat } from "node:fs/promises";
-import { env } from "../app/lib/env.server";
+import { env } from "../server/lib/env.server";
 
 async function ensureCloudflaredInstalled() {
     // TODO: Auto-update
@@ -17,7 +17,8 @@ async function ensureCloudflaredInstalled() {
 export async function startCloudflared() {
     const token = env.CLOUDFLARED_TOKEN;
     if (!token) {
-        throw new Error("Missing Cloudflare Tunnel token");
+        console.log("Skipping Cloudflare Tunnel setup: No token");
+        return;
     }
 
     await ensureCloudflaredInstalled();

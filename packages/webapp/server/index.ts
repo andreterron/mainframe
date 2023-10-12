@@ -71,6 +71,9 @@ app.all(
     text({ type: () => true }),
     async (req, res, next) => {
         try {
+            console.log(
+                `Received webhook request for dataset ${req.params.dataset_id}`,
+            );
             const [dataset] = await db
                 .select()
                 .from(datasetsTable)
@@ -148,7 +151,11 @@ const serverPromise = startListen();
 let cloudflaredProcess: ChildProcess | undefined;
 
 startCloudflared()
-    .then(async ({ child, url, connections }) => {
+    .then(async (args) => {
+        if (!args) {
+            return;
+        }
+        const { child, url, connections } = args;
         cloudflaredProcess = child;
 
         const baseApiUrl = env.TUNNEL_BASE_API_URL;
