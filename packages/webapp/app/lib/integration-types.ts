@@ -28,7 +28,7 @@ export interface IntegrationObject {
 // TODO: Merge `objects` and `tables` options
 export interface Integration {
     name: string;
-    setup?: (dataset: Dataset) => Promise<any>;
+    setupWebhooks?: (dataset: Dataset, baseApiUrl: string) => Promise<any>;
     webhook?: (
         dataset: Dataset,
         // TODO: Migrate away from express

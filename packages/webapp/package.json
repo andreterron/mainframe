@@ -28,6 +28,7 @@
         "better-sqlite3": "^8.6.0",
         "class-variance-authority": "^0.7.0",
         "close-with-grace": "^1.2.0",
+        "cloudflared": "^0.5.0",
         "clsx": "^2.0.0",
         "cookie": "^0.5.0",
         "cookie-signature": "^1.2.1",

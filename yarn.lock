@@ -1627,6 +1627,11 @@ close-with-grace@^1.2.0:
   resolved "https://registry.yarnpkg.com/close-with-grace/-/close-with-grace-1.2.0.tgz#9af82cc62b40125125e4c772e4dbe3cd8c3ff494"
   integrity sha512-Xga0jyAb4fX98u5pZAgqlbqHP8cHuy5M3Wto0k0L/36aP2C25Cjp51XfPw3Hz7dNC2L2/hF/PK/KJhO275L+VA==
 
+cloudflared@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/cloudflared/-/cloudflared-0.5.0.tgz#90b316b8a6fb36ee46183a608bf6d2d3e5131b16"
+  integrity sha512-ILt34H2KNd15cbGm3VfLvswUHCJJ5vhDXN5M0u9BfEul4DLMQ/Y3ecOP5YUPFN9ERcVabfsMEcLbC0hN3AydTw==
+
 clsx@2.0.0, clsx@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/clsx/-/clsx-2.0.0.tgz#12658f3fd98fafe62075595a5c30e43d18f3d00b"
