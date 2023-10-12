@@ -11,7 +11,6 @@ export function SadPath({
     error?: TRPCClientErrorLike<AppRouter> | undefined;
     isLoading?: boolean;
 }) {
-    console.log("Loading", isLoading, "Error", error);
     return (
         <div className={className}>
             {isTrpcNotFoundError(error) ? (
