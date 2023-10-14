@@ -153,14 +153,27 @@ export const toggl: Integration = {
                 await syncTable(dataset, table);
             }
 
-            if (webhookToThis && !webhookToThis.validated_at) {
-                await fetch(
-                    `https://api.track.toggl.com/webhooks/api/v1/ping/${id}/${webhookToThis.subscription_id}`,
-                    {
-                        method: "POST",
-                        headers: togglHeaders(dataset),
-                    },
-                );
+            if (webhookToThis) {
+                if (!webhookToThis.validated_at) {
+                    await fetch(
+                        `https://api.track.toggl.com/webhooks/api/v1/ping/${id}/${webhookToThis.subscription_id}`,
+                        {
+                            method: "POST",
+                            headers: togglHeaders(dataset),
+                        },
+                    );
+                } else if (!webhookToThis.enabled) {
+                    await fetch(
+                        `https://api.track.toggl.com/webhooks/api/v1/subscriptions/${id}/${webhookToThis.subscription_id}`,
+                        {
+                            method: "PATCH",
+                            headers: togglHeaders(dataset),
+                            body: JSON.stringify({
+                                enabled: true,
+                            }),
+                        },
+                    );
+                }
             }
         }
     },
