@@ -30,7 +30,7 @@ void (async function () {
     await installDependencies();
 
     // How to run
-    console.log("\nRun this command to start your Mainframe:\n\nyarn start");
+    console.log("\nRun this command to start your Mainframe:\n\npm start");
 
     // TODO: run on login https://github.com/andreterron/mainframe/issues/13
     // TODO: delete git

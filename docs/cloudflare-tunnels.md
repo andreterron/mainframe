@@ -54,6 +54,6 @@ Follow these steps to connect an application through your tunnel. If you are loo
 
 After saving the tunnel, you will be redirected to the **Tunnels** page. Look for your new tunnel to be listed along with its active connector.
 
-Restart your Mainframe instance, kill the process and run `yarn start` on the root of your Mainframe folder.
+Restart your Mainframe instance, kill the process and run `npm start` on the root of your Mainframe folder.
 
 Open your custom domain on a browser to see your Mainframe!

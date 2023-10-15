@@ -26,16 +26,17 @@ with lib;
                 "network.target"
             ];
             description = "Start Mainframe";
+            path = with pkgs; [ bash nodejs-18_x ];
             serviceConfig = {
                 WorkingDirectory = ./.;
-                ExecStart = "${pkgs.yarn}/bin/yarn start";
+                ExecStart = "${pkgs.nodejs-18_x}/bin/npm run start";
                 User = "${cfg.user}";
             };
         };
 
         environment.systemPackages = with pkgs.buildPackages; [
             nodejs-18_x
-            yarn
+            bash
         ];
     };
 }

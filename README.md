@@ -13,7 +13,7 @@ Run these commands to get started with Mainframe:
 ```sh
 npm create mainframe
 cd mainframe
-yarn start
+npm start
 ```
 
 Then, to open the dashboard, navigate to <http://localhost:8744>

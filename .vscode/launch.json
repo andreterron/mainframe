@@ -8,12 +8,10 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "runtimeExecutable": "yarn",
+            "skipFiles": ["<node_internals>/**"],
+            "runtimeExecutable": "npm",
             "cwd": "${workspaceFolder}",
-            "runtimeArgs": ["start"],
+            "runtimeArgs": ["start"]
         }
     ]
 }
