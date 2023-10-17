@@ -18,6 +18,7 @@ import { Context, createContext } from "./trpc_context";
 import { appRouter } from "./trpc_router";
 import cors from "cors";
 import ViteExpress from "vite-express";
+import { apiRouter } from "./api";
 
 const t = initTRPC.context<Context>().create();
 
@@ -107,6 +108,8 @@ app.use(
         createContext,
     }),
 );
+
+app.use("/api", apiRouter);
 
 app.use(
     (

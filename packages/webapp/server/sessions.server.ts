@@ -99,16 +99,7 @@ async function createSession(): Promise<MainframeSession> {
     };
 }
 
-export async function getSession(
-    cookieHeader?: string | null | undefined,
-    options?: any,
-): Promise<MainframeSession> {
-    const sessionId = getSessionIdFromCookieHeader(cookieHeader);
-
-    if (!sessionId) {
-        return createSession();
-    }
-
+export async function getSessionFromId(sessionId: string) {
     const [row] = await db
         .select({ userId: sessionsTable.userId })
         .from(sessionsTable)
@@ -124,6 +115,19 @@ export async function getSession(
             userId: row.userId ?? undefined,
         },
     };
+}
+
+export async function getSessionFromCookies(
+    cookieHeader?: string | null | undefined,
+    options?: any,
+): Promise<MainframeSession> {
+    const sessionId = getSessionIdFromCookieHeader(cookieHeader);
+
+    if (!sessionId) {
+        return createSession();
+    }
+
+    return getSessionFromId(sessionId);
 }
 
 export async function commitSession(

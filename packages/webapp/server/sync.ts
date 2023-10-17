@@ -18,6 +18,7 @@ import {
 import { db } from "./db/db.server";
 import { and, eq } from "drizzle-orm";
 import { deserialize, serialize } from "../app/utils/serialization";
+import { writeOperation } from "./lib/operations";
 
 export async function updateRowFromTableType(
     dataset: Dataset,
@@ -66,6 +67,9 @@ export async function updateRow(data: any, id: string, tableId: string) {
             set: { data: serialize(data), sourceId: id },
         })
         .returning();
+    if (upserted) {
+        writeOperation({ type: "row", tableId, data: data });
+    }
     return !!upserted;
 }
 
@@ -102,6 +106,14 @@ export async function updateObject(
             set: { data: serialize(data), sourceId: id },
         })
         .returning();
+    if (upserted) {
+        writeOperation({
+            type: "object",
+            datasetId: dataset.id,
+            objectType,
+            data: data,
+        });
+    }
     return !!upserted;
 }
 

@@ -11,7 +11,11 @@ import { Context } from "./trpc_context";
 import { zDatasetInsert, zDatasetPatch } from "../app/db/validation";
 import { and, eq } from "drizzle-orm";
 import { syncDataset, syncObject, syncTable } from "./sync";
-import { commitSession, destroySession, getSession } from "./sessions.server";
+import {
+    commitSession,
+    destroySession,
+    getSessionFromCookies,
+} from "./sessions.server";
 import {
     createClientIntegration,
     getDatasetObject,
@@ -40,7 +44,7 @@ const router = t.router;
 const isAuthed = t.middleware(async (opts) => {
     const { ctx } = opts;
 
-    const session = await getSession(ctx.req.header("cookie"));
+    const session = await getSessionFromCookies(ctx.req.header("cookie"));
 
     const userId = session.data.userId;
 
@@ -65,7 +69,7 @@ export const appRouter = router({
         console.log("TRPC AUTH INFO");
         const hasUsers = await checkIfUserExists();
 
-        const session = await getSession(ctx.req.header("cookie"));
+        const session = await getSessionFromCookies(ctx.req.header("cookie"));
         const userId = session.data.userId;
         console.log("TRPC AUTH INFO DATA", userId);
 
@@ -94,7 +98,7 @@ export const appRouter = router({
             }
 
             // Don't pass the cookie header here, because we always want a fresh session
-            const session = await getSession();
+            const session = await getSessionFromCookies();
 
             session.data.userId = account.id;
 
@@ -128,7 +132,7 @@ export const appRouter = router({
             const account = await createUserAccount(username, password);
 
             // Don't pass the cookie header here, because we always want a fresh session
-            const session = await getSession();
+            const session = await getSessionFromCookies();
 
             session.data.userId = account.id;
 
@@ -139,7 +143,7 @@ export const appRouter = router({
             };
         }),
     logout: t.procedure.mutation(async ({ ctx }) => {
-        const session = await getSession(ctx.req.header("Cookie"));
+        const session = await getSessionFromCookies(ctx.req.header("Cookie"));
 
         const hasUsers = await checkIfUserExists();
 
