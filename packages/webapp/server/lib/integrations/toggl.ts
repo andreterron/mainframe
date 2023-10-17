@@ -285,7 +285,7 @@ export const toggl: Integration = {
             if (
                 object?.objId &&
                 (json.payload.stop === null ||
-                    deserialize(currentEntryRow?.data ?? null).id ===
+                    deserialize(currentEntryRow?.data ?? null)?.id ===
                         json.payload.id)
             ) {
                 await updateObject(
