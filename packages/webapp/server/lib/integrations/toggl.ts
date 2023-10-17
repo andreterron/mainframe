@@ -290,8 +290,10 @@ export const toggl: Integration = {
             ) {
                 await updateObject(
                     dataset,
-                    json.payload,
-                    json.payload ? object.objId(dataset, json.payload) : null,
+                    json.metadata.action === "deleted" ? null : json.payload,
+                    json.payload && json.metadata.action !== "deleted"
+                        ? object.objId(dataset, json.payload)
+                        : null,
                     object.id,
                 );
             }
