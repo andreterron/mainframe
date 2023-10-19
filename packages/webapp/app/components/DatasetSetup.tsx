@@ -6,7 +6,7 @@ export default function DatasetSetup({
     dataset,
 }: {
     onIntegrationSelected: (type: string) => void;
-    dataset: Dataset;
+    dataset?: Dataset;
 }) {
     return (
         <div className="flex flex-col items-start gap-4">
