@@ -66,12 +66,10 @@ export const protectedProcedure = t.procedure.use(isAuthed);
 export const appRouter = router({
     // Auth
     authInfo: t.procedure.query(async ({ input, ctx }) => {
-        console.log("TRPC AUTH INFO");
         const hasUsers = await checkIfUserExists();
 
         const session = await getSessionFromCookies(ctx.req.header("cookie"));
         const userId = session.data.userId;
-        console.log("TRPC AUTH INFO DATA", userId);
 
         return {
             hasUsers,
