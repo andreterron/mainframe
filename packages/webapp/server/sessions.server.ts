@@ -9,6 +9,7 @@ export interface MainframeSession {
     id: string;
     data: {
         userId?: string;
+        type?: "admin" | "api";
     };
     error?: "not_found";
 }
@@ -27,7 +28,11 @@ const cookieSettings: CookieSerializeOptions = {
     secure: false,
 };
 
-function getSessionIdFromCookieHeader(cookieHeader: string | null | undefined) {
+// NOTE: Prefer using `getSessionFromCookies`. This function doesn't create a new session
+//       if the request has no session. Useful for API requests.
+export function getSessionIdFromCookieHeader(
+    cookieHeader: string | null | undefined,
+) {
     if (!cookieHeader) {
         return null;
     }
@@ -73,6 +78,7 @@ async function updateData(
         .update(sessionsTable)
         .set({
             userId: data.userId ?? null,
+            type: data.type,
             expires: expires?.getTime() ?? null,
         })
         .where(eq(sessionsTable.id, id));
@@ -99,22 +105,31 @@ async function createSession(): Promise<MainframeSession> {
     };
 }
 
-export async function getSessionFromId(sessionId: string) {
+export async function getSessionFromId(
+    sessionId: string,
+): Promise<MainframeSession | undefined> {
     const [row] = await db
-        .select({ userId: sessionsTable.userId })
+        .select({ userId: sessionsTable.userId, type: sessionsTable.type })
         .from(sessionsTable)
         .where(eq(sessionsTable.id, sessionId));
 
     if (!row) {
-        return createSession();
+        return undefined;
     }
 
     return {
         id: sessionId,
         data: {
             userId: row.userId ?? undefined,
+            type: row.type,
         },
     };
+}
+
+export async function getSessionFromIdOrCreate(sessionId: string) {
+    const session = await getSessionFromId(sessionId);
+
+    return session ?? createSession();
 }
 
 export async function getSessionFromCookies(
@@ -127,7 +142,7 @@ export async function getSessionFromCookies(
         return createSession();
     }
 
-    return getSessionFromId(sessionId);
+    return getSessionFromIdOrCreate(sessionId);
 }
 
 export async function commitSession(

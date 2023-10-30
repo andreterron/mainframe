@@ -3,6 +3,7 @@ import {
     datasetsTable,
     objectsTable,
     rowsTable,
+    sessionsTable,
     tablesTable,
 } from "../app/db/schema";
 import { db } from "./db/db.server";
@@ -49,12 +50,15 @@ const isAuthed = t.middleware(async (opts) => {
 
     const userId = session.data.userId;
 
-    if (!userId) {
+    if (!userId || session.data.type !== "admin") {
         throw new TRPCError({ code: "UNAUTHORIZED" });
     }
 
     return opts.next({
-        ctx,
+        ctx: {
+            ...ctx,
+            userId,
+        },
     });
 });
 
@@ -322,7 +326,7 @@ export const appRouter = router({
                     target: [tablesTable.datasetId, tablesTable.key],
                     set: { key: tableId },
                 })
-                .returning({ view: tablesTable.view });
+                .returning({ id: tablesTable.id, view: tablesTable.view });
 
             const rows = await db
                 .select({ id: rowsTable.id, data: rowsTable.data })
@@ -394,6 +398,38 @@ export const appRouter = router({
             }
             return deserializeData(row);
         }),
+
+    getApiKey: protectedProcedure.query(async ({ ctx }) => {
+        const [apiKey] = await db
+            .select({ id: sessionsTable.id })
+            .from(sessionsTable)
+            .where(
+                and(
+                    eq(sessionsTable.type, "api"),
+                    eq(sessionsTable.userId, ctx.userId),
+                ),
+            );
+        if (apiKey) {
+            return apiKey;
+        }
+
+        // TODO: Remove dynamic import
+        const { nanoid } = await import("nanoid");
+        const id = nanoid(32);
+
+        const [newApiKey] = await db
+            .insert(sessionsTable)
+            .values({
+                id,
+                userId: ctx.userId,
+                type: "api",
+            })
+            .returning({
+                id: sessionsTable.id,
+            });
+
+        return newApiKey;
+    }),
 
     // Integrations
     integrationsAll: t.procedure.query(

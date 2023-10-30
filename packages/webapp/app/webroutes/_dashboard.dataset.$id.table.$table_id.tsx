@@ -10,7 +10,7 @@ import {
     useReactTable,
 } from "@tanstack/react-table";
 import { ColumnMenu } from "../components/ColumnMenu";
-import { EyeIcon, EyeOffIcon, MoreVerticalIcon } from "lucide-react";
+import { Code2Icon, EyeIcon, EyeOffIcon, MoreVerticalIcon } from "lucide-react";
 import { Button } from "../components/ui/button";
 import {
     Popover,
@@ -22,6 +22,7 @@ import { Label } from "../components/ui/label";
 import { cn } from "../lib/utils";
 import { trpc } from "../lib/trpc_client";
 import { SadPath } from "../components/SadPath";
+import { ApiHelper } from "../components/ApiHelper";
 
 const colHelper = createColumnHelper<Record<string, any>>();
 
@@ -182,6 +183,11 @@ export default function DatasetTableDetails() {
                     <h1 className="text-2xl font-medium flex-1">
                         {dataset?.name}
                     </h1>
+                    <ApiHelper apiPath={`table/${dbTable.id}/rows`}>
+                        <button className="ml-2 inline-flex justify-center rounded-md bg-black bg-opacity-0 p-1.5 text-sm font-medium hover:bg-opacity-5 data-[state=open]:bg-opacity-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-opacity-75">
+                            <Code2Icon className="h-4 w-4" />
+                        </button>
+                    </ApiHelper>
                     <Popover>
                         <PopoverTrigger className="ml-2 inline-flex justify-center rounded-md bg-black bg-opacity-0 p-1.5 text-sm font-medium hover:bg-opacity-5 data-[state=open]:bg-opacity-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-opacity-75">
                             <MoreVerticalIcon className="h-4 w-4" />

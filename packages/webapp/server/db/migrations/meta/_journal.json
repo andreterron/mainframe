@@ -22,6 +22,13 @@
       "when": 1698624312890,
       "tag": "0002_aspiring_wraith",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1698651033781,
+      "tag": "0003_smiling_warbound",
+      "breakpoints": true
     }
   ]
 }

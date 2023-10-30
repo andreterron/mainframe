@@ -21,6 +21,21 @@ const singleUserKey = (name: string) =>
         },
     })(name);
 
+const enumType = <VALUES extends readonly string[]>(
+    name: string,
+    values: VALUES,
+) =>
+    customType<{
+        data: VALUES[number];
+        driverData: string;
+    }>({
+        dataType() {
+            return `text check(\`${name}\` IN (${values
+                .map((v) => `'${v}'`)
+                .join(",")}))`;
+        },
+    })(name);
+
 // TODO: Type validation and Error handling
 const json = <TData>(name: string) =>
     customType<{ data: TData; driverData: string | null }>({
@@ -147,4 +162,7 @@ export const sessionsTable = sqliteTable("sessions", {
         onUpdate: "cascade",
     }),
     expires: integer("expires"),
+    type: enumType("type", ["admin", "api"] as const)
+        .notNull()
+        .default("admin"),
 });

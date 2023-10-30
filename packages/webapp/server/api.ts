@@ -1,6 +1,13 @@
 import { Router } from "express";
 import { Operation, operations } from "./lib/operations";
-import { getSessionFromId } from "./sessions.server";
+import {
+    getSessionFromId,
+    getSessionIdFromCookieHeader,
+} from "./sessions.server";
+import { db } from "./db/db.server";
+import { objectsTable, rowsTable, tablesTable } from "../app/db/schema";
+import { and, eq } from "drizzle-orm";
+import { deserializeData } from "../app/utils/serialization";
 
 export const apiRouter = Router();
 
@@ -19,7 +26,9 @@ function parseBearerHeader(header: string | undefined) {
 apiRouter.use(async (req, res, next) => {
     const authorization = req.header("authorization");
 
-    const sessionId = parseBearerHeader(authorization);
+    const sessionId =
+        parseBearerHeader(authorization) ??
+        getSessionIdFromCookieHeader(req.header("cookie"));
 
     const session = sessionId ? await getSessionFromId(sessionId) : undefined;
 
@@ -28,6 +37,41 @@ apiRouter.use(async (req, res, next) => {
     } else {
         next();
     }
+});
+
+apiRouter.get("/table/:table_id/rows", async (req, res) => {
+    const rows = await db
+        .select({ id: rowsTable.id, data: rowsTable.data })
+        .from(rowsTable)
+        .where(eq(rowsTable.tableId, req.params.table_id))
+        .limit(100);
+
+    res.contentType("application/json");
+    res.send(JSON.stringify(rows.map(deserializeData)));
+});
+
+apiRouter.get("/object/:dataset_id/:object_type", async (req, res) => {
+    const [object] = await db
+        .select({ id: objectsTable.id, data: objectsTable.data })
+        .from(objectsTable)
+        .where(
+            and(
+                eq(objectsTable.datasetId, req.params.dataset_id),
+                eq(objectsTable.objectType, req.params.object_type),
+            ),
+        )
+        .limit(1);
+
+    res.contentType("application/json");
+    res.send(JSON.stringify(deserializeData(object)));
+    // const rows = await db
+    //     .select({ id: rowsTable.id, data: rowsTable.data })
+    //     .from(rowsTable)
+    //     .where(
+    //         eq(tablesTable.key, req.params.table_id),
+    //     )
+    //     .limit(100);
+    // res.send(JSON.stringify(rows.map(deserializeData)))
 });
 
 apiRouter.get("/operations", (req, res) => {

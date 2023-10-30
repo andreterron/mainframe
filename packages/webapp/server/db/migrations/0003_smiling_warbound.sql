@@ -1,0 +1,1 @@
+ALTER TABLE sessions ADD `type` text check(`type` IN ('admin','api')) DEFAULT 'admin' NOT NULL;

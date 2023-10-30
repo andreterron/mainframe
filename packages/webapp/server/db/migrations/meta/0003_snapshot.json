@@ -1,8 +1,8 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "83fad131-938f-4115-bcd2-94e725706b06",
-  "prevId": "c8d7c520-27cd-4d4a-b104-23dd9030b120",
+  "id": "bac96aab-a654-4efa-8ba9-3cf8ca9a7b58",
+  "prevId": "83fad131-938f-4115-bcd2-94e725706b06",
   "tables": {
     "datasets": {
       "name": "datasets",
@@ -195,6 +195,14 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text check(`type` IN ('admin','api'))",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'admin'"
         }
       },
       "indexes": {},
