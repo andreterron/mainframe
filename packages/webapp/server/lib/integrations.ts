@@ -42,6 +42,7 @@ export function createClientIntegration(
     return {
         name: integration.name,
         authType: integration.authType,
+        authSetupDocs: integration.authSetupDocs,
         objects: Object.entries(integration.objects ?? {}).map(([k, v]) => ({
             id: k,
             name: v.name,

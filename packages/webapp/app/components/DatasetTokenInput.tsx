@@ -20,6 +20,16 @@ export default function DatasetTokenInput({
     return (
         <div className="flex flex-col gap-8 items-start">
             <DatasetHeader dataset={dataset}>{dataset.name}</DatasetHeader>
+            {integration.authSetupDocs && (
+                <a
+                    href={integration.authSetupDocs}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-700 py-1 px-2 rounded border"
+                >
+                    Documentation →
+                </a>
+            )}
             <form
                 autoComplete="off"
                 onSubmit={(e) => {

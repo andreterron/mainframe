@@ -46,6 +46,9 @@ async function getAuth(dataset: Dataset) {
 export const google: Integration = {
     name: "Google Calendar",
     authType: "oauth2",
+    // TODO: Show the markdown file in the dashboard
+    authSetupDocs:
+        "https://github.com/andreterron/mainframe/blob/main/packages/docs/integrations/google.md",
     async getOAuthUrl(baseUrl: string, dataset: Dataset) {
         if (
             !dataset.credentials ||

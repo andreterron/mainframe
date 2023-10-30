@@ -74,6 +74,8 @@ function isPingWebhookEvent(event: TogglWebhook): event is TogglWebhookPing {
 export const toggl: Integration = {
     name: "Toggl",
     authType: "token",
+    authSetupDocs:
+        "https://github.com/andreterron/mainframe/blob/main/packages/docs/integrations/toggl.md",
     setupWebhooks: async (dataset: Dataset, baseApiUrl: string) => {
         // Remove trailing slashes
         const normalizedBaseApiUrl = baseApiUrl.replace(/\/+$/, "");

@@ -6,6 +6,7 @@ export type AuthType = "oauth2" | "token" | "none";
 export interface ClientIntegration {
     name: string;
     authType: AuthType;
+    authSetupDocs?: string;
     objects: {
         id: string;
         name: string;
@@ -32,6 +33,7 @@ export interface IntegrationObject {
 export interface Integration {
     name: string;
     authType: AuthType;
+    authSetupDocs?: string;
     getOAuthUrl?: (
         baseUrl: string,
         dataset: Dataset,

@@ -4,6 +4,8 @@ import { Dataset } from "../../../app/lib/types";
 export const github: Integration = {
     name: "GitHub",
     authType: "token",
+    authSetupDocs:
+        "https://docs.github.com/en/enterprise-server@3.6/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens",
     objects: {
         currentUser: {
             name: "Current User",
