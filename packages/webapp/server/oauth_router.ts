@@ -7,8 +7,14 @@ import { eq } from "drizzle-orm";
 export const oauthRouter = Router();
 
 function getBaseUrl(req: Request) {
-    // TODO: Ensure that when tunneling, the protocol will be https, and not http
-    return `${req.protocol}://${req.header("host")}/oauth/callback`;
+    // If the host is localhost or an IPv4, assume it's http
+    // Otherwise, assume it's https.
+    // TODO: Consider a more configurable way to determine between http and https
+    const host = req.header("host");
+    const protocol = host?.match(/(localhost|\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})/)
+        ? "http"
+        : "https";
+    return `${protocol}://${host}/oauth/callback`;
 }
 
 oauthRouter.get("/start/:dataset_id", async (req, res) => {
@@ -42,14 +48,19 @@ oauthRouter.get("/start/:dataset_id", async (req, res) => {
 
     const baseUrl = getBaseUrl(req);
 
-    const url = await integration.getOAuthUrl(baseUrl, dataset);
+    try {
+        const url = await integration.getOAuthUrl(baseUrl, dataset);
 
-    if (!url) {
-        res.status(400).send("Integration doesn't support oauth");
-        return;
+        if (!url) {
+            res.status(400).send("Integration doesn't support oauth");
+            return;
+        }
+
+        res.redirect(url);
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500);
     }
-
-    res.redirect(url);
 });
 
 oauthRouter.get("/callback/:dataset_id", async (req, res) => {
@@ -83,7 +94,11 @@ oauthRouter.get("/callback/:dataset_id", async (req, res) => {
 
     const baseUrl = getBaseUrl(req);
 
-    await integration.oauthCallback(baseUrl, dataset, req.query as any);
-
-    res.redirect(`/dataset/${dataset.id}`);
+    try {
+        await integration.oauthCallback(baseUrl, dataset, req.query as any);
+        res.redirect(`/dataset/${dataset.id}`);
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500);
+    }
 });

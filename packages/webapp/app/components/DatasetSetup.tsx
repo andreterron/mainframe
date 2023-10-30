@@ -40,7 +40,7 @@ export default function DatasetSetup({
                     className="block border shadow rounded-lg py-2 px-4"
                     onClick={() => onIntegrationSelected("google")}
                 >
-                    Google
+                    Google Calendar
                 </button>
                 {/* <button
                     className="block border shadow rounded-lg py-2 px-4"

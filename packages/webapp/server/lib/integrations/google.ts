@@ -15,30 +15,30 @@ async function getAuth(dataset: Dataset) {
         return null;
     }
 
-    const accessToken = dataset.credentials?.accessToken;
-
     const oauth2Client = new api.auth.OAuth2({
         clientId: dataset.credentials.clientId,
         clientSecret: dataset.credentials.clientSecret,
         credentials: {
-            access_token: accessToken,
+            access_token: dataset.credentials?.accessToken,
             refresh_token: dataset.credentials?.refreshToken,
         },
     });
 
     // TODO: Only refresh token if it's expired, or close to it
-    const resp = await oauth2Client.refreshAccessToken();
+    if (dataset.credentials?.refreshToken) {
+        const resp = await oauth2Client.refreshAccessToken();
 
-    await db
-        .update(datasetsTable)
-        .set({
-            credentials: {
-                ...dataset.credentials,
-                accessToken: resp.credentials.access_token ?? undefined,
-                refreshToken: resp.credentials.refresh_token ?? undefined,
-            },
-        })
-        .where(eq(datasetsTable.id, dataset.id));
+        await db
+            .update(datasetsTable)
+            .set({
+                credentials: {
+                    ...dataset.credentials,
+                    accessToken: resp.credentials.access_token ?? undefined,
+                    refreshToken: resp.credentials.refresh_token ?? undefined,
+                },
+            })
+            .where(eq(datasetsTable.id, dataset.id));
+    }
 
     return oauth2Client;
 }
@@ -64,6 +64,7 @@ export const google: Integration = {
 
         return oauth2Client.generateAuthUrl({
             access_type: "offline",
+            prompt: "consent", // Ensure we'll get a refresh token
             scope: "https://www.googleapis.com/auth/calendar.readonly",
         });
     },
