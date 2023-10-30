@@ -7,11 +7,13 @@ import { eq } from "drizzle-orm";
 export const oauthRouter = Router();
 
 function getBaseUrl(req: Request) {
-    // If the host is localhost or an IPv4, assume it's http
+    // If the host is localhost, an IPv4, or ends in .lan, assume it's http
     // Otherwise, assume it's https.
     // TODO: Consider a more configurable way to determine between http and https
     const host = req.header("host");
-    const protocol = host?.match(/(localhost|\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3})/)
+    const protocol = host?.match(
+        /(localhost|\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|\.lan$)/,
+    )
         ? "http"
         : "https";
     return `${protocol}://${host}/oauth/callback`;
