@@ -4,6 +4,7 @@ import DatasetTokenInput from "../components/DatasetTokenInput";
 import { DatasetPage } from "../components/DatasetPage";
 import { trpc } from "../lib/trpc_client";
 import { SadPath } from "../components/SadPath";
+import { DatasetCredentials } from "../lib/types";
 
 export default function DatasetDetails() {
     const { id } = useParams();
@@ -62,12 +63,12 @@ export default function DatasetDetails() {
         });
     }
 
-    function setToken(token: string) {
+    function setCredentials(credentials: DatasetCredentials) {
         if (!dataset || !id) {
             console.error("No doc to set token");
             return;
         }
-        datasetsUpdate.mutate({ id, patch: { token } });
+        datasetsUpdate.mutate({ id, patch: { credentials } });
     }
 
     return (
@@ -77,16 +78,21 @@ export default function DatasetDetails() {
                     onIntegrationSelected={(type) => setIntegrationType(type)}
                     dataset={dataset}
                 />
-            ) : !dataset.token ? (
-                <DatasetTokenInput
-                    onSubmit={(token) => setToken(token)}
-                    dataset={dataset}
-                />
             ) : integrations?.[dataset.integrationType] ? (
-                <DatasetPage
-                    dataset={dataset}
-                    integration={integrations[dataset.integrationType]}
-                />
+                integrations?.[dataset.integrationType].authType !== "none" &&
+                !dataset.credentials?.token &&
+                !dataset.credentials?.accessToken ? (
+                    <DatasetTokenInput
+                        onSubmit={(creds) => setCredentials(creds)}
+                        dataset={dataset}
+                        integration={integrations[dataset.integrationType]}
+                    />
+                ) : (
+                    <DatasetPage
+                        dataset={dataset}
+                        integration={integrations[dataset.integrationType]}
+                    />
+                )
             ) : (
                 <span>Error: Integration not found</span>
             )}

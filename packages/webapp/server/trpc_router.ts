@@ -31,6 +31,7 @@ import { peloton } from "./lib/integrations/peloton";
 import { posthog } from "./lib/integrations/posthog";
 import { toggl } from "./lib/integrations/toggl";
 import { ClientIntegration } from "../app/lib/integration-types";
+import { google } from "./lib/integrations/google";
 
 /**
  * Initialization of tRPC backend
@@ -398,6 +399,7 @@ export const appRouter = router({
     integrationsAll: t.procedure.query(
         (): Record<string, ClientIntegration> => {
             return {
+                google: createClientIntegration(google),
                 toggl: createClientIntegration(toggl),
                 posthog: createClientIntegration(posthog),
                 github: createClientIntegration(github),

@@ -7,14 +7,16 @@ import { deserialize } from "../../../app/utils/serialization";
 
 export const peloton: Integration = {
     name: "Peloton",
+    authType: "token",
     objects: {
         currentUser: {
             name: "Current User",
             get: async (dataset: Dataset) => {
+                if (!dataset.credentials?.token) return null;
                 const res = await fetch("https://api.onepeloton.com/api/me", {
                     headers: {
                         "Content-Type": "application/json",
-                        Cookie: `peloton_session_id=${dataset.token}`,
+                        Cookie: `peloton_session_id=${dataset.credentials.token}`,
                     },
                 });
                 return res.json();
@@ -28,6 +30,7 @@ export const peloton: Integration = {
         workouts: {
             name: "Workouts",
             async get(dataset) {
+                if (!dataset.credentials?.token) return [];
                 try {
                     const [user] = await db
                         .select()
@@ -48,7 +51,7 @@ export const peloton: Integration = {
                             method: "get",
                             headers: {
                                 "Content-Type": "application/json",
-                                Cookie: `peloton_session_id=${dataset.token}`,
+                                Cookie: `peloton_session_id=${dataset.credentials.token}`,
                             },
                         },
                     );

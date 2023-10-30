@@ -36,6 +36,12 @@ export default function DatasetSetup({
                 >
                     Peloton
                 </button>
+                <button
+                    className="block border shadow rounded-lg py-2 px-4"
+                    onClick={() => onIntegrationSelected("google")}
+                >
+                    Google
+                </button>
                 {/* <button
                     className="block border shadow rounded-lg py-2 px-4"
                     onClick={() => onIntegrationSelected("network")}

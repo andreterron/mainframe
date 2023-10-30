@@ -3,13 +3,15 @@ import { Dataset } from "../../../app/lib/types";
 
 export const github: Integration = {
     name: "GitHub",
+    authType: "token",
     objects: {
         currentUser: {
             name: "Current User",
             get: async (dataset: Dataset) => {
+                if (!dataset.credentials?.token) return null;
                 const res = await fetch("https://api.github.com/user", {
                     headers: {
-                        Authorization: `Bearer ${dataset.token}`,
+                        Authorization: `Bearer ${dataset.credentials.token}`,
                         "X-GitHub-Api-Version": "2022-11-28",
                     },
                 });
@@ -24,9 +26,10 @@ export const github: Integration = {
         repos: {
             name: "Repos",
             get: async (dataset: Dataset) => {
+                if (!dataset.credentials?.token) return [];
                 const res = await fetch(`https://api.github.com/user/repos`, {
                     headers: {
-                        Authorization: `Bearer ${dataset.token}`,
+                        Authorization: `Bearer ${dataset.credentials.token}`,
                         "X-GitHub-Api-Version": "2022-11-28",
                     },
                 });

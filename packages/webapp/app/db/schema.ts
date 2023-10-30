@@ -6,6 +6,8 @@ import {
     customType,
 } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
+// TODO: Remove dependency cycle
+import type { DatasetCredentials } from "../lib/types";
 
 // TODO: This only exists to ensure there's only one active user. This type can
 //       be removed once admins can create other users, and we have permissions
@@ -19,6 +21,26 @@ const singleUserKey = (name: string) =>
         },
     })(name);
 
+// TODO: Type validation and Error handling
+const json = <TData>(name: string) =>
+    customType<{ data: TData; driverData: string | null }>({
+        dataType() {
+            return "text";
+        },
+        toDriver(value: TData): string | null {
+            if (value === null || value === undefined) {
+                return null;
+            }
+            return JSON.stringify(value);
+        },
+        fromDriver(value) {
+            if (value === null) {
+                return null;
+            }
+            return JSON.parse(value);
+        },
+    })(name);
+
 export const datasetsTable = sqliteTable("datasets", {
     id: text("id")
         .default(sql`(lower(hex(randomblob(16))))`)
@@ -26,7 +48,8 @@ export const datasetsTable = sqliteTable("datasets", {
         .primaryKey(),
     name: text("name").default("").notNull(),
     integrationType: text("integration_type"),
-    token: text("token"),
+    // TODO: Improve type
+    credentials: json<DatasetCredentials>("credentials"),
 });
 
 export const tablesTable = sqliteTable(

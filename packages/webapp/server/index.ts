@@ -19,6 +19,7 @@ import { appRouter } from "./trpc_router";
 import cors from "cors";
 import ViteExpress from "vite-express";
 import { apiRouter } from "./api";
+import { oauthRouter } from "./oauth_router";
 
 const t = initTRPC.context<Context>().create();
 
@@ -110,6 +111,7 @@ app.use(
 );
 
 app.use("/api", apiRouter);
+app.use("/oauth", oauthRouter);
 
 app.use(
     (

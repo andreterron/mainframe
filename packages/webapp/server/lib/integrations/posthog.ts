@@ -27,11 +27,12 @@ async function getProjectChildren(dataset: Dataset, urlPath: string) {
         );
         const projectItems = await Promise.all(
             projectIds.map(async (id): Promise<any[]> => {
+                if (!dataset.credentials?.token) return [];
                 const res = await fetch(
                     `https://app.posthog.com/api/projects/${id}/${urlPath}`,
                     {
                         headers: {
-                            Authorization: `Bearer ${dataset.token}`,
+                            Authorization: `Bearer ${dataset.credentials.token}`,
                         },
                     },
                 );
@@ -48,15 +49,17 @@ async function getProjectChildren(dataset: Dataset, urlPath: string) {
 
 export const posthog: Integration = {
     name: "Posthog",
+    authType: "token",
     objects: {
         user: {
             name: "Current User",
             get: async (dataset: Dataset) => {
+                if (!dataset.credentials?.token) return null;
                 const res = await fetch(
                     "https://app.posthog.com/api/users/@me/",
                     {
                         headers: {
-                            Authorization: `Bearer ${dataset.token}`,
+                            Authorization: `Bearer ${dataset.credentials.token}`,
                         },
                     },
                 );
@@ -71,11 +74,12 @@ export const posthog: Integration = {
         projects: {
             name: "Projects",
             async get(dataset) {
+                if (!dataset.credentials?.token) return [];
                 const res = await fetch(
                     "https://app.posthog.com/api/projects/",
                     {
                         headers: {
-                            Authorization: `Bearer ${dataset.token}`,
+                            Authorization: `Bearer ${dataset.credentials.token}`,
                         },
                     },
                 );

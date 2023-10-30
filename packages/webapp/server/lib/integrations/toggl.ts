@@ -11,9 +11,11 @@ import { deserialize } from "../../../app/utils/serialization";
 
 function togglHeaders(dataset: Dataset) {
     return {
-        Authorization: `Basic ${Buffer.from(
-            dataset.token + ":api_token",
-        ).toString("base64")}`,
+        Authorization: dataset.credentials?.token
+            ? `Basic ${Buffer.from(
+                  dataset.credentials.token + ":api_token",
+              ).toString("base64")}`
+            : "",
         "User-Agent": "Mainframe <mainframe.so>",
     };
 }
@@ -71,6 +73,7 @@ function isPingWebhookEvent(event: TogglWebhook): event is TogglWebhookPing {
 
 export const toggl: Integration = {
     name: "Toggl",
+    authType: "token",
     setupWebhooks: async (dataset: Dataset, baseApiUrl: string) => {
         // Remove trailing slashes
         const normalizedBaseApiUrl = baseApiUrl.replace(/\/+$/, "");

@@ -190,7 +190,10 @@ export async function syncTable(
 }
 
 export async function syncDataset(dataset: Dataset) {
-    if (!dataset.integrationType || !dataset.token) {
+    if (
+        !dataset.integrationType ||
+        (!dataset.credentials?.token && !dataset.credentials?.accessToken)
+    ) {
         return;
     }
 

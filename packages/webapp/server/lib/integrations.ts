@@ -10,6 +10,7 @@ import { peloton } from "./integrations/peloton";
 import { posthog } from "./integrations/posthog";
 import { toggl } from "./integrations/toggl";
 import { Dataset } from "../../app/lib/types";
+import { google } from "./integrations/google";
 
 export function getIntegrationFromType(
     type: string | undefined,
@@ -29,6 +30,9 @@ export function getIntegrationFromType(
     if (type === "network") {
         return network;
     }
+    if (type === "google") {
+        return google;
+    }
     return null;
 }
 
@@ -37,6 +41,7 @@ export function createClientIntegration(
 ): ClientIntegration {
     return {
         name: integration.name,
+        authType: integration.authType,
         objects: Object.entries(integration.objects ?? {}).map(([k, v]) => ({
             id: k,
             name: v.name,

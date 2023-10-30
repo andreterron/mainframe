@@ -4,6 +4,7 @@ import find from "local-devices";
 
 export const network: Integration = {
     name: "Network",
+    authType: "none",
     tables: {
         networkDevices: {
             name: "Network Devices",
