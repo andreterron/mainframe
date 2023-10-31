@@ -73,7 +73,6 @@ async function updateData(
     data: MainframeSession["data"],
     expires: Date | undefined,
 ) {
-    console.log("Updating...", id, data);
     await db
         .update(sessionsTable)
         .set({

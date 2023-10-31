@@ -77,7 +77,6 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (!isFetching && authInfo && !authInfo.isLoggedIn) {
-            console.log("AUTH INFO", authInfo);
             navigate(authInfo.hasUsers ? "/login" : "/setup");
         }
     }, [authInfo]);

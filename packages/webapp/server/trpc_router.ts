@@ -107,7 +107,6 @@ export const appRouter = router({
 
             ctx.res.appendHeader("Set-Cookie", await commitSession(session));
 
-            console.log("TRPC ALMOST DONE LOGIN");
             return {
                 redirect: "/",
             };

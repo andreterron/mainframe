@@ -20,6 +20,8 @@ import cors from "cors";
 import ViteExpress from "vite-express";
 import { apiRouter } from "./api";
 import { oauthRouter } from "./oauth_router";
+import { ip } from "address";
+import chalk from "chalk";
 
 const t = initTRPC.context<Context>().create();
 
@@ -132,10 +134,48 @@ app.use(
 
 let server: Server | undefined;
 
+function printSuccess(port: number) {
+    console.log(`\n 🎉  Your Mainframe is up!`);
+    const localUrl = `http://localhost:${port}`;
+    let lanUrl: string | null = null;
+    const localIp = ip();
+    // Check if the address is a private ip
+    // https://en.wikipedia.org/wiki/Private_network#Private_IPv4_address_spaces
+    // https://github.com/facebook/create-react-app/blob/d960b9e38c062584ff6cfb1a70e1512509a966e7/packages/react-dev-utils/WebpackDevServerUtils.js#LL48C9-L54C10
+    if (
+        localIp &&
+        /^10[.]|^172[.](1[6-9]|2[0-9]|3[0-1])[.]|^192[.]168[.]/.test(localIp)
+    ) {
+        lanUrl = `http://${localIp}:${port}`;
+    }
+
+    const urls = [`${chalk.bold("Local:")}            ${chalk.cyan(localUrl)}`];
+
+    if (lanUrl) {
+        urls.push(`${chalk.bold("On Your Network:")}  ${chalk.cyan(lanUrl)}`);
+    }
+
+    if (env.TUNNEL_BASE_API_URL) {
+        urls.push(
+            `${chalk.bold("On The Internet:")}   ${chalk.cyan(
+                env.TUNNEL_BASE_API_URL,
+            )}`,
+        );
+    }
+
+    const urlLines = urls
+        .map((line, i, a) => `${i === a.length - 1 ? ` └─  ` : ` ├─  `}${line}`)
+        .join("\n");
+
+    console.log(`\n${urlLines}\n`);
+
+    console.log(`${chalk.bold("Press Ctrl+C to stop")}\n`);
+}
+
 function startListen() {
     return new Promise<void>((resolve, reject) => {
         server = ViteExpress.listen(app, port, () => {
-            console.log(`Sync server listening on port ${port}`);
+            printSuccess(port);
             resolve();
         }).on("error", function (err) {
             if ((err as any).code === "EADDRINUSE") {

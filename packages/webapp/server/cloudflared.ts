@@ -17,7 +17,7 @@ async function ensureCloudflaredInstalled() {
 export async function startCloudflared() {
     const token = env.CLOUDFLARED_TOKEN;
     if (!token) {
-        console.log("Skipping Cloudflare Tunnel setup: No token");
+        // Skipping Cloudflare Tunnel setup: No token
         return;
     }
 

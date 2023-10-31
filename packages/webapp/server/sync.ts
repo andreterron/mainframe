@@ -121,14 +121,9 @@ export async function syncObject(
     dataset: Dataset,
     objectDefinition: IntegrationObject & { id: string },
 ) {
-    console.log("Syncing");
     if (!objectDefinition.get || !objectDefinition.objId) {
         return;
     }
-
-    console.log(
-        `Loading data for object ${objectDefinition.name} from ${dataset.name}`,
-    );
 
     // Call fetch for each object definition
     const data = await objectDefinition.get(dataset);
@@ -148,8 +143,6 @@ export async function syncTable(
     if (!table.get) {
         return;
     }
-
-    console.log(`Loading data for table ${table.name} from ${dataset.name}`);
 
     // Call fetch on each table
     const data = await table.get(dataset);
@@ -185,8 +178,6 @@ export async function syncTable(
             updated++;
         }
     }
-
-    console.log(`Updated ${updated} rows`);
 }
 
 export async function syncDataset(dataset: Dataset) {
