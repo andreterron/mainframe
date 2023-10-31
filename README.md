@@ -4,6 +4,12 @@ Mainframe is a database to sync data from third-party services.
 
 <img width="832" alt="Mainframe Screenshot" src="./assets/Mainframe_Screenshot.png">
 
+<p align="center">
+    <a href="https://github.com/andreterron/mainframe/issues">Report a Bug</a>
+    ·
+    <a href="https://discord.gg/HUS4y59Dxw">Discord Community</a>
+</p>
+
 ## Get started
 
 #### Setup
