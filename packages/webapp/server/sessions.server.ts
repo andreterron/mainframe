@@ -14,7 +14,7 @@ export interface MainframeSession {
     error?: "not_found";
 }
 
-const cookieName = "__session";
+const cookieNames: [string, ...string[]] = ["__session_mainframe", "__session"];
 const cookieSecrets = env.COOKIE_SECRET ? [env.COOKIE_SECRET] : [];
 const cookieSettings: CookieSerializeOptions = {
     path: "/",
@@ -36,26 +36,31 @@ export function getSessionIdFromCookieHeader(
     if (!cookieHeader) {
         return null;
     }
-    const parsed = parse(cookieHeader, {
-        decode(value) {
-            for (let secret of cookieSecrets) {
-                const unsigned = cookieSignature.unsign(value, secret);
-                if (unsigned !== false) {
-                    return unsigned;
+    for (let cookieName of cookieNames) {
+        const parsed = parse(cookieHeader, {
+            decode(value) {
+                for (let secret of cookieSecrets) {
+                    const unsigned = cookieSignature.unsign(value, secret);
+                    if (unsigned !== false) {
+                        return unsigned;
+                    }
                 }
-            }
-            return value;
-        },
-    })[cookieName] as string | undefined;
-    // Ensures it's not an empty string or null
-    return parsed ? parsed : null;
+                return value;
+            },
+        })[cookieName] as string | undefined;
+        // Ensures it's not an empty string or null
+        if (parsed) {
+            return parsed;
+        }
+    }
+    return null;
 }
 
 function serializeSessionCookie(
     value: string,
     options?: CookieSerializeOptions,
 ) {
-    return serialize(cookieName, value, {
+    return serialize(cookieNames[0], value, {
         encode(value) {
             const secret = cookieSecrets.at(0);
             if (secret) {
