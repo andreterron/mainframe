@@ -1,15 +1,9 @@
 import { PropsWithChildren, useState, useEffect } from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Label } from "./ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import codeStyleLight from "react-syntax-highlighter/dist/esm/styles/hljs/docco";
 import {
     Dialog,
-    DialogClose,
     DialogContent,
-    DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
     DialogTrigger,
@@ -235,11 +229,6 @@ export function ApiHelper({
                         </div>
                     )}
                 </div>
-                <DialogFooter>
-                    <DialogClose asChild>
-                        <Button>Done</Button>
-                    </DialogClose>
-                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
