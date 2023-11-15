@@ -11,6 +11,7 @@ import { posthog } from "./integrations/posthog";
 import { toggl } from "./integrations/toggl";
 import { Dataset } from "../../app/lib/types";
 import { google } from "./integrations/google";
+import { zotero } from "./integrations/zotero";
 
 export function getIntegrationFromType(
     type: string | undefined,
@@ -32,6 +33,9 @@ export function getIntegrationFromType(
     }
     if (type === "google") {
         return google;
+    }
+    if (type === "zotero") {
+        return zotero;
     }
     return null;
 }

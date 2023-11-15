@@ -33,6 +33,7 @@ import { posthog } from "./lib/integrations/posthog";
 import { toggl } from "./lib/integrations/toggl";
 import { ClientIntegration } from "../app/lib/integration-types";
 import { google } from "./lib/integrations/google";
+import { zotero } from "./lib/integrations/zotero";
 
 /**
  * Initialization of tRPC backend
@@ -271,6 +272,7 @@ export const appRouter = router({
                         ),
                     )
                     .limit(1);
+                console.log("after another select for some reason");
             }
 
             if (!object) {
@@ -439,7 +441,8 @@ export const appRouter = router({
                 posthog: createClientIntegration(posthog),
                 github: createClientIntegration(github),
                 peloton: createClientIntegration(peloton),
-                network: createClientIntegration(network),
+                // network: createClientIntegration(network),
+                zotero: createClientIntegration(zotero),
             };
         },
     ),
