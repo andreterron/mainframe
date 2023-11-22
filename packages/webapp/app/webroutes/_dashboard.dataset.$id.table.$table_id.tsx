@@ -111,10 +111,10 @@ export default function DatasetTableDetails() {
           return value === undefined
             ? ""
             : value && typeof value === "object"
-              ? Array.isArray(value)
-                ? "[...]"
-                : "{...}"
-              : JSON.stringify(value);
+            ? Array.isArray(value)
+              ? "[...]"
+              : "{...}"
+            : JSON.stringify(value);
         },
       }),
     );
@@ -163,7 +163,7 @@ export default function DatasetTableDetails() {
     },
   });
 
-  if (!dataset || !dbTable) {
+  if (!dataset || !dbTable || !rows) {
     return (
       <SadPath
         className="p-4"
@@ -224,55 +224,59 @@ export default function DatasetTableDetails() {
         </div>
         <div></div>
         <div className="max-w-full overflow-auto">
-          <table className="text-sm text-left text-gray-500 dark:text-gray-400 border-separate border-spacing-0 border-t">
-            <thead className="text-sm text-gray-700 font-mono">
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="">
-                  {headerGroup.headers.map((header) => (
-                    <th
-                      key={header.id}
-                      scope="col"
-                      className="group box-border border-b bg-gray-50 dark:bg-gray-700 dark:text-gray-400 px-6 py-3 sticky top-0"
-                    >
-                      <span className="flex items-center">
-                        <span className="flex-grow overflow-hidden text-ellipsis">
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext(),
-                              )}
+          {rows.length === 0 ? (
+            <span className="text-gray-500 mx-4">(Empty table)</span>
+          ) : (
+            <table className="text-sm text-left text-gray-500 dark:text-gray-400 border-separate border-spacing-0 border-t">
+              <thead className="text-sm text-gray-700 font-mono">
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id} className="">
+                    {headerGroup.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        scope="col"
+                        className="group box-border border-b bg-gray-50 dark:bg-gray-700 dark:text-gray-400 px-6 py-3 sticky top-0"
+                      >
+                        <span className="flex items-center">
+                          <span className="flex-grow overflow-hidden text-ellipsis">
+                            {header.isPlaceholder
+                              ? null
+                              : flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                )}
+                          </span>
+                          {header.column.id !== "_open" ? (
+                            <ColumnMenu header={header} />
+                          ) : null}
                         </span>
-                        {header.column.id !== "_open" ? (
-                          <ColumnMenu header={header} />
-                        ) : null}
-                      </span>
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows.map((row) => (
-                <tr
-                  key={row.id}
-                  className="bg-white dark:bg-gray-800 dark:border-gray-700"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <td
-                      key={cell.id}
-                      className="px-6 py-4 border-b font-mono whitespace-nowrap"
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.map((row) => (
+                  <tr
+                    key={row.id}
+                    className="bg-white dark:bg-gray-800 dark:border-gray-700"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <td
+                        key={cell.id}
+                        className="px-6 py-4 border-b font-mono whitespace-nowrap"
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
     </div>
