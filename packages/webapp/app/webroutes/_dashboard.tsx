@@ -183,6 +183,7 @@ export default function Dashboard() {
                             href="https://discord.gg/HUS4y59Dxw"
                             target="_blank"
                             rel="noopener noreferrer"
+                            title="Discord"
                             className={clsx([
                                 "flex items-center justify-center gap-1.5 p-2 rounded-lg",
                                 "text-slate-600 hover:text-sky-600",
