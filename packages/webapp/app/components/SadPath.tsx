@@ -3,23 +3,23 @@ import type { AppRouter } from "../../server/trpc_router";
 import { isTrpcNotFoundError } from "../utils/errors";
 
 export function SadPath({
-    className,
-    error,
-    isLoading = false,
+  className,
+  error,
+  isLoading = false,
 }: {
-    className?: string | undefined;
-    error?: TRPCClientErrorLike<AppRouter> | undefined;
-    isLoading?: boolean;
+  className?: string | undefined;
+  error?: TRPCClientErrorLike<AppRouter> | undefined;
+  isLoading?: boolean;
 }) {
-    return (
-        <div className={className}>
-            {isTrpcNotFoundError(error) ? (
-                <span>Not Found</span>
-            ) : isLoading ? (
-                <span className="animate-loading-fade-in">Loading...</span>
-            ) : (
-                <span>Error! {error?.message ?? ""}</span>
-            )}
-        </div>
-    );
+  return (
+    <div className={className}>
+      {isTrpcNotFoundError(error) ? (
+        <span>Not Found</span>
+      ) : isLoading ? (
+        <span className="animate-loading-fade-in">Loading...</span>
+      ) : (
+        <span>Error! {error?.message ?? ""}</span>
+      )}
+    </div>
+  );
 }

@@ -10,8 +10,8 @@ This tutorial is based on [Cloudflare's official docs](https://developers.cloudf
 
 Before you start, make sure you:
 
--   [Add a website to Cloudflare](https://developers.cloudflare.com/fundamentals/setup/account-setup/add-site/).
--   [Change your domain nameservers to Cloudflare](https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/).
+- [Add a website to Cloudflare](https://developers.cloudflare.com/fundamentals/setup/account-setup/add-site/).
+- [Change your domain nameservers to Cloudflare](https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/).
 
 ## 1. Create a tunnel
 
@@ -25,7 +25,7 @@ Before you start, make sure you:
 
 5. Copy the token displayed in the **Install and run a connector** section, displayed after `sudo cloudflared service install `. Here's a highlighted screenshot:
 
-    ![Cloudflare UI highlighting tokens](./images/cloudflare-tunnel-token.png)
+   ![Cloudflare UI highlighting tokens](./images/cloudflare-tunnel-token.png)
 
 (The tokens in the image are fake)
 

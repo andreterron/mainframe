@@ -1,16 +1,16 @@
 {
-    "name": "create-mainframe",
-    "version": "0.3.0",
-    "author": "Andre Terron (https://andreterron.com)",
-    "main": "index.js",
-    "type": "module",
-    "bin": {
-        "create-mainframe": "index.js"
-    },
-    "license": "MIT",
-    "private": false,
-    "dependencies": {
-        "is-npm": "^6.0.0",
-        "zx": "^7.2.3"
-    }
+  "name": "create-mainframe",
+  "version": "0.3.0",
+  "author": "Andre Terron (https://andreterron.com)",
+  "main": "index.js",
+  "type": "module",
+  "bin": {
+    "create-mainframe": "index.js"
+  },
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "is-npm": "^6.0.0",
+    "zx": "^7.2.3"
+  }
 }

@@ -86,10 +86,7 @@
       "indexes": {
         "objects_object_type_dataset_id_unique": {
           "name": "objects_object_type_dataset_id_unique",
-          "columns": [
-            "object_type",
-            "dataset_id"
-          ],
+          "columns": ["object_type", "dataset_id"],
           "isUnique": true
         }
       },
@@ -98,12 +95,8 @@
           "name": "objects_dataset_id_datasets_id_fk",
           "tableFrom": "objects",
           "tableTo": "datasets",
-          "columnsFrom": [
-            "dataset_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["dataset_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -147,10 +140,7 @@
       "indexes": {
         "rows_table_id_source_id_unique": {
           "name": "rows_table_id_source_id_unique",
-          "columns": [
-            "table_id",
-            "source_id"
-          ],
+          "columns": ["table_id", "source_id"],
           "isUnique": true
         }
       },
@@ -159,12 +149,8 @@
           "name": "rows_table_id_tables_id_fk",
           "tableFrom": "rows",
           "tableTo": "tables",
-          "columnsFrom": [
-            "table_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["table_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -203,12 +189,8 @@
           "name": "sessions_userId_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -253,10 +235,7 @@
       "indexes": {
         "tables_dataset_id_key_unique": {
           "name": "tables_dataset_id_key_unique",
-          "columns": [
-            "dataset_id",
-            "key"
-          ],
+          "columns": ["dataset_id", "key"],
           "isUnique": true
         }
       },
@@ -265,12 +244,8 @@
           "name": "tables_dataset_id_datasets_id_fk",
           "tableFrom": "tables",
           "tableTo": "datasets",
-          "columnsFrom": [
-            "dataset_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["dataset_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "cascade"
         }
@@ -315,16 +290,12 @@
       "indexes": {
         "users_username_unique": {
           "name": "users_username_unique",
-          "columns": [
-            "username"
-          ],
+          "columns": ["username"],
           "isUnique": true
         },
         "users_single_user_key_unique": {
           "name": "users_single_user_key_unique",
-          "columns": [
-            "single_user_key"
-          ],
+          "columns": ["single_user_key"],
           "isUnique": true
         }
       },

@@ -1,4 +1,4 @@
 {
-    "image": "mcr.microsoft.com/devcontainers/typescript-node:18",
-    "postCreateCommand": "npm install"
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:18",
+  "postCreateCommand": "npm install"
 }

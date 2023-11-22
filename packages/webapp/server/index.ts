@@ -28,167 +28,167 @@ const t = initTRPC.context<Context>().create();
 const port = env.PORT;
 
 async function setupWebhooks(baseApiUrl: string) {
-    // Get all datasets
-    const datasets = await db.select().from(datasetsTable);
+  // Get all datasets
+  const datasets = await db.select().from(datasetsTable);
 
-    // For each integration
-    for (let dataset of datasets) {
-        const integration = getIntegrationForDataset(dataset);
-        if (integration?.setupWebhooks) {
-            await integration.setupWebhooks(dataset, baseApiUrl);
-        }
+  // For each integration
+  for (let dataset of datasets) {
+    const integration = getIntegrationForDataset(dataset);
+    if (integration?.setupWebhooks) {
+      await integration.setupWebhooks(dataset, baseApiUrl);
     }
+  }
 }
 
 // Create cron
 const task = cron.schedule(
-    "*/10 * * * *",
-    async (now) => {
-        try {
-            await syncAll();
-        } catch (e) {
-            console.error(e);
-        }
-    },
-    {
-        runOnInit: true,
-    },
+  "*/10 * * * *",
+  async (now) => {
+    try {
+      await syncAll();
+    } catch (e) {
+      console.error(e);
+    }
+  },
+  {
+    runOnInit: true,
+  },
 );
 
 const app = express();
 
 app.get("/healthcheck", (req, res) => {
-    res.json({ success: true });
+  res.json({ success: true });
 });
 
 process
-    .on("unhandledRejection", (reason, p) => {
-        console.error(reason, "Unhandled Rejection at Promise", p);
-    })
-    .on("uncaughtException", (err) => {
-        console.error(err, "Uncaught Exception thrown");
-    });
+  .on("unhandledRejection", (reason, p) => {
+    console.error(reason, "Unhandled Rejection at Promise", p);
+  })
+  .on("uncaughtException", (err) => {
+    console.error(err, "Uncaught Exception thrown");
+  });
 
 app.all(
-    ["/webhooks/:dataset_id", "/webhooks/:dataset_id/*"],
-    // Text is used here so integrations can validate the webhook signature
-    text({ type: () => true }),
-    async (req, res, next) => {
-        try {
-            console.log(
-                `Received webhook request for dataset ${req.params.dataset_id}`,
-            );
-            const [dataset] = await db
-                .select()
-                .from(datasetsTable)
-                .where(eq(datasetsTable.id, req.params.dataset_id))
-                .limit(1);
-            if (!dataset) {
-                res.sendStatus(404);
-                return;
-            }
-            if (!dataset) {
-                return res.sendStatus(404);
-            }
-            const integration = getIntegrationForDataset(dataset);
+  ["/webhooks/:dataset_id", "/webhooks/:dataset_id/*"],
+  // Text is used here so integrations can validate the webhook signature
+  text({ type: () => true }),
+  async (req, res, next) => {
+    try {
+      console.log(
+        `Received webhook request for dataset ${req.params.dataset_id}`,
+      );
+      const [dataset] = await db
+        .select()
+        .from(datasetsTable)
+        .where(eq(datasetsTable.id, req.params.dataset_id))
+        .limit(1);
+      if (!dataset) {
+        res.sendStatus(404);
+        return;
+      }
+      if (!dataset) {
+        return res.sendStatus(404);
+      }
+      const integration = getIntegrationForDataset(dataset);
 
-            if (!integration?.webhook) {
-                return res.sendStatus(404);
-            }
+      if (!integration?.webhook) {
+        return res.sendStatus(404);
+      }
 
-            integration.webhook(dataset, req, res);
-        } catch (e) {
-            next(e);
-        }
-    },
+      integration.webhook(dataset, req, res);
+    } catch (e) {
+      next(e);
+    }
+  },
 );
 
 app.use(
-    "/trpc",
-    cors(),
-    trpcExpress.createExpressMiddleware({
-        router: appRouter,
-        createContext,
-    }),
+  "/trpc",
+  cors(),
+  trpcExpress.createExpressMiddleware({
+    router: appRouter,
+    createContext,
+  }),
 );
 
 app.use("/api", apiRouter);
 app.use("/oauth", oauthRouter);
 
 app.use(
-    (
-        err: any,
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction,
-    ) => {
-        if (err) {
-            console.error(err);
-            if (err instanceof ZodError) {
-                return res.sendStatus(400);
-            }
-            res.sendStatus(500);
-        }
-    },
+  (
+    err: any,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction,
+  ) => {
+    if (err) {
+      console.error(err);
+      if (err instanceof ZodError) {
+        return res.sendStatus(400);
+      }
+      res.sendStatus(500);
+    }
+  },
 );
 
 let server: Server | undefined;
 
 function printSuccess(port: number) {
-    console.log(`\n 🎉  Your Mainframe is up!`);
-    const localUrl = `http://localhost:${port}`;
-    let lanUrl: string | null = null;
-    const localIp = ip();
-    // Check if the address is a private ip
-    // https://en.wikipedia.org/wiki/Private_network#Private_IPv4_address_spaces
-    // https://github.com/facebook/create-react-app/blob/d960b9e38c062584ff6cfb1a70e1512509a966e7/packages/react-dev-utils/WebpackDevServerUtils.js#LL48C9-L54C10
-    if (
-        localIp &&
-        /^10[.]|^172[.](1[6-9]|2[0-9]|3[0-1])[.]|^192[.]168[.]/.test(localIp)
-    ) {
-        lanUrl = `http://${localIp}:${port}`;
-    }
+  console.log(`\n 🎉  Your Mainframe is up!`);
+  const localUrl = `http://localhost:${port}`;
+  let lanUrl: string | null = null;
+  const localIp = ip();
+  // Check if the address is a private ip
+  // https://en.wikipedia.org/wiki/Private_network#Private_IPv4_address_spaces
+  // https://github.com/facebook/create-react-app/blob/d960b9e38c062584ff6cfb1a70e1512509a966e7/packages/react-dev-utils/WebpackDevServerUtils.js#LL48C9-L54C10
+  if (
+    localIp &&
+    /^10[.]|^172[.](1[6-9]|2[0-9]|3[0-1])[.]|^192[.]168[.]/.test(localIp)
+  ) {
+    lanUrl = `http://${localIp}:${port}`;
+  }
 
-    const urls = [`${chalk.bold("Local:")}            ${chalk.cyan(localUrl)}`];
+  const urls = [`${chalk.bold("Local:")}            ${chalk.cyan(localUrl)}`];
 
-    if (lanUrl) {
-        urls.push(`${chalk.bold("On Your Network:")}  ${chalk.cyan(lanUrl)}`);
-    }
+  if (lanUrl) {
+    urls.push(`${chalk.bold("On Your Network:")}  ${chalk.cyan(lanUrl)}`);
+  }
 
-    if (env.TUNNEL_BASE_API_URL) {
-        urls.push(
-            `${chalk.bold("On The Internet:")}   ${chalk.cyan(
-                env.TUNNEL_BASE_API_URL,
-            )}`,
-        );
-    }
+  if (env.TUNNEL_BASE_API_URL) {
+    urls.push(
+      `${chalk.bold("On The Internet:")}   ${chalk.cyan(
+        env.TUNNEL_BASE_API_URL,
+      )}`,
+    );
+  }
 
-    const urlLines = urls
-        .map((line, i, a) => `${i === a.length - 1 ? ` └─  ` : ` ├─  `}${line}`)
-        .join("\n");
+  const urlLines = urls
+    .map((line, i, a) => `${i === a.length - 1 ? ` └─  ` : ` ├─  `}${line}`)
+    .join("\n");
 
-    console.log(`\n${urlLines}\n`);
+  console.log(`\n${urlLines}\n`);
 
-    console.log(`${chalk.bold("Press Ctrl+C to stop")}\n`);
+  console.log(`${chalk.bold("Press Ctrl+C to stop")}\n`);
 }
 
 function startListen() {
-    return new Promise<void>((resolve, reject) => {
-        server = ViteExpress.listen(app, port, () => {
-            printSuccess(port);
-            resolve();
-        }).on("error", function (err) {
-            if ((err as any).code === "EADDRINUSE") {
-                // port is currently in use
-                console.log(`Address in use, retry ${addrInUseRetries++}...`);
-                setTimeout(() => {
-                    addrInUseTimeout *= 2;
-                    startListen().then(resolve, reject);
-                }, addrInUseTimeout);
-                return;
-            }
-        });
+  return new Promise<void>((resolve, reject) => {
+    server = ViteExpress.listen(app, port, () => {
+      printSuccess(port);
+      resolve();
+    }).on("error", function (err) {
+      if ((err as any).code === "EADDRINUSE") {
+        // port is currently in use
+        console.log(`Address in use, retry ${addrInUseRetries++}...`);
+        setTimeout(() => {
+          addrInUseTimeout *= 2;
+          startListen().then(resolve, reject);
+        }, addrInUseTimeout);
+        return;
+      }
     });
+  });
 }
 
 const serverPromise = startListen();
@@ -196,46 +196,47 @@ const serverPromise = startListen();
 let cloudflaredProcess: ChildProcess | undefined;
 
 startCloudflared()
-    .then(async (args) => {
-        if (!args) {
-            return;
-        }
-        const { child, url, connections } = args;
-        cloudflaredProcess = child;
+  .then(async (args) => {
+    if (!args) {
+      return;
+    }
+    const { child, url, connections } = args;
+    cloudflaredProcess = child;
 
-        const baseApiUrl = env.TUNNEL_BASE_API_URL;
+    const baseApiUrl = env.TUNNEL_BASE_API_URL;
 
-        // Ensure tunnel is connected before setting up webhooks
-        await Promise.all(connections);
+    // Ensure tunnel is connected before setting up webhooks
+    await Promise.all(connections);
 
-        // Wait for the API to be ready
-        await serverPromise;
+    // Wait for the API to be ready
+    await serverPromise;
 
-        await setupWebhooks(baseApiUrl);
-    })
-    .catch((e) => console.error(e));
+    await setupWebhooks(baseApiUrl);
+  })
+  .catch((e) => console.error(e));
 
 let addrInUseTimeout = 100;
 let addrInUseRetries = 1;
 
 process.on("uncaughtException", (err) => {
-    console.error(err);
-    process.exit(1);
+  console.error(err);
+  process.exit(1);
 });
 
 process.on("unhandledRejection", (err) => {
-    console.error(err);
-    process.exit(1);
+  console.error(err);
+  process.exit(1);
 });
 
 closeWithGrace(async ({ signal }) => {
-    task.stop();
-    cloudflaredProcess?.kill(signal);
-    if (server) {
-        await new Promise<void>((resolve, reject) =>
-            server?.close((e) => {
-                e ? reject(e) : resolve();
-            }),
-        );
-    }
+  task.stop();
+  cloudflaredProcess?.kill(signal);
+  if (server) {
+    await new Promise<void>(
+      (resolve, reject) =>
+        server?.close((e) => {
+          e ? reject(e) : resolve();
+        }),
+    );
+  }
 });

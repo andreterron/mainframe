@@ -6,18 +6,18 @@ import gcal from "./google_calendar.png";
 import zotero from "./zotero.png";
 
 export function datasetIcon(id: string) {
-    switch (id) {
-        case "github":
-            return github;
-        case "toggl":
-            return toggl;
-        case "posthog":
-            return posthog;
-        case "peloton":
-            return peloton;
-        case "google":
-            return gcal;
-        case "zotero":
-            return zotero;
-    }
+  switch (id) {
+    case "github":
+      return github;
+    case "toggl":
+      return toggl;
+    case "posthog":
+      return posthog;
+    case "peloton":
+      return peloton;
+    case "google":
+      return gcal;
+    case "zotero":
+      return zotero;
+  }
 }

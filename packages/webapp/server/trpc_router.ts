@@ -1,10 +1,10 @@
 import { TRPCError, initTRPC } from "@trpc/server";
 import {
-    datasetsTable,
-    objectsTable,
-    rowsTable,
-    sessionsTable,
-    tablesTable,
+  datasetsTable,
+  objectsTable,
+  rowsTable,
+  sessionsTable,
+  tablesTable,
 } from "../app/db/schema";
 import { db } from "./db/db.server";
 import { z } from "zod";
@@ -13,14 +13,14 @@ import { zDatasetInsert, zDatasetPatch } from "../app/db/validation";
 import { and, eq } from "drizzle-orm";
 import { syncDataset, syncObject, syncTable } from "./sync";
 import {
-    commitSession,
-    destroySession,
-    getSessionFromCookies,
+  commitSession,
+  destroySession,
+  getSessionFromCookies,
 } from "./sessions.server";
 import {
-    createClientIntegration,
-    getDatasetObject,
-    getDatasetTable,
+  createClientIntegration,
+  getDatasetObject,
+  getDatasetTable,
 } from "./lib/integrations";
 import { deserializeData } from "../app/utils/serialization";
 import { ROW_LIMIT } from "../app/utils/constants";
@@ -45,22 +45,22 @@ const router = t.router;
 // const publicProcedure = t.procedure;
 
 const isAuthed = t.middleware(async (opts) => {
-    const { ctx } = opts;
+  const { ctx } = opts;
 
-    const session = await getSessionFromCookies(ctx.req.header("cookie"));
+  const session = await getSessionFromCookies(ctx.req.header("cookie"));
 
-    const userId = session.data.userId;
+  const userId = session.data.userId;
 
-    if (!userId || session.data.type !== "admin") {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-    }
+  if (!userId || session.data.type !== "admin") {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
 
-    return opts.next({
-        ctx: {
-            ...ctx,
-            userId,
-        },
-    });
+  return opts.next({
+    ctx: {
+      ...ctx,
+      userId,
+    },
+  });
 });
 
 export const protectedProcedure = t.procedure.use(isAuthed);
@@ -70,382 +70,378 @@ export const protectedProcedure = t.procedure.use(isAuthed);
  * that can be used throughout the router
  */
 export const appRouter = router({
-    // Auth
-    authInfo: t.procedure.query(async ({ input, ctx }) => {
-        const hasUsers = await checkIfUserExists();
+  // Auth
+  authInfo: t.procedure.query(async ({ input, ctx }) => {
+    const hasUsers = await checkIfUserExists();
 
-        const session = await getSessionFromCookies(ctx.req.header("cookie"));
-        const userId = session.data.userId;
+    const session = await getSessionFromCookies(ctx.req.header("cookie"));
+    const userId = session.data.userId;
 
-        return {
-            hasUsers,
-            isLoggedIn: !!userId,
-        };
+    return {
+      hasUsers,
+      isLoggedIn: !!userId,
+    };
+  }),
+  login: t.procedure
+    .input(
+      z.object({
+        username: z.string().nonempty(),
+        password: z.string().nonempty(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const { username, password } = input;
+
+      const account = await validateUserAccount(username, password);
+
+      if (!account) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "Invalid username/password",
+        });
+      }
+
+      // Don't pass the cookie header here, because we always want a fresh session
+      const session = await getSessionFromCookies();
+
+      session.data.userId = account.id;
+
+      ctx.res.appendHeader("Set-Cookie", await commitSession(session));
+
+      return {
+        redirect: "/",
+      };
     }),
-    login: t.procedure
-        .input(
-            z.object({
-                username: z.string().nonempty(),
-                password: z.string().nonempty(),
-            }),
-        )
-        .mutation(async ({ input, ctx }) => {
-            const { username, password } = input;
+  signup: t.procedure
+    .input(
+      z.object({
+        username: z.string().nonempty(),
+        password: z.string().nonempty(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const hasUsers = await checkIfUserExists();
 
-            const account = await validateUserAccount(username, password);
+      if (hasUsers) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Only one user can be created, please login",
+        });
+      }
 
-            if (!account) {
-                throw new TRPCError({
-                    code: "UNAUTHORIZED",
-                    message: "Invalid username/password",
-                });
-            }
+      const { username, password } = input;
 
-            // Don't pass the cookie header here, because we always want a fresh session
-            const session = await getSessionFromCookies();
+      // TODO: This can fail if the username already exists
+      const account = await createUserAccount(username, password);
 
-            session.data.userId = account.id;
+      // Don't pass the cookie header here, because we always want a fresh session
+      const session = await getSessionFromCookies();
 
-            ctx.res.appendHeader("Set-Cookie", await commitSession(session));
+      session.data.userId = account.id;
 
-            return {
-                redirect: "/",
-            };
-        }),
-    signup: t.procedure
-        .input(
-            z.object({
-                username: z.string().nonempty(),
-                password: z.string().nonempty(),
-            }),
-        )
-        .mutation(async ({ input, ctx }) => {
-            const hasUsers = await checkIfUserExists();
+      ctx.res.appendHeader("Set-Cookie", await commitSession(session));
 
-            if (hasUsers) {
-                throw new TRPCError({
-                    code: "BAD_REQUEST",
-                    message: "Only one user can be created, please login",
-                });
-            }
-
-            const { username, password } = input;
-
-            // TODO: This can fail if the username already exists
-            const account = await createUserAccount(username, password);
-
-            // Don't pass the cookie header here, because we always want a fresh session
-            const session = await getSessionFromCookies();
-
-            session.data.userId = account.id;
-
-            ctx.res.appendHeader("Set-Cookie", await commitSession(session));
-
-            return {
-                redirect: "/",
-            };
-        }),
-    logout: t.procedure.mutation(async ({ ctx }) => {
-        const session = await getSessionFromCookies(ctx.req.header("Cookie"));
-
-        const hasUsers = await checkIfUserExists();
-
-        ctx.res.appendHeader("Set-Cookie", await destroySession(session));
-
-        return {
-            redirect: hasUsers ? "/login" : "/setup",
-        };
+      return {
+        redirect: "/",
+      };
     }),
+  logout: t.procedure.mutation(async ({ ctx }) => {
+    const session = await getSessionFromCookies(ctx.req.header("Cookie"));
 
-    // Dataset
-    datasetsAll: protectedProcedure.query(async () => {
-        const datasets = await db.select().from(datasetsTable);
-        return datasets;
+    const hasUsers = await checkIfUserExists();
+
+    ctx.res.appendHeader("Set-Cookie", await destroySession(session));
+
+    return {
+      redirect: hasUsers ? "/login" : "/setup",
+    };
+  }),
+
+  // Dataset
+  datasetsAll: protectedProcedure.query(async () => {
+    const datasets = await db.select().from(datasetsTable);
+    return datasets;
+  }),
+  datasetsGet: protectedProcedure
+    .input(z.object({ id: z.string().nonempty() }))
+    .query(async ({ input }) => {
+      const [dataset] = await db
+        .select()
+        .from(datasetsTable)
+        .where(eq(datasetsTable.id, input.id))
+        .limit(1);
+
+      if (!dataset) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return dataset;
     }),
-    datasetsGet: protectedProcedure
-        .input(z.object({ id: z.string().nonempty() }))
-        .query(async ({ input }) => {
-            const [dataset] = await db
-                .select()
-                .from(datasetsTable)
-                .where(eq(datasetsTable.id, input.id))
-                .limit(1);
+  datasetsCreate: protectedProcedure
+    .input(zDatasetInsert)
+    .mutation(async ({ input }) => {
+      const [dataset] = await db
+        .insert(datasetsTable)
+        .values(input)
+        .returning();
 
-            if (!dataset) {
-                throw new TRPCError({ code: "NOT_FOUND" });
-            }
+      if (!dataset) {
+        throw new TRPCError({ code: "CONFLICT" });
+      }
 
-            return dataset;
-        }),
-    datasetsCreate: protectedProcedure
-        .input(zDatasetInsert)
-        .mutation(async ({ input }) => {
-            const [dataset] = await db
-                .insert(datasetsTable)
-                .values(input)
-                .returning();
+      void syncDataset(dataset).catch((e) => console.error(e));
 
-            if (!dataset) {
-                throw new TRPCError({ code: "CONFLICT" });
-            }
+      return dataset;
+    }),
+  datasetsUpdate: protectedProcedure
+    .input(z.object({ id: z.string(), patch: zDatasetPatch }))
+    .mutation(async ({ input }) => {
+      const [dataset] = await db
+        .update(datasetsTable)
+        .set(input.patch)
+        .where(eq(datasetsTable.id, input.id))
+        .returning();
 
-            void syncDataset(dataset).catch((e) => console.error(e));
+      if (!dataset) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
 
-            return dataset;
-        }),
-    datasetsUpdate: protectedProcedure
-        .input(z.object({ id: z.string(), patch: zDatasetPatch }))
-        .mutation(async ({ input }) => {
-            const [dataset] = await db
-                .update(datasetsTable)
-                .set(input.patch)
-                .where(eq(datasetsTable.id, input.id))
-                .returning();
+      void syncDataset(dataset).catch((e) => console.error(e));
 
-            if (!dataset) {
-                throw new TRPCError({ code: "NOT_FOUND" });
-            }
-
-            void syncDataset(dataset).catch((e) => console.error(e));
-
-            return dataset;
-        }),
-    datasetsDelete: protectedProcedure
-        .input(z.object({ id: z.string() }))
-        .mutation(async ({ input }) => {
-            await db
-                .delete(datasetsTable)
-                .where(eq(datasetsTable.id, input.id));
-        }),
-
-    // Object
-
-    getObjectAndDataset: protectedProcedure
-        .input(
-            z.object({
-                datasetId: z.string().optional(),
-                objectId: z.string().optional(),
-            }),
-        )
-        .query(async ({ input }) => {
-            const { datasetId, objectId } = input;
-
-            if (!datasetId || !objectId) {
-                // TODO: Review
-                throw new TRPCError({ code: "NOT_FOUND" });
-            }
-
-            let [[dataset], [object]] = await Promise.all([
-                db
-                    .select()
-                    .from(datasetsTable)
-                    .where(eq(datasetsTable.id, datasetId))
-                    .limit(1),
-                db
-                    .select()
-                    .from(objectsTable)
-                    .where(
-                        and(
-                            eq(objectsTable.objectType, objectId),
-                            eq(objectsTable.datasetId, datasetId),
-                        ),
-                    )
-                    .limit(1),
-            ]);
-
-            const objectDefinition = getDatasetObject(dataset, objectId);
-
-            const syncPromise = objectDefinition
-                ? syncObject(dataset, objectDefinition)
-                : null;
-
-            if (!object) {
-                await syncPromise;
-
-                [object] = await db
-                    .select()
-                    .from(objectsTable)
-                    .where(
-                        and(
-                            eq(objectsTable.objectType, objectId),
-                            eq(objectsTable.datasetId, datasetId),
-                        ),
-                    )
-                    .limit(1);
-                console.log("after another select for some reason");
-            }
-
-            if (!object) {
-                throw new TRPCError({ code: "NOT_FOUND" });
-            }
-
-            return {
-                object: deserializeData(object),
-                dataset,
-            };
-        }),
-
-    // Table
-    tablesPageLoader: protectedProcedure
-        .input(
-            z.object({
-                datasetId: z.string().optional(),
-                tableId: z.string().optional(),
-            }),
-        )
-        .query(async ({ input }) => {
-            const { datasetId, tableId } = input;
-            if (!datasetId || !tableId) {
-                throw new TRPCError({ code: "NOT_FOUND" });
-            }
-
-            const [dataset] = await db
-                .select()
-                .from(datasetsTable)
-                .where(eq(datasetsTable.id, datasetId))
-                .limit(1);
-
-            if (!dataset) {
-                throw new TRPCError({ code: "NOT_FOUND" });
-            }
-
-            const table = getDatasetTable(dataset, tableId);
-
-            if (!table) {
-                throw new TRPCError({ code: "NOT_FOUND" });
-            }
-
-            // Upsert table
-            const tableRows = await db
-                .insert(tablesTable)
-                .values({
-                    datasetId: dataset.id,
-                    name: table.name,
-                    key: tableId,
-                })
-                .onConflictDoUpdate({
-                    target: [tablesTable.datasetId, tablesTable.key],
-                    set: { key: tableId },
-                })
-                .returning({ id: tablesTable.id, view: tablesTable.view });
-
-            const rows = await db
-                .select({ id: rowsTable.id, data: rowsTable.data })
-                .from(rowsTable)
-                .innerJoin(tablesTable, eq(tablesTable.id, rowsTable.tableId))
-                .where(
-                    and(
-                        eq(tablesTable.datasetId, datasetId),
-                        eq(tablesTable.key, tableId),
-                    ),
-                )
-                .limit(ROW_LIMIT);
-
-            // Trigger sync of this table in the background
-            void syncTable(dataset, table).catch((e) => console.error(e));
-
-            return {
-                dataset,
-                rows: rows.map(deserializeData),
-                table: tableRows.at(0),
-            };
-        }),
-    tablesUpdateView: protectedProcedure
-        .input(
-            z.object({
-                datasetId: z.string().nonempty(),
-                tableId: z.string().nonempty(),
-                // TODO: Make sure view is what we expect before saving
-                view: z.string().nonempty(),
-            }),
-        )
-        .mutation(async ({ input }) => {
-            const { datasetId, tableId, view } = input;
-
-            const returned = await db
-                .update(tablesTable)
-                .set({ view: view })
-                .where(
-                    and(
-                        eq(tablesTable.datasetId, datasetId),
-                        eq(tablesTable.key, tableId),
-                    ),
-                )
-                .returning();
-
-            if (returned.length === 0) {
-                throw new TRPCError({ code: "NOT_FOUND" });
-            }
-        }),
-
-    // Row
-    getRow: protectedProcedure
-        .input(
-            z.object({
-                rowId: z.string().optional(),
-            }),
-        )
-        .query(async ({ input: { rowId } }) => {
-            if (!rowId) {
-                throw new TRPCError({ code: "NOT_FOUND" });
-            }
-            const [row] = await db
-                .select({ data: rowsTable.data })
-                .from(rowsTable)
-                .where(eq(rowsTable.id, rowId))
-                .limit(1);
-            if (!row) {
-                throw new TRPCError({ code: "NOT_FOUND" });
-            }
-            return deserializeData(row);
-        }),
-
-    getApiKey: protectedProcedure.query(async ({ ctx }) => {
-        const [apiKey] = await db
-            .select({ id: sessionsTable.id })
-            .from(sessionsTable)
-            .where(
-                and(
-                    eq(sessionsTable.type, "api"),
-                    eq(sessionsTable.userId, ctx.userId),
-                ),
-            );
-        if (apiKey) {
-            return apiKey;
-        }
-
-        // TODO: Remove dynamic import
-        const { nanoid } = await import("nanoid");
-        const id = nanoid(32);
-
-        const [newApiKey] = await db
-            .insert(sessionsTable)
-            .values({
-                id,
-                userId: ctx.userId,
-                type: "api",
-            })
-            .returning({
-                id: sessionsTable.id,
-            });
-
-        return newApiKey;
+      return dataset;
+    }),
+  datasetsDelete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input }) => {
+      await db.delete(datasetsTable).where(eq(datasetsTable.id, input.id));
     }),
 
-    // Integrations
-    integrationsAll: t.procedure.query(
-        (): Record<string, ClientIntegration> => {
-            return {
-                google: createClientIntegration(google),
-                toggl: createClientIntegration(toggl),
-                posthog: createClientIntegration(posthog),
-                github: createClientIntegration(github),
-                peloton: createClientIntegration(peloton),
-                // network: createClientIntegration(network),
-                zotero: createClientIntegration(zotero),
-            };
-        },
-    ),
+  // Object
+
+  getObjectAndDataset: protectedProcedure
+    .input(
+      z.object({
+        datasetId: z.string().optional(),
+        objectId: z.string().optional(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const { datasetId, objectId } = input;
+
+      if (!datasetId || !objectId) {
+        // TODO: Review
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      let [[dataset], [object]] = await Promise.all([
+        db
+          .select()
+          .from(datasetsTable)
+          .where(eq(datasetsTable.id, datasetId))
+          .limit(1),
+        db
+          .select()
+          .from(objectsTable)
+          .where(
+            and(
+              eq(objectsTable.objectType, objectId),
+              eq(objectsTable.datasetId, datasetId),
+            ),
+          )
+          .limit(1),
+      ]);
+
+      const objectDefinition = getDatasetObject(dataset, objectId);
+
+      const syncPromise = objectDefinition
+        ? syncObject(dataset, objectDefinition)
+        : null;
+
+      if (!object) {
+        await syncPromise;
+
+        [object] = await db
+          .select()
+          .from(objectsTable)
+          .where(
+            and(
+              eq(objectsTable.objectType, objectId),
+              eq(objectsTable.datasetId, datasetId),
+            ),
+          )
+          .limit(1);
+        console.log("after another select for some reason");
+      }
+
+      if (!object) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return {
+        object: deserializeData(object),
+        dataset,
+      };
+    }),
+
+  // Table
+  tablesPageLoader: protectedProcedure
+    .input(
+      z.object({
+        datasetId: z.string().optional(),
+        tableId: z.string().optional(),
+      }),
+    )
+    .query(async ({ input }) => {
+      const { datasetId, tableId } = input;
+      if (!datasetId || !tableId) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const [dataset] = await db
+        .select()
+        .from(datasetsTable)
+        .where(eq(datasetsTable.id, datasetId))
+        .limit(1);
+
+      if (!dataset) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const table = getDatasetTable(dataset, tableId);
+
+      if (!table) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      // Upsert table
+      const tableRows = await db
+        .insert(tablesTable)
+        .values({
+          datasetId: dataset.id,
+          name: table.name,
+          key: tableId,
+        })
+        .onConflictDoUpdate({
+          target: [tablesTable.datasetId, tablesTable.key],
+          set: { key: tableId },
+        })
+        .returning({ id: tablesTable.id, view: tablesTable.view });
+
+      const rows = await db
+        .select({ id: rowsTable.id, data: rowsTable.data })
+        .from(rowsTable)
+        .innerJoin(tablesTable, eq(tablesTable.id, rowsTable.tableId))
+        .where(
+          and(
+            eq(tablesTable.datasetId, datasetId),
+            eq(tablesTable.key, tableId),
+          ),
+        )
+        .limit(ROW_LIMIT);
+
+      // Trigger sync of this table in the background
+      void syncTable(dataset, table).catch((e) => console.error(e));
+
+      return {
+        dataset,
+        rows: rows.map(deserializeData),
+        table: tableRows.at(0),
+      };
+    }),
+  tablesUpdateView: protectedProcedure
+    .input(
+      z.object({
+        datasetId: z.string().nonempty(),
+        tableId: z.string().nonempty(),
+        // TODO: Make sure view is what we expect before saving
+        view: z.string().nonempty(),
+      }),
+    )
+    .mutation(async ({ input }) => {
+      const { datasetId, tableId, view } = input;
+
+      const returned = await db
+        .update(tablesTable)
+        .set({ view: view })
+        .where(
+          and(
+            eq(tablesTable.datasetId, datasetId),
+            eq(tablesTable.key, tableId),
+          ),
+        )
+        .returning();
+
+      if (returned.length === 0) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+    }),
+
+  // Row
+  getRow: protectedProcedure
+    .input(
+      z.object({
+        rowId: z.string().optional(),
+      }),
+    )
+    .query(async ({ input: { rowId } }) => {
+      if (!rowId) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+      const [row] = await db
+        .select({ data: rowsTable.data })
+        .from(rowsTable)
+        .where(eq(rowsTable.id, rowId))
+        .limit(1);
+      if (!row) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+      return deserializeData(row);
+    }),
+
+  getApiKey: protectedProcedure.query(async ({ ctx }) => {
+    const [apiKey] = await db
+      .select({ id: sessionsTable.id })
+      .from(sessionsTable)
+      .where(
+        and(
+          eq(sessionsTable.type, "api"),
+          eq(sessionsTable.userId, ctx.userId),
+        ),
+      );
+    if (apiKey) {
+      return apiKey;
+    }
+
+    // TODO: Remove dynamic import
+    const { nanoid } = await import("nanoid");
+    const id = nanoid(32);
+
+    const [newApiKey] = await db
+      .insert(sessionsTable)
+      .values({
+        id,
+        userId: ctx.userId,
+        type: "api",
+      })
+      .returning({
+        id: sessionsTable.id,
+      });
+
+    return newApiKey;
+  }),
+
+  // Integrations
+  integrationsAll: t.procedure.query((): Record<string, ClientIntegration> => {
+    return {
+      google: createClientIntegration(google),
+      toggl: createClientIntegration(toggl),
+      posthog: createClientIntegration(posthog),
+      github: createClientIntegration(github),
+      peloton: createClientIntegration(peloton),
+      // network: createClientIntegration(network),
+      zotero: createClientIntegration(zotero),
+    };
+  }),
 });
 
 // Export type router type signature,

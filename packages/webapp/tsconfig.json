@@ -1,33 +1,33 @@
 {
-    "include": ["app/**/*.ts", "app/**/*.tsx", "server/**/*.ts"],
-    "compilerOptions": {
-        "lib": ["DOM", "DOM.Iterable", "ES2020"],
-        "isolatedModules": true,
-        "esModuleInterop": true,
-        "jsx": "react-jsx",
-        "moduleResolution": "bundler",
-        "resolveJsonModule": true,
-        "target": "ES2020",
-        "strict": true,
-        "allowJs": true,
-        "module": "ESNext",
-        "forceConsistentCasingInFileNames": true,
-        "baseUrl": ".",
-        "paths": {
-            "~/*": ["./app/*"]
-        },
-        "allowSyntheticDefaultImports": true,
-        "useDefineForClassFields": true,
-        "skipLibCheck": true,
-
-        /* Bundler mode */
-        "allowImportingTsExtensions": true,
-
-        /* Linting */
-        "noFallthroughCasesInSwitch": true,
-
-        // Vite handles building
-        "noEmit": true
+  "include": ["app/**/*.ts", "app/**/*.tsx", "server/**/*.ts"],
+  "compilerOptions": {
+    "lib": ["DOM", "DOM.Iterable", "ES2020"],
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "target": "ES2020",
+    "strict": true,
+    "allowJs": true,
+    "module": "ESNext",
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./app/*"]
     },
-    "references": [{ "path": "./tsconfig.node.json" }]
+    "allowSyntheticDefaultImports": true,
+    "useDefineForClassFields": true,
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "allowImportingTsExtensions": true,
+
+    /* Linting */
+    "noFallthroughCasesInSwitch": true,
+
+    // Vite handles building
+    "noEmit": true
+  },
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

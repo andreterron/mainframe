@@ -8,14 +8,14 @@ const dbPath = join(dbDirname, "mainframe.db");
 
 // Ensure that the database folder exists
 try {
-    mkdirSync(dbDirname);
+  mkdirSync(dbDirname);
 } catch (e) {
-    if (!(e instanceof Error) || !("code" in e) || e.code !== "EEXIST") {
-        console.log(
-            `Failed to create database dir, please create it manually: ${dbDirname}`,
-        );
-        throw e;
-    }
+  if (!(e instanceof Error) || !("code" in e) || e.code !== "EEXIST") {
+    console.log(
+      `Failed to create database dir, please create it manually: ${dbDirname}`,
+    );
+    throw e;
+  }
 }
 
 const sqlite = new Database(dbPath);

@@ -3,21 +3,21 @@ import { trpc } from "../lib/trpc_client";
 import { useNavigate } from "react-router-dom";
 
 export default function AuthLogout() {
-    const logout = trpc.logout.useMutation();
-    const navigate = useNavigate();
+  const logout = trpc.logout.useMutation();
+  const navigate = useNavigate();
 
-    async function handleLogout() {
-        try {
-            const result = await logout.mutateAsync();
-            navigate(result.redirect);
-        } catch (e) {
-            console.error(e);
-            navigate("/");
-        }
+  async function handleLogout() {
+    try {
+      const result = await logout.mutateAsync();
+      navigate(result.redirect);
+    } catch (e) {
+      console.error(e);
+      navigate("/");
     }
+  }
 
-    useEffect(() => {
-        handleLogout();
-    }, []);
-    return null;
+  useEffect(() => {
+    handleLogout();
+  }, []);
+  return null;
 }

@@ -12,46 +12,46 @@ import DatasetRowDetails from "./webroutes/_dashboard.row.$row_id";
 import Index from "./webroutes/_dashboard._index";
 
 export const router = createBrowserRouter([
-    {
-        element: <AuthPage />,
-        children: [
-            {
-                path: "/login",
-                element: <AuthLogin />,
-            },
-            {
-                path: "/logout",
-                element: <AuthLogout />,
-            },
-            {
-                path: "/setup",
-                element: <AuthSignup />,
-            },
-        ],
-    },
-    {
-        element: <Dashboard />,
-        children: [
-            {
-                path: "/",
-                element: <Index />,
-            },
-            {
-                path: "/dataset/:id",
-                element: <DatasetDetails />,
-            },
-            {
-                path: "/dataset/:id/object/:object_id",
-                element: <DatasetObjectDetails />,
-            },
-            {
-                path: "/dataset/:id/table/:table_id",
-                element: <DatasetTableDetails />,
-            },
-            {
-                path: "/row/:row_id",
-                element: <DatasetRowDetails />,
-            },
-        ],
-    },
+  {
+    element: <AuthPage />,
+    children: [
+      {
+        path: "/login",
+        element: <AuthLogin />,
+      },
+      {
+        path: "/logout",
+        element: <AuthLogout />,
+      },
+      {
+        path: "/setup",
+        element: <AuthSignup />,
+      },
+    ],
+  },
+  {
+    element: <Dashboard />,
+    children: [
+      {
+        path: "/",
+        element: <Index />,
+      },
+      {
+        path: "/dataset/:id",
+        element: <DatasetDetails />,
+      },
+      {
+        path: "/dataset/:id/object/:object_id",
+        element: <DatasetObjectDetails />,
+      },
+      {
+        path: "/dataset/:id/table/:table_id",
+        element: <DatasetTableDetails />,
+      },
+      {
+        path: "/row/:row_id",
+        element: <DatasetRowDetails />,
+      },
+    ],
+  },
 ]);

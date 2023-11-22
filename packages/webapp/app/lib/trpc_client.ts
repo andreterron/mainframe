@@ -1,7 +1,7 @@
 import {
-    TRPCClientError,
-    createTRPCReact,
-    httpBatchLink,
+  TRPCClientError,
+  createTRPCReact,
+  httpBatchLink,
 } from "@trpc/react-query";
 import type { AppRouter } from "../../server/trpc_router";
 import { useState } from "react";
@@ -11,36 +11,35 @@ import { isTrpcNotFoundError } from "../utils/errors";
 export const trpc = createTRPCReact<AppRouter>();
 
 export const useRootQueryClient = () => {
-    const [queryClient] = useState(
-        () =>
-            new QueryClient({
-                defaultOptions: {
-                    queries: {
-                        retry(failureCount, error) {
-                            return (
-                                // Do not retry "Not Found" errors
-                                !(
-                                    error instanceof TRPCClientError &&
-                                    isTrpcNotFoundError(error)
-                                ) && failureCount < 3
-                            );
-                        },
-                    },
-                },
-            }),
-    );
-    return queryClient;
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry(failureCount, error) {
+              return (
+                // Do not retry "Not Found" errors
+                !(
+                  error instanceof TRPCClientError && isTrpcNotFoundError(error)
+                ) && failureCount < 3
+              );
+            },
+          },
+        },
+      }),
+  );
+  return queryClient;
 };
 
 export const useRootTRPCClient = () => {
-    const [trpcClient] = useState(() =>
-        trpc.createClient({
-            links: [
-                httpBatchLink({
-                    url: "/trpc",
-                }),
-            ],
+  const [trpcClient] = useState(() =>
+    trpc.createClient({
+      links: [
+        httpBatchLink({
+          url: "/trpc",
         }),
-    );
-    return trpcClient;
+      ],
+    }),
+  );
+  return trpcClient;
 };
