@@ -4,6 +4,7 @@ import posthog from "./posthog.png";
 import peloton from "./peloton.png";
 import gcal from "./google_calendar.png";
 import zotero from "./zotero.png";
+import notion from "./notion.png";
 
 export function datasetIcon(id: string) {
   switch (id) {
@@ -19,5 +20,7 @@ export function datasetIcon(id: string) {
       return gcal;
     case "zotero":
       return zotero;
+    case "notion":
+      return notion;
   }
 }

@@ -12,6 +12,7 @@ import { toggl } from "./integrations/toggl";
 import { Dataset } from "../../app/lib/types";
 import { google } from "./integrations/google";
 import { zotero } from "./integrations/zotero";
+import { notion } from "./integrations/notion";
 
 export function getIntegrationFromType(
   type: string | undefined,
@@ -36,6 +37,9 @@ export function getIntegrationFromType(
   }
   if (type === "zotero") {
     return zotero;
+  }
+  if (type === "notion") {
+    return notion;
   }
   return null;
 }

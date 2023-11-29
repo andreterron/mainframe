@@ -34,6 +34,7 @@ import { toggl } from "./lib/integrations/toggl";
 import { ClientIntegration } from "../app/lib/integration-types";
 import { google } from "./lib/integrations/google";
 import { zotero } from "./lib/integrations/zotero";
+import { notion } from "./lib/integrations/notion";
 
 /**
  * Initialization of tRPC backend
@@ -440,6 +441,7 @@ export const appRouter = router({
       peloton: createClientIntegration(peloton),
       // network: createClientIntegration(network),
       zotero: createClientIntegration(zotero),
+      notion: createClientIntegration(notion),
     };
   }),
 });
