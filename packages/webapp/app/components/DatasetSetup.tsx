@@ -19,7 +19,7 @@ function IntegrationButton({
       onClick={onClick}
     >
       {icon ? (
-        <img className="relative h-4 w-4 m-0.5" src={icon} />
+        <img className="relative h-4 w-4 m-0.5 object-contain" src={icon} />
       ) : (
         <svg
           xmlns="http://www.w3.org/2000/svg"

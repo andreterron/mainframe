@@ -35,6 +35,7 @@ import { ClientIntegration } from "../app/lib/integration-types";
 import { google } from "./lib/integrations/google";
 import { zotero } from "./lib/integrations/zotero";
 import { notion } from "./lib/integrations/notion";
+import { oura } from "./lib/integrations/oura";
 
 /**
  * Initialization of tRPC backend
@@ -442,6 +443,7 @@ export const appRouter = router({
       // network: createClientIntegration(network),
       zotero: createClientIntegration(zotero),
       notion: createClientIntegration(notion),
+      oura: createClientIntegration(oura),
     };
   }),
 });

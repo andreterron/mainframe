@@ -5,6 +5,7 @@ import peloton from "./peloton.png";
 import gcal from "./google_calendar.png";
 import zotero from "./zotero.png";
 import notion from "./notion.png";
+import oura from "./oura.png";
 
 export function datasetIcon(id: string) {
   switch (id) {
@@ -22,5 +23,7 @@ export function datasetIcon(id: string) {
       return zotero;
     case "notion":
       return notion;
+    case "oura":
+      return oura;
   }
 }

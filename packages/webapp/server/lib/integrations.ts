@@ -13,6 +13,7 @@ import { Dataset } from "../../app/lib/types";
 import { google } from "./integrations/google";
 import { zotero } from "./integrations/zotero";
 import { notion } from "./integrations/notion";
+import { oura } from "./integrations/oura";
 
 export function getIntegrationFromType(
   type: string | undefined,
@@ -40,6 +41,9 @@ export function getIntegrationFromType(
   }
   if (type === "notion") {
     return notion;
+  }
+  if (type === "oura") {
+    return oura;
   }
   return null;
 }
