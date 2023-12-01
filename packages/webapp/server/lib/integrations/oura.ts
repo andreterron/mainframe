@@ -98,7 +98,6 @@ export const oura: Integration = {
         }
         const json = await res.json();
 
-        console.log(json);
         // TODO: Pagination: json.next_token
         return json.data;
       },
