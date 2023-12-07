@@ -9,3 +9,7 @@ If you want your Mainframe to launch with your system, you can use systemd servi
     3. `sudo systemctl start mainframe`
 
 If you run into issues, or need to see your Mainframe logs, run `journalctl -u mainframe` to see all logs, or `journalctl -f -u mainframe` to get a live feed of logs.
+
+## Notes
+
+If the `mainframe.service` file is updated, run `systemctl daemon-reload` to refresh systemd's cached version

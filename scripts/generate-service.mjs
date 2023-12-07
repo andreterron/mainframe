@@ -9,6 +9,7 @@ const repoFolder = resolve(__dirname, '..')
 console.log(__dirname, repoFolder)
 const filepath = resolve(repoFolder, 'mainframe.service')
 
+// Run `systemctl daemon-reload` if this file is updated!
 await writeFile(filepath, `[Unit]
 Description=Mainframe
 After=network.target
