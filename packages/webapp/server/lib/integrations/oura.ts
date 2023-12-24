@@ -54,7 +54,7 @@ export const oura: Integration = {
   name: "Oura",
   authType: "token",
   authSetupDocs:
-    "https://github.com/andreterron/mainframe/blob/main/packages/docs/integrations/docs.md",
+    "https://github.com/andreterron/mainframe/blob/main/packages/docs/integrations/oura.md",
   objects: {
     user: {
       name: "User",
