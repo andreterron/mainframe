@@ -56,4 +56,7 @@ export interface Integration {
   tables: {
     [key: string]: IntegrationTable;
   };
+  actions?: {
+    [key: string]: (dataset: Dataset, input: any) => Promise<any>;
+  };
 }

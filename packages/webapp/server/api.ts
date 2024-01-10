@@ -5,9 +5,11 @@ import {
   getSessionIdFromCookieHeader,
 } from "./sessions.server";
 import { db } from "./db/db.server";
-import { objectsTable, rowsTable, tablesTable } from "../app/db/schema";
+import { datasetsTable, objectsTable, rowsTable } from "../app/db/schema";
 import { and, eq } from "drizzle-orm";
 import { deserializeData } from "../app/utils/serialization";
+import { getIntegrationFromType } from "./lib/integrations";
+import bodyParser from "body-parser";
 
 export const apiRouter = Router();
 
@@ -73,6 +75,41 @@ apiRouter.get("/object/:dataset_id/:object_type", async (req, res) => {
   //     .limit(100);
   // res.send(JSON.stringify(rows.map(deserializeData)))
 });
+
+apiRouter.post(
+  "/action/:dataset_id/:action_name",
+  bodyParser.json(),
+  async (req, res) => {
+    // Get the dataset info
+    const [dataset] = await db
+      .select()
+      .from(datasetsTable)
+      .where(eq(datasetsTable.id, req.params.dataset_id))
+      .limit(1);
+    const integration = getIntegrationFromType(
+      dataset?.integrationType ?? undefined,
+    );
+
+    // Call the action
+    const action = integration?.actions?.[req.params.action_name];
+    if (!action) {
+      res.sendStatus(404);
+      return;
+    }
+
+    try {
+      const result = await action(dataset, req.body);
+      if (result) {
+        res.contentType("json").send(JSON.stringify(result));
+      } else {
+        res.sendStatus(204);
+      }
+    } catch (e) {
+      console.error(e);
+      res.sendStatus(500);
+    }
+  },
+);
 
 apiRouter.get("/operations", (req, res) => {
   if (req.accepts("text/event-stream")) {

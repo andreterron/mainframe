@@ -71,6 +71,30 @@ function isPingWebhookEvent(event: TogglWebhook): event is TogglWebhookPing {
   return event.payload === "ping";
 }
 
+const startEntry = async (dataset: Dataset, input: { workspaceId: string }) => {
+  const res = await fetch(
+    `https://api.track.toggl.com/api/v9/workspaces/${input.workspaceId}/time_entries`,
+    {
+      method: "POST",
+      headers: togglHeaders(dataset),
+      body: JSON.stringify({
+        created_with: "Mainframe (https://mainframe.so)",
+        description: null,
+        tags: [],
+        billable: false,
+        workspace_id: input.workspaceId,
+        duration: -1,
+        start: new Date().toISOString(),
+        stop: null,
+      }),
+    },
+  );
+  if (res.ok) {
+    return res.json();
+  }
+  console.error(await res.text());
+};
+
 export const toggl: Integration = {
   name: "Toggl",
   authType: "token",
@@ -430,6 +454,66 @@ export const toggl: Integration = {
         }
       },
       rowId: (dataset: Dataset, row: any) => `${row.subscription_id}`,
+    },
+  },
+  actions: {
+    start_entry: startEntry,
+    stop_current_entry: async (dataset: Dataset) => {
+      // Get current entry
+      const res = await fetch(
+        "https://api.track.toggl.com/api/v9/me/time_entries/current",
+        {
+          headers: togglHeaders(dataset),
+        },
+      );
+      if (!res.ok) {
+        console.error(res.text());
+        return;
+      }
+
+      const json = await res.json();
+      const entry = json;
+
+      // Stop the entry
+      await fetch(
+        `https://api.track.toggl.com/api/v9/workspaces/${entry.workspace_id}/time_entries/${entry.id}/stop`,
+        {
+          method: "PATCH",
+          headers: togglHeaders(dataset),
+        },
+      );
+    },
+    toggle_current_entry_running: async (
+      dataset: Dataset,
+      input: { workspaceId: string },
+    ) => {
+      // Get current entry
+      const res = await fetch(
+        "https://api.track.toggl.com/api/v9/me/time_entries/current",
+        {
+          headers: togglHeaders(dataset),
+        },
+      );
+      if (!res.ok) {
+        console.error(res.text());
+        return;
+      }
+
+      const json = await res.json();
+      const entry = json;
+
+      if (entry === null) {
+        await startEntry(dataset, { workspaceId: input.workspaceId });
+      } else {
+        // Stop the entry
+        await fetch(
+          `https://api.track.toggl.com/api/v9/workspaces/${entry.workspace_id}/time_entries/${entry.id}/stop`,
+          {
+            method: "PATCH",
+            headers: togglHeaders(dataset),
+          },
+        );
+      }
     },
   },
 };
