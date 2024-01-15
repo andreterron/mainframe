@@ -57,6 +57,8 @@ export const peloton: Integration = {
           );
           const json = await workouts.json();
           return json.data;
+          // TODO: Get more metrics for each workout: https://api.onepeloton.com/api/workout/${workout_id}/performance_graph?every_n=5
+
           // const res = await fetch(
           //     "https://api.track.toggl.com/api/v9/me/time_entries",
           //     {
