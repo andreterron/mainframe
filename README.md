@@ -1,6 +1,6 @@
 # Mainframe
 
-Mainframe is a database to sync data from third-party services.
+Mainframe is a Personal Data Warehouse. It syncs data from third-party services into a centralized location.
 
 <img width="832" alt="Mainframe Screenshot" src="./assets/Mainframe_Screenshot.png">
 
