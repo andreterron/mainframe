@@ -5,11 +5,11 @@ import {
   rowsTable,
   sessionsTable,
   tablesTable,
-} from "../app/db/schema";
+} from "@mainframe-so/shared";
 import { db } from "./db/db.server";
 import { z } from "zod";
 import { Context } from "./trpc_context";
-import { zDatasetInsert, zDatasetPatch } from "../app/db/validation";
+import { zDatasetInsert, zDatasetPatch } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
 import { syncDataset, syncObject, syncTable } from "./sync";
 import {

@@ -1,5 +1,5 @@
 import { db } from "./db/db.server";
-import { sessionsTable } from "../app/db/schema";
+import { sessionsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
 import { env } from "./lib/env.server";
 import { CookieSerializeOptions, parse, serialize } from "cookie";
@@ -160,8 +160,8 @@ export async function commitSession(
     options?.maxAge != null
       ? new Date(Date.now() + options.maxAge * 1000)
       : options?.expires != null
-        ? options.expires
-        : cookieSettings.expires;
+      ? options.expires
+      : cookieSettings.expires;
 
   await updateData(id, data, expires);
 

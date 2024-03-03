@@ -7,6 +7,9 @@
     "build": "vite build",
     "test": "vitest"
   },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "MIT",

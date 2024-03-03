@@ -1,6 +1,6 @@
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 import { trpc } from "../lib/trpc_client";
-import { Dataset } from "../lib/types";
+import { Dataset } from "@mainframe-so/shared";
 import { DatasetHeader } from "./DatasetHeader";
 
 function IntegrationButton({

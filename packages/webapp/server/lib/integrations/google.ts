@@ -1,8 +1,8 @@
 import { Integration } from "../../../app/lib/integration-types";
-import { Dataset } from "../../../app/lib/types";
+import { Dataset } from "@mainframe-so/shared";
 import { google as api, calendar_v3 } from "googleapis";
 import { db } from "../../db/db.server";
-import { datasetsTable } from "../../../app/db/schema";
+import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
 
 async function getAuth(dataset: Dataset) {

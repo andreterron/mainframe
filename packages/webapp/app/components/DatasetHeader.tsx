@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 import { useNavigate } from "react-router-dom";
 import { trpc } from "../lib/trpc_client";
-import { Dataset } from "../lib/types";
+import { Dataset } from "@mainframe-so/shared";
 
 export function DatasetHeader({
   children,

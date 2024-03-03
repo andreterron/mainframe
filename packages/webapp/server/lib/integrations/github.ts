@@ -1,5 +1,5 @@
 import { Integration } from "../../../app/lib/integration-types";
-import { Dataset } from "../../../app/lib/types";
+import { Dataset } from "@mainframe-so/shared";
 
 export const github: Integration = {
   name: "GitHub",

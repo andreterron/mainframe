@@ -1,8 +1,8 @@
 import { deserialize } from "../../../app/utils/serialization";
 import { db } from "../../db/db.server";
 import { Integration } from "../../../app/lib/integration-types";
-import { Dataset } from "../../../app/lib/types";
-import { rowsTable, tablesTable } from "../../../app/db/schema";
+import { Dataset } from "@mainframe-so/shared";
+import { rowsTable, tablesTable } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
 
 async function getProjectChildren(dataset: Dataset, urlPath: string) {

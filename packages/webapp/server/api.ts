@@ -5,7 +5,7 @@ import {
   getSessionIdFromCookieHeader,
 } from "./sessions.server";
 import { db } from "./db/db.server";
-import { datasetsTable, objectsTable, rowsTable } from "../app/db/schema";
+import { datasetsTable, objectsTable, rowsTable } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
 import { deserializeData } from "../app/utils/serialization";
 import { getIntegrationFromType } from "./lib/integrations";

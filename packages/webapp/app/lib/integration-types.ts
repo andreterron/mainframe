@@ -1,4 +1,4 @@
-import { Dataset } from "./types";
+import { Dataset } from "@mainframe-so/shared";
 import { Request, Response } from "express";
 
 export type AuthType = "oauth2" | "token" | "none";

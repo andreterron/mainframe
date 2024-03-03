@@ -9,7 +9,7 @@ import { network } from "./integrations/network";
 import { peloton } from "./integrations/peloton";
 import { posthog } from "./integrations/posthog";
 import { toggl } from "./integrations/toggl";
-import { Dataset } from "../../app/lib/types";
+import { Dataset } from "@mainframe-so/shared";
 import { google } from "./integrations/google";
 import { zotero } from "./integrations/zotero";
 import { notion } from "./integrations/notion";

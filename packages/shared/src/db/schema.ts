@@ -7,7 +7,7 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 // TODO: Remove dependency cycle
-import type { DatasetCredentials } from "../lib/types";
+import type { DatasetCredentials } from "../types";
 
 // TODO: This only exists to ensure there's only one active user. This type can
 //       be removed once admins can create other users, and we have permissions

@@ -3,7 +3,7 @@ import {
   getObjectsForDataset,
   getTablesForDataset,
 } from "./lib/integrations";
-import { Dataset } from "../app/lib/types";
+import { Dataset } from "../../shared/src/types";
 import { isEqual } from "lodash";
 import {
   IntegrationObject,
@@ -14,7 +14,7 @@ import {
   objectsTable,
   rowsTable,
   tablesTable,
-} from "../app/db/schema";
+} from "@mainframe-so/shared";
 import { db } from "./db/db.server";
 import { and, eq } from "drizzle-orm";
 import { deserialize, serialize } from "../app/utils/serialization";

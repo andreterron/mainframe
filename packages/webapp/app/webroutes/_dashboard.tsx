@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Dataset } from "../lib/types";
+import { Dataset } from "@mainframe-so/shared";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 import { trpc } from "../lib/trpc_client";
 

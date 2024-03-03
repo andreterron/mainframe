@@ -4,7 +4,7 @@ import type {
   objectsTable,
   rowsTable,
   tablesTable,
-} from "../db/schema";
+} from "./db/schema";
 
 export type Dataset = InferSelectModel<typeof datasetsTable>;
 

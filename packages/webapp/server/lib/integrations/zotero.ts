@@ -1,5 +1,5 @@
 import { Integration } from "../../../app/lib/integration-types";
-import { Dataset } from "../../../app/lib/types";
+import { Dataset } from "@mainframe-so/shared";
 
 function zoteroHeaders(token: string) {
   return {

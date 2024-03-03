@@ -1,7 +1,7 @@
 import { Request, Router } from "express";
 import { getIntegrationForDataset } from "./lib/integrations";
 import { db } from "./db/db.server";
-import { datasetsTable } from "../app/db/schema";
+import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
 
 export const oauthRouter = Router();

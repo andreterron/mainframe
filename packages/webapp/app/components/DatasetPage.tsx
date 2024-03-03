@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Dataset } from "../lib/types";
+import { Dataset } from "@mainframe-so/shared";
 import { DatasetHeader } from "./DatasetHeader";
 import type { ClientIntegration } from "../lib/integration-types";
 

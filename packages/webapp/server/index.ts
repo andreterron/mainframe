@@ -8,7 +8,7 @@ import { env } from "./lib/env.server";
 import { ZodError } from "zod";
 import type { Server } from "http";
 import { syncAll } from "./sync";
-import { datasetsTable } from "../app/db/schema";
+import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
 import { startCloudflared } from "./cloudflared";
 import type { ChildProcess } from "node:child_process";
@@ -232,11 +232,10 @@ closeWithGrace(async ({ signal }) => {
   task.stop();
   cloudflaredProcess?.kill(signal);
   if (server) {
-    await new Promise<void>(
-      (resolve, reject) =>
-        server?.close((e) => {
-          e ? reject(e) : resolve();
-        }),
+    await new Promise<void>((resolve, reject) =>
+      server?.close((e) => {
+        e ? reject(e) : resolve();
+      }),
     );
   }
 });

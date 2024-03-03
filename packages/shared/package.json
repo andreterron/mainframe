@@ -1,0 +1,18 @@
+{
+  "name": "@mainframe-so/shared",
+  "version": "0.1.0",
+  "description": "",
+  "scripts": {
+    "build": "tsc"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.9.3"
+  },
+  "dependencies": {}
+}
