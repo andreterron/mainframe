@@ -39,7 +39,7 @@
     "drizzle-orm": "^0.28.5",
     "drizzle-zod": "^0.5.1",
     "envsafe": "^2.0.3",
-    "express": "^4.18.2",
+    "express": "^4.18.3",
     "googleapis": "^128.0.0",
     "isbot": "^3.6.8",
     "local-devices": "^4.0.0",
