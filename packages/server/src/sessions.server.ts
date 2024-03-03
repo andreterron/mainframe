@@ -17,7 +17,7 @@ export interface MainframeSession {
 const cookieNames: [string, ...string[]] = ["__session_mainframe", "__session"];
 const cookieSecrets = env.COOKIE_SECRET ? [env.COOKIE_SECRET] : [];
 const cookieSettings: CookieSerializeOptions = {
-  path: "/",
+  // path: "/",
   httpOnly: true,
   // maxAge: 400 days is to the maximum timespan available
   // https://developer.chrome.com/blog/cookie-max-age-expires/

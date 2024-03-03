@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import { db } from "../../db/db.server";
-import { Integration } from "../../../app/lib/integration-types";
+import { Integration } from "../integration-types";
 import { Dataset, Row } from "@mainframe-so/shared";
 import { syncTable, updateObject, updateRowFromTableType } from "../../sync";
 import { getDatasetObject, getDatasetTable } from "../integrations";
 import crypto from "crypto";
 import { objectsTable, rowsTable, tablesTable } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
-import { deserialize } from "../../../app/utils/serialization";
+import { deserialize } from "../../utils/serialization";
 
 function togglHeaders(dataset: Dataset) {
   return {

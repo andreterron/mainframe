@@ -1,10 +1,5 @@
 {
-  "include": [
-    "app/**/*.ts",
-    "app/**/*.tsx",
-    "server/**/*.ts",
-    "../shared/src/types.ts"
-  ],
+  "include": ["app/**/*.ts", "app/**/*.tsx", "server/**/*.ts"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2020"],
     "isolatedModules": true,

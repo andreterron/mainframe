@@ -1,4 +1,4 @@
-import { Integration } from "../../../app/lib/integration-types";
+import { Integration } from "../integration-types";
 import { Dataset } from "@mainframe-so/shared";
 import { google as api, calendar_v3 } from "googleapis";
 import { db } from "../../db/db.server";

@@ -7,7 +7,7 @@ import {
 import { db } from "./db/db.server";
 import { datasetsTable, objectsTable, rowsTable } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
-import { deserializeData } from "../app/utils/serialization";
+import { deserializeData } from "./utils/serialization";
 import { getIntegrationFromType } from "./lib/integrations";
 import bodyParser from "body-parser";
 

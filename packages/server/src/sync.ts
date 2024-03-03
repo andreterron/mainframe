@@ -5,10 +5,7 @@ import {
 } from "./lib/integrations";
 import { Dataset } from "../../shared/src/types";
 import { isEqual } from "lodash";
-import {
-  IntegrationObject,
-  IntegrationTable,
-} from "../app/lib/integration-types";
+import { IntegrationObject, IntegrationTable } from "./lib/integration-types";
 import {
   datasetsTable,
   objectsTable,
@@ -17,7 +14,7 @@ import {
 } from "@mainframe-so/shared";
 import { db } from "./db/db.server";
 import { and, eq } from "drizzle-orm";
-import { deserialize, serialize } from "../app/utils/serialization";
+import { deserialize, serialize } from "./utils/serialization";
 import { writeOperation } from "./lib/operations";
 
 export async function updateRowFromTableType(

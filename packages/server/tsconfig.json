@@ -1,6 +1,6 @@
 {
   "display": "Default",
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "@mainframe-so/shared"],
   "compilerOptions": {
     "composite": false,
     "declaration": true,

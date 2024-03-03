@@ -1,5 +1,4 @@
-import { ClientIntegration } from "../lib/integration-types";
-import { Dataset } from "@mainframe-so/shared";
+import { Dataset, ClientIntegration } from "@mainframe-so/shared";
 import { DatasetHeader } from "./DatasetHeader";
 
 export default function DatasetTokenInput({

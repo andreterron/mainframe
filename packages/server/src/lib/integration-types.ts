@@ -1,21 +1,5 @@
-import { Dataset } from "@mainframe-so/shared";
+import { Dataset, AuthType } from "@mainframe-so/shared";
 import { Request, Response } from "express";
-
-export type AuthType = "oauth2" | "token" | "none";
-
-export interface ClientIntegration {
-  name: string;
-  authType: AuthType;
-  authSetupDocs?: string;
-  objects: {
-    id: string;
-    name: string;
-  }[];
-  tables: {
-    id: string;
-    name: string;
-  }[];
-}
 
 export interface IntegrationTable {
   name: string;

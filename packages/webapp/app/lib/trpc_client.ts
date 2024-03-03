@@ -3,7 +3,7 @@ import {
   createTRPCReact,
   httpBatchLink,
 } from "@trpc/react-query";
-import type { AppRouter } from "../../server/trpc_router";
+import type { AppRouter } from "@mainframe-so/server";
 import { useState } from "react";
 import { QueryClient } from "@tanstack/react-query";
 import { isTrpcNotFoundError } from "../utils/errors";
@@ -36,7 +36,13 @@ export const useRootTRPCClient = () => {
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: "/trpc",
+          url: "http://localhost:8777/trpc",
+          fetch(url, options) {
+            return fetch(url, {
+              ...options,
+              credentials: "include",
+            });
+          },
         }),
       ],
     }),

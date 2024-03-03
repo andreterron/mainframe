@@ -1,4 +1,4 @@
-import { Integration } from "../../../app/lib/integration-types";
+import { Integration } from "../integration-types";
 import { Dataset } from "@mainframe-so/shared";
 import find from "local-devices";
 

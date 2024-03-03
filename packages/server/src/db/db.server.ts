@@ -2,8 +2,12 @@ import { drizzle, BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import Database from "better-sqlite3";
 import { mkdirSync } from "fs";
 import { join, resolve } from "path";
+import { __dirnameFromImportMetaUrl } from "../utils/dirname";
+
+const __dirname = __dirnameFromImportMetaUrl(import.meta.url);
 
 const dbDirname = resolve(__dirname, "..", "..", "..", "..", "database");
+
 const dbPath = join(dbDirname, "mainframe.db");
 
 // Ensure that the database folder exists

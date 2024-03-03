@@ -11,10 +11,14 @@
     "dev": "cd packages/webapp && npm run dev",
     "build": "cd packages/webapp && npm run build",
     "start": "node scripts/generate-env.mjs && cd packages/webapp && npm run db:migrate && npm run dev",
-    "notstart": "pwd && node scripts/generate-env.mjs && ls && (cd packages/webapp && ls && npm run db:migrate && npm run dev)"
+    "notstart": "pwd && node scripts/generate-env.mjs && ls && (cd packages/webapp && ls && npm run db:migrate && npm run dev)",
+    "db:migrate": "tsx server/db/migrate.ts",
+    "db:generate": "drizzle-kit generate:sqlite",
+    "db:drop": "drizzle-kit drop"
   },
   "devDependencies": {
     "concurrently": "^8.2.0",
+    "drizzle-kit": "^0.19.13",
     "nanoid": "^4.0.2"
   },
   "dependencies": {

@@ -1,6 +1,6 @@
 import { bin, install, tunnel } from "cloudflared";
 import { stat } from "node:fs/promises";
-import { env } from "../server/lib/env.server";
+import { env } from "./lib/env.server";
 
 async function ensureCloudflaredInstalled() {
   // TODO: Auto-update

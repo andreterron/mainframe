@@ -1,4 +1,4 @@
-import { Integration } from "../../../app/lib/integration-types";
+import { Integration } from "../integration-types";
 
 export const notion: Integration = {
   name: "Notion",

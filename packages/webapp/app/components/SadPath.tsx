@@ -1,5 +1,5 @@
 import { TRPCClientErrorLike } from "@trpc/client";
-import type { AppRouter } from "../../server/trpc_router";
+import type { AppRouter } from "@mainframe-so/server";
 import { isTrpcNotFoundError } from "../utils/errors";
 
 export function SadPath({

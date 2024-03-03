@@ -5,11 +5,13 @@ import {
   rowsTable,
   sessionsTable,
   tablesTable,
+  zDatasetInsert,
+  zDatasetPatch,
+  ClientIntegration,
 } from "@mainframe-so/shared";
 import { db } from "./db/db.server";
 import { z } from "zod";
 import { Context } from "./trpc_context";
-import { zDatasetInsert, zDatasetPatch } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
 import { syncDataset, syncObject, syncTable } from "./sync";
 import {
@@ -22,8 +24,8 @@ import {
   getDatasetObject,
   getDatasetTable,
 } from "./lib/integrations";
-import { deserializeData } from "../app/utils/serialization";
-import { ROW_LIMIT } from "../app/utils/constants";
+import { deserializeData } from "./utils/serialization";
+import { ROW_LIMIT } from "./utils/constants";
 import { createUserAccount, validateUserAccount } from "./lib/auth.server";
 import { checkIfUserExists } from "./db/helpers";
 import { github } from "./lib/integrations/github";
@@ -31,7 +33,6 @@ import { network } from "./lib/integrations/network";
 import { peloton } from "./lib/integrations/peloton";
 import { posthog } from "./lib/integrations/posthog";
 import { toggl } from "./lib/integrations/toggl";
-import { ClientIntegration } from "../app/lib/integration-types";
 import { google } from "./lib/integrations/google";
 import { zotero } from "./lib/integrations/zotero";
 import { notion } from "./lib/integrations/notion";
