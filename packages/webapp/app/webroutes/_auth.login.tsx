@@ -2,6 +2,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { trpc } from "../lib/trpc_client";
 import { TRPCClientError } from "@trpc/client";
+import { cn } from "~/lib/utils";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
 
 export default function AuthLogin() {
   const [loading, setLoading] = useState(false);
@@ -33,9 +37,14 @@ export default function AuthLogin() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className={cn("grid gap-6")}>
+      <div className="flex flex-col space-y-2 text-center">
+        <h1 className="text-2xl font-semibold tracking-tight">Login</h1>
+        {/* <p className="text-sm text-muted-foreground">
+          This protects access to your database
+        </p> */}
+      </div>
       <form
-        className="space-y-4"
         onSubmit={(e) => {
           e.preventDefault();
           if (e.target instanceof HTMLFormElement) {
@@ -43,72 +52,122 @@ export default function AuthLogin() {
           }
         }}
       >
-        <div className="mb-4">
-          <h2 className="text-gray-600 font-bold">Login</h2>
-        </div>
-        <div>
-          <label
-            htmlFor="username"
-            className="block text-xs font-semibold text-gray-600 uppercase mb-1"
-          >
-            Username
-          </label>
-          <input
-            className="w-full p-4 text-sm bg-gray-50 focus:outline-none border border-gray-200 rounded text-gray-600 focus:border-gray-400"
-            id="username"
-            name="username"
-            autoComplete="username"
-            type="text"
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="password"
-            className="block text-xs font-semibold text-gray-600 uppercase mb-1"
-          >
-            Password
-          </label>
-          <input
-            className="w-full p-4 text-sm bg-gray-50 focus:outline-none border border-gray-200 rounded text-gray-600 focus:border-gray-400"
-            id="password"
-            type="password"
-            name="password"
-            autoComplete="current-password"
-            required
-          />
-        </div>
-        <div>
-          <button
-            disabled={loading}
-            className="w-full py-4 bg-blue-600 hover:bg-blue-700 rounded text-sm font-bold text-gray-50 transition duration-200"
-          >
+        <div className="grid gap-2">
+          <div className="grid gap-1">
+            <Label htmlFor="email">Username</Label>
+            <Input
+              id="username"
+              type="text"
+              autoCapitalize="none"
+              autoComplete="username"
+              autoCorrect="off"
+              placeholder="memex"
+              disabled={loading}
+            />
+          </div>
+          <div className="grid gap-1">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              name="password"
+              placeholder="•••••••••••••"
+              autoComplete="password"
+              required
+              disabled={loading}
+            />
+          </div>
+          <Button disabled={loading}>
+            {/* {loading && (
+              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+            )} */}
             Sign In
-          </button>
+          </Button>
+          <div className="mt-2 text-sm text-rose-700">
+            {error ?? <>&nbsp;</>}
+          </div>
+          {isLoggedIn ? (
+            <div className="mt-2 text-sm grid gap-1 text-center">
+              <span className="font-semibold">You're already logged in!</span>
+              <div>
+                <Link
+                  className="underline text-gray-500 hover:text-neutral-900"
+                  to="/"
+                >
+                  Go to dashboard
+                </Link>{" "}
+                <span className="text-gray-500">•</span>{" "}
+                <Link
+                  className="underline text-gray-500 hover:text-neutral-900"
+                  to="/logout"
+                >
+                  Logout
+                </Link>
+              </div>
+            </div>
+          ) : !hasUsers ? (
+            /* Only suggest signup if the DB has no users */
+            <div className="mt-2 text-sm text-gray-400 text-center">
+              Don't have an account yet?{" "}
+              <Link
+                className="underline text-gray-500 hover:text-neutral-900"
+                to="/setup"
+              >
+                Setup your account
+              </Link>
+            </div>
+          ) : (
+            <div className="mt-2 text-sm text-gray-400">&nbsp;</div>
+          )}
+          {/* {isLoggedIn ? (
+            <div className="mt-2 text-sm grid gap-1 text-center">
+              <span className="font-semibold">You're already logged in!</span>
+              <div>
+                <Link
+                  className="underline text-gray-500 hover:text-neutral-900"
+                  to="/"
+                >
+                  Go to dashboard
+                </Link>{" "}
+                <span className="text-gray-500">•</span>{" "}
+                <Link
+                  className="underline text-gray-500 hover:text-neutral-900"
+                  to="/logout"
+                >
+                  Logout
+                </Link>
+              </div>
+            </div>
+          ) : hasUsers ? (
+            <div className="mt-2 text-sm text-gray-500">
+              Mainframe is already setup, please{" "}
+              <Link className="underline hover:text-neutral-900" to="/login">
+                Login
+              </Link>
+            </div>
+          ) : (
+            <div className="mt-2 text-sm text-gray-400">&nbsp;</div>
+          )} */}
         </div>
-        {error ? (
-          <div className="mt-2 text-sm text-rose-700">{error}</div>
-        ) : null}
       </form>
-      {isLoggedIn ? (
-        <div className="mt-2 text-sm">
-          <span className="font-semibold">You're already logged in!</span>{" "}
-          <Link className="text-sky-600 hover:text-sky-500" to="/">
-            Go to dashboard
-          </Link>{" "}
-          <span className="text-gray-400">•</span>{" "}
-          <Link className="text-sky-600 hover:text-sky-500" to="/logout">
-            Logout
-          </Link>
+      {/* <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
         </div>
-      ) : !hasUsers ? (
-        /* Only suggest signup if the DB has no users */
-        <div className="mt-2 text-sm text-gray-400">
-          Don't have an account yet?{" "}
-          <Link className="text-sky-600 hover:text-sky-500" to="/setup">
-            Setup your account
-          </Link>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">
+            Or continue with
+          </span>
         </div>
-      ) : null}
+      </div>
+      <Button variant="outline" type="button" disabled={loading}>
+        {loading ? (
+          <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <Icons.gitHub className="mr-2 h-4 w-4" />
+        )}{" "}
+        GitHub
+      </Button> */}
     </div>
   );
 }
