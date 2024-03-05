@@ -3,7 +3,6 @@ import {
   getObjectsForDataset,
   getTablesForDataset,
 } from "./lib/integrations";
-import { Dataset } from "../../shared/src/types";
 import { isEqual } from "lodash";
 import { IntegrationObject, IntegrationTable } from "./lib/integration-types";
 import {
@@ -11,6 +10,7 @@ import {
   objectsTable,
   rowsTable,
   tablesTable,
+  Dataset,
 } from "@mainframe-so/shared";
 import { db } from "./db/db.server";
 import { and, eq } from "drizzle-orm";

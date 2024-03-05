@@ -2,6 +2,8 @@
   "name": "@mainframe-so/server",
   "version": "0.1.0",
   "description": "",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.ts",
   "scripts": {
     "dev": "tsx watch --clear-screen=false src/app.ts",
     "build": "tsc"

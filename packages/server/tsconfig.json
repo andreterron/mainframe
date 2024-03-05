@@ -1,6 +1,6 @@
 {
   "display": "Default",
-  "include": ["src/**/*.ts", "@mainframe-so/shared"],
+  "include": ["src/**/*.ts"],
   "compilerOptions": {
     "composite": false,
     "declaration": true,
@@ -17,7 +17,8 @@
     "strict": true,
     "target": "es2016",
     "module": "ESNext",
-    "types": ["node", "express", "vite/client"]
+    "outDir": "dist",
+    "types": ["node"]
   },
   "exclude": ["node_modules"]
 }
