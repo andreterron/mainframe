@@ -11,6 +11,8 @@ export default function AuthLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
   const { data: authInfo } = trpc.authInfo.useQuery();
+  const { data: authEnabled, isLoading: loadingAuthEnabled } =
+    trpc.authEnabled.useQuery();
   const hasUsers = authInfo?.hasUsers ?? false;
   const isLoggedIn = authInfo?.isLoggedIn ?? false;
 
@@ -36,6 +38,10 @@ export default function AuthLogin() {
     }
   }
 
+  if (loadingAuthEnabled) {
+    return null;
+  }
+
   return (
     <div className={cn("grid gap-6")}>
       <div className="flex flex-col space-y-2 text-center">
@@ -53,39 +59,48 @@ export default function AuthLogin() {
         }}
       >
         <div className="grid gap-2">
-          <div className="grid gap-1">
-            <Label htmlFor="email">Username</Label>
-            <Input
-              id="username"
-              type="text"
-              autoCapitalize="none"
-              autoComplete="username"
-              autoCorrect="off"
-              placeholder="memex"
-              disabled={loading}
-            />
-          </div>
-          <div className="grid gap-1">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              name="password"
-              placeholder="•••••••••••••"
-              autoComplete="password"
-              required
-              disabled={loading}
-            />
-          </div>
-          <Button disabled={loading}>
-            {/* {loading && (
+          {authEnabled?.pass.enabled ? (
+            <>
+              <div className="grid gap-1">
+                <Label htmlFor="email">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  autoCapitalize="none"
+                  autoComplete="username"
+                  autoCorrect="off"
+                  placeholder="memex"
+                  disabled={loading}
+                />
+              </div>
+              <div className="grid gap-1">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  name="password"
+                  placeholder="•••••••••••••"
+                  autoComplete="password"
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <Button disabled={loading}>
+                {/* {loading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )} */}
-            Sign In
-          </Button>
-          <div className="mt-2 text-sm text-rose-700">
-            {error ?? <>&nbsp;</>}
-          </div>
+                Sign In
+              </Button>
+              <div className="mt-2 text-sm text-rose-700">
+                {error ?? <>&nbsp;</>}
+              </div>
+            </>
+          ) : null}
+          {authEnabled?.link.enabled ? (
+            <Button asChild>
+              <a href={authEnabled.link.url}>Login with Hello</a>
+            </Button>
+          ) : null}
           {isLoggedIn ? (
             <div className="mt-2 text-sm grid gap-1 text-center">
               <span className="font-semibold">You're already logged in!</span>

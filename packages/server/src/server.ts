@@ -14,7 +14,7 @@ import { startCloudflared } from "./cloudflared";
 import type { ChildProcess } from "node:child_process";
 import { initTRPC } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
-import { Context, createContext } from "./trpc_context";
+import { Context, CreateContextHooks, createContext } from "./trpc_context";
 import { appRouter } from "./trpc_router";
 export type { AppRouter } from "./trpc_router";
 import cors from "cors";
@@ -23,7 +23,11 @@ import { oauthRouter } from "./oauth_router";
 import { ip } from "address";
 import chalk from "chalk";
 
-export function setupServer(hooks: { express?: (app: Express) => void } = {}) {
+export interface SetupServerHooks extends CreateContextHooks {
+  express?: (app: Express) => void;
+}
+
+export function setupServer(hooks: SetupServerHooks = {}) {
   const t = initTRPC.context<Context>().create();
 
   const port = env.PORT || 8777;
@@ -57,6 +61,8 @@ export function setupServer(hooks: { express?: (app: Express) => void } = {}) {
   );
 
   const app = express();
+
+  hooks.express?.(app);
 
   app.get("/healthcheck", (req, res) => {
     res.json({ success: true });
@@ -104,14 +110,12 @@ export function setupServer(hooks: { express?: (app: Express) => void } = {}) {
     },
   );
 
-  hooks.express?.(app);
-
   app.use(
     "/trpc",
     cors({ credentials: true, origin: "http://localhost:8744" }),
     trpcExpress.createExpressMiddleware({
       router: appRouter,
-      createContext,
+      createContext: createContext(hooks),
     }),
   );
 

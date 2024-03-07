@@ -1,6 +1,17 @@
 import { inferAsyncReturnType } from "@trpc/server";
 import { CreateExpressContextOptions } from "@trpc/server/adapters/express";
-export function createContext({ req, res }: CreateExpressContextOptions) {
-  return { req, res };
+
+export interface CreateContextHooks {
+  trpcGetUserId?: ({
+    req,
+    res,
+  }: CreateExpressContextOptions) => string | undefined;
 }
-export type Context = inferAsyncReturnType<typeof createContext>;
+
+export function createContext(hooks: CreateContextHooks) {
+  return ({ req, res }: CreateExpressContextOptions) => {
+    return { req, res, userId: hooks.trpcGetUserId?.({ req, res }) };
+  };
+}
+
+export type Context = inferAsyncReturnType<ReturnType<typeof createContext>>;

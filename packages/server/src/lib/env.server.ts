@@ -1,4 +1,4 @@
-import { envsafe, num, str } from "envsafe";
+import { bool, envsafe, num, str } from "envsafe";
 import dotenv from "dotenv";
 
 if (typeof window === "undefined") {
@@ -10,4 +10,6 @@ export const env = envsafe({
   CLOUDFLARED_TOKEN: str({ default: "", allowEmpty: true }),
   TUNNEL_BASE_API_URL: str({ default: "", allowEmpty: true }),
   COOKIE_SECRET: str({ default: "", allowEmpty: true }),
+  VITE_AUTH_PASS: bool({ default: true }),
+  VITE_AUTH_URL: str({ default: "", allowEmpty: true }),
 });

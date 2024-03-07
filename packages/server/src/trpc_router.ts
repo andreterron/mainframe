@@ -37,6 +37,7 @@ import { google } from "./lib/integrations/google";
 import { zotero } from "./lib/integrations/zotero";
 import { notion } from "./lib/integrations/notion";
 import { oura } from "./lib/integrations/oura";
+import { env } from "./lib/env.server";
 
 /**
  * Initialization of tRPC backend
@@ -45,16 +46,23 @@ import { oura } from "./lib/integrations/oura";
 const t = initTRPC.context<Context>().create();
 
 const router = t.router;
-// const publicProcedure = t.procedure;
+
+async function getUserIdFromCtx(ctx: Context) {
+  if (ctx.userId) {
+    return { userId: ctx.userId };
+  }
+
+  const session = await getSessionFromCookies(ctx.req.header("cookie"));
+  const userId = session.data.userId;
+  return { userId, session };
+}
 
 const isAuthed = t.middleware(async (opts) => {
   const { ctx } = opts;
 
-  const session = await getSessionFromCookies(ctx.req.header("cookie"));
+  let { userId, session } = await getUserIdFromCtx(ctx);
 
-  const userId = session.data.userId;
-
-  if (!userId || session.data.type !== "admin") {
+  if (!userId || session?.data.type !== "admin") {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
@@ -73,12 +81,24 @@ export const protectedProcedure = t.procedure.use(isAuthed);
  * that can be used throughout the router
  */
 export const appRouter = router({
+  authEnabled: t.procedure.query(async ({}) => {
+    return {
+      pass: { enabled: env.VITE_AUTH_PASS },
+      link: env.VITE_AUTH_URL
+        ? {
+            enabled: true as const,
+            url: env.VITE_AUTH_URL,
+          }
+        : { enabled: false as const },
+    };
+  }),
+
   // Auth
-  authInfo: t.procedure.query(async ({ input, ctx }) => {
+  // TODO: Disable auth procedures if username/password auth isn't enabled
+  authInfo: t.procedure.query(async ({ ctx }) => {
     const hasUsers = await checkIfUserExists();
 
-    const session = await getSessionFromCookies(ctx.req.header("cookie"));
-    const userId = session.data.userId;
+    let { userId } = await getUserIdFromCtx(ctx);
 
     return {
       hasUsers,
