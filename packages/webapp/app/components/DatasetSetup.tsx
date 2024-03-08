@@ -59,6 +59,7 @@ export default function DatasetSetup({
         {(integrations ? Object.entries(integrations) : []).map(
           ([key, { name }]) => (
             <IntegrationButton
+              key={key}
               name={name}
               type={key}
               onClick={() => onIntegrationSelected(key)}
