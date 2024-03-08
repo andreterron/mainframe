@@ -117,6 +117,14 @@ export const appRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
+      if (!env.VITE_AUTH_PASS) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            "This Mainframe instance doesn't support username/password authentication",
+        });
+      }
+
       const { username, password } = input;
 
       const account = await validateUserAccount(username, password);
@@ -147,6 +155,14 @@ export const appRouter = router({
       }),
     )
     .mutation(async ({ input, ctx }) => {
+      if (!env.VITE_AUTH_PASS) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message:
+            "This Mainframe instance doesn't support username/password authentication",
+        });
+      }
+
       const hasUsers = await checkIfUserExists();
 
       if (hasUsers) {
