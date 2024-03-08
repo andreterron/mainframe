@@ -1,7 +1,7 @@
-import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { LibSQLDatabase } from "drizzle-orm/libsql";
 import { usersTable } from "@mainframe-so/shared";
 
-export async function checkIfUserExists(db: BetterSQLite3Database) {
+export async function checkIfUserExists(db: LibSQLDatabase) {
   const [user] = await db
     .select({ id: usersTable.id })
     .from(usersTable)

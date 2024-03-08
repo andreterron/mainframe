@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { env } from "./lib/env.server";
 import { CookieSerializeOptions, parse, serialize } from "cookie";
 import cookieSignature from "cookie-signature";
-import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { LibSQLDatabase } from "drizzle-orm/libsql";
 
 export interface MainframeSession {
   id: string;
@@ -74,7 +74,7 @@ function serializeSessionCookie(
 }
 
 async function updateData(
-  db: BetterSQLite3Database,
+  db: LibSQLDatabase,
   id: string,
   data: MainframeSession["data"],
   expires: Date | undefined,
@@ -89,13 +89,11 @@ async function updateData(
     .where(eq(sessionsTable.id, id));
 }
 
-async function deleteData(db: BetterSQLite3Database, id: string) {
+async function deleteData(db: LibSQLDatabase, id: string) {
   await db.delete(sessionsTable).where(eq(sessionsTable.id, id));
 }
 
-async function createSession(
-  db: BetterSQLite3Database,
-): Promise<MainframeSession> {
+async function createSession(db: LibSQLDatabase): Promise<MainframeSession> {
   // TODO: Remove dynamic import
   const { nanoid } = await import("nanoid");
   const id = nanoid(32);
@@ -113,7 +111,7 @@ async function createSession(
 }
 
 export async function getSessionFromId(
-  db: BetterSQLite3Database,
+  db: LibSQLDatabase,
   sessionId: string,
 ): Promise<MainframeSession | undefined> {
   const [row] = await db
@@ -135,7 +133,7 @@ export async function getSessionFromId(
 }
 
 export async function getSessionFromIdOrCreate(
-  db: BetterSQLite3Database,
+  db: LibSQLDatabase,
   sessionId: string,
 ) {
   const session = await getSessionFromId(db, sessionId);
@@ -144,7 +142,7 @@ export async function getSessionFromIdOrCreate(
 }
 
 export async function getSessionFromCookies(
-  db: BetterSQLite3Database,
+  db: LibSQLDatabase,
   cookieHeader?: string | null | undefined,
   options?: any,
 ): Promise<MainframeSession> {
@@ -159,7 +157,7 @@ export async function getSessionFromCookies(
 
 export async function commitSession(
   session: MainframeSession,
-  db: BetterSQLite3Database,
+  db: LibSQLDatabase,
   options?: CookieSerializeOptions,
 ) {
   // Update row
@@ -186,7 +184,7 @@ export async function commitSession(
 
 export async function destroySession(
   session: MainframeSession,
-  db: BetterSQLite3Database,
+  db: LibSQLDatabase,
   options?: CookieSerializeOptions,
 ) {
   // Delete row

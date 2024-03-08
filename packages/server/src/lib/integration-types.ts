@@ -1,10 +1,10 @@
 import { Dataset, AuthType } from "@mainframe-so/shared";
-import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { LibSQLDatabase } from "drizzle-orm/libsql";
 import { Request, Response } from "express";
 
 export interface IntegrationTable {
   name: string;
-  get?: (dataset: Dataset, db: BetterSQLite3Database) => Promise<any>;
+  get?: (dataset: Dataset, db: LibSQLDatabase) => Promise<any>;
   rowId?: (dataset: Dataset, row: any) => string;
 }
 
@@ -27,10 +27,10 @@ export interface Integration {
     baseUrl: string,
     dataset: Dataset,
     query: { code: string },
-    db: BetterSQLite3Database,
+    db: LibSQLDatabase,
   ) => Promise<void>;
   setupWebhooks?: (
-    db: BetterSQLite3Database,
+    db: LibSQLDatabase,
     dataset: Dataset,
     baseApiUrl: string,
   ) => Promise<any>;

@@ -3,9 +3,9 @@ import { Dataset } from "@mainframe-so/shared";
 import { google as api, calendar_v3 } from "googleapis";
 import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
-import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { LibSQLDatabase } from "drizzle-orm/libsql";
 
-async function getAuth(dataset: Dataset, db: BetterSQLite3Database) {
+async function getAuth(dataset: Dataset, db: LibSQLDatabase) {
   if (
     !dataset.credentials ||
     !dataset.credentials.clientId ||

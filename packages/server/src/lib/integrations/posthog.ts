@@ -3,10 +3,10 @@ import { Integration } from "../integration-types";
 import { Dataset } from "@mainframe-so/shared";
 import { rowsTable, tablesTable } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
-import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { LibSQLDatabase } from "drizzle-orm/libsql";
 
 async function getProjectChildren(
-  db: BetterSQLite3Database,
+  db: LibSQLDatabase,
   dataset: Dataset,
   urlPath: string,
 ) {

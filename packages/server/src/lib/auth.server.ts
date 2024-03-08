@@ -1,10 +1,10 @@
 import { hash } from "bcryptjs";
 import { usersTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
-import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { LibSQLDatabase } from "drizzle-orm/libsql";
 
 export async function createUserAccount(
-  db: BetterSQLite3Database,
+  db: LibSQLDatabase,
   username: string,
   password: string,
 ) {
@@ -20,7 +20,7 @@ export async function createUserAccount(
 }
 
 export async function validateUserAccount(
-  db: BetterSQLite3Database,
+  db: LibSQLDatabase,
   username: string,
   password: string,
 ): Promise<{ id: string } | null> {

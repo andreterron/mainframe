@@ -15,10 +15,10 @@ import {
 import { and, eq } from "drizzle-orm";
 import { deserialize, serialize } from "./utils/serialization";
 import { writeOperation } from "./lib/operations";
-import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { LibSQLDatabase } from "drizzle-orm/libsql";
 
 export async function updateRowFromTableType(
-  db: BetterSQLite3Database,
+  db: LibSQLDatabase,
   dataset: Dataset,
   tableKey: string,
   data: any,
@@ -49,7 +49,7 @@ export async function updateRowFromTableType(
 }
 
 export async function updateRow(
-  db: BetterSQLite3Database,
+  db: LibSQLDatabase,
   data: any,
   id: string,
   tableId: string,
@@ -77,7 +77,7 @@ export async function updateRow(
 }
 
 export async function updateObject(
-  db: BetterSQLite3Database,
+  db: LibSQLDatabase,
   dataset: Dataset,
   data: any,
   id: string | null,
@@ -122,7 +122,7 @@ export async function updateObject(
 }
 
 export async function syncObject(
-  db: BetterSQLite3Database,
+  db: LibSQLDatabase,
   dataset: Dataset,
   objectDefinition: IntegrationObject & { id: string },
 ) {
@@ -143,7 +143,7 @@ export async function syncObject(
 }
 
 export async function syncTable(
-  db: BetterSQLite3Database,
+  db: LibSQLDatabase,
   dataset: Dataset,
   table: IntegrationTable & { id: string },
 ) {
@@ -187,7 +187,7 @@ export async function syncTable(
   }
 }
 
-export async function syncDataset(db: BetterSQLite3Database, dataset: Dataset) {
+export async function syncDataset(db: LibSQLDatabase, dataset: Dataset) {
   if (
     !dataset.integrationType ||
     (!dataset.credentials?.token && !dataset.credentials?.accessToken)
@@ -210,7 +210,7 @@ export async function syncDataset(db: BetterSQLite3Database, dataset: Dataset) {
   }
 }
 
-export async function syncAll(db: BetterSQLite3Database) {
+export async function syncAll(db: LibSQLDatabase) {
   // Load all datasets
   const datasets = await db.select().from(datasetsTable);
 

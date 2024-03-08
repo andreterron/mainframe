@@ -22,23 +22,20 @@ import { apiRouter } from "./api";
 import { oauthRouter } from "./oauth_router";
 import { ip } from "address";
 import chalk from "chalk";
-import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import { LibSQLDatabase } from "drizzle-orm/libsql";
 
 export interface SetupServerHooks extends CreateContextHooks {
   express?: (app: Express) => void;
   getDB?: (
     req: express.Request,
-  ) =>
-    | Promise<BetterSQLite3Database | undefined>
-    | BetterSQLite3Database
-    | undefined;
+  ) => Promise<LibSQLDatabase | undefined> | LibSQLDatabase | undefined;
 }
 
 declare global {
   namespace Express {
     interface Request {
       // TODO: This is optional
-      db: BetterSQLite3Database;
+      db: LibSQLDatabase;
     }
   }
 }

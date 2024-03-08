@@ -1,5 +1,5 @@
-import { drizzle, BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
-import Database from "better-sqlite3";
+import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
+import { createClient } from "@libsql/client";
 import { mkdirSync } from "fs";
 import { join, resolve } from "path";
 import { __dirnameFromImportMetaUrl } from "../utils/dirname";
@@ -22,6 +22,6 @@ try {
   }
 }
 
-const sqlite = new Database(dbPath);
+const sqlite = createClient({ url: `file://${dbPath}` });
 
-export const db: BetterSQLite3Database = drizzle(sqlite);
+export const db: LibSQLDatabase = drizzle(sqlite);

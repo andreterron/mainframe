@@ -1,4 +1,4 @@
-import { migrate } from "drizzle-orm/better-sqlite3/migrator";
+import { migrate } from "drizzle-orm/libsql/migrator";
 import { db } from "./db.server";
 import { resolve } from "node:path";
 import { __dirnameFromImportMetaUrl } from "../utils/dirname";
