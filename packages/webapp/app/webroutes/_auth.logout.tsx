@@ -1,23 +1,11 @@
 import { useEffect } from "react";
-import { trpc } from "../lib/trpc_client";
-import { useNavigate } from "react-router-dom";
+import { useLogout } from "../lib/use-logout";
 
 export default function AuthLogout() {
-  const logout = trpc.logout.useMutation();
-  const navigate = useNavigate();
-
-  async function handleLogout() {
-    try {
-      const result = await logout.mutateAsync();
-      navigate(result.redirect);
-    } catch (e) {
-      console.error(e);
-      navigate("/");
-    }
-  }
+  const logout = useLogout();
 
   useEffect(() => {
-    handleLogout();
+    logout.mutate();
   }, []);
   return null;
 }

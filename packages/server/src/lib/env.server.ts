@@ -11,5 +11,6 @@ export const env = envsafe({
   TUNNEL_BASE_API_URL: str({ default: "", allowEmpty: true }),
   COOKIE_SECRET: str({ default: "", allowEmpty: true }),
   VITE_AUTH_PASS: bool({ default: true }),
-  VITE_AUTH_URL: str({ default: "", allowEmpty: true }),
+  VITE_AUTH_LOGIN_URL: str({ default: "", allowEmpty: true }),
+  VITE_AUTH_LOGOUT_URL: str({ default: "", allowEmpty: true }),
 });

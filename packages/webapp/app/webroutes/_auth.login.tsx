@@ -6,6 +6,7 @@ import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { useLogout } from "../lib/use-logout";
 
 export default function AuthLogin() {
   const [loading, setLoading] = useState(false);
@@ -19,6 +20,7 @@ export default function AuthLogin() {
   const navigate = useNavigate();
 
   const login = trpc.login.useMutation();
+  const logout = useLogout();
 
   async function handleSubmit(username: string, password: string) {
     setLoading(true);
@@ -91,16 +93,16 @@ export default function AuthLogin() {
             )} */}
                 Sign In
               </Button>
-              <div className="mt-2 text-sm text-rose-700">
-                {error ?? <>&nbsp;</>}
-              </div>
             </>
           ) : null}
           {authEnabled?.link.enabled ? (
             <Button asChild>
-              <a href={authEnabled.link.url}>Login with Hello</a>
+              <a href={authEnabled.link.loginUrl}>Login with Hello</a>
             </Button>
           ) : null}
+          <div className="mt-2 text-sm text-rose-700">
+            {error ?? <>&nbsp;</>}
+          </div>
           {isLoggedIn ? (
             <div className="mt-2 text-sm grid gap-1 text-center">
               <span className="font-semibold">You're already logged in!</span>
@@ -112,12 +114,12 @@ export default function AuthLogin() {
                   Go to dashboard
                 </Link>{" "}
                 <span className="text-gray-500">•</span>{" "}
-                <Link
+                <button
                   className="underline text-gray-500 hover:text-neutral-900"
-                  to="/logout"
+                  onClick={() => logout.mutate()}
                 >
                   Logout
-                </Link>
+                </button>
               </div>
             </div>
           ) : !hasUsers ? (
@@ -134,35 +136,6 @@ export default function AuthLogin() {
           ) : (
             <div className="mt-2 text-sm text-gray-400">&nbsp;</div>
           )}
-          {/* {isLoggedIn ? (
-            <div className="mt-2 text-sm grid gap-1 text-center">
-              <span className="font-semibold">You're already logged in!</span>
-              <div>
-                <Link
-                  className="underline text-gray-500 hover:text-neutral-900"
-                  to="/"
-                >
-                  Go to dashboard
-                </Link>{" "}
-                <span className="text-gray-500">•</span>{" "}
-                <Link
-                  className="underline text-gray-500 hover:text-neutral-900"
-                  to="/logout"
-                >
-                  Logout
-                </Link>
-              </div>
-            </div>
-          ) : hasUsers ? (
-            <div className="mt-2 text-sm text-gray-500">
-              Mainframe is already setup, please{" "}
-              <Link className="underline hover:text-neutral-900" to="/login">
-                Login
-              </Link>
-            </div>
-          ) : (
-            <div className="mt-2 text-sm text-gray-400">&nbsp;</div>
-          )} */}
         </div>
       </form>
       {/* <div className="relative">

@@ -62,7 +62,9 @@ const isAuthed = t.middleware(async (opts) => {
 
   let { userId, session } = await getUserIdFromCtx(ctx);
 
-  if (!userId || session?.data.type !== "admin") {
+  // TODO: (session && session.data.type !== "admin") restricts access to
+  // admins, but only when using password auth. This likely needs a refactor
+  if (!userId || (session && session.data.type !== "admin")) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
@@ -84,12 +86,14 @@ export const appRouter = router({
   authEnabled: t.procedure.query(async ({}) => {
     return {
       pass: { enabled: env.VITE_AUTH_PASS },
-      link: env.VITE_AUTH_URL
-        ? {
-            enabled: true as const,
-            url: env.VITE_AUTH_URL,
-          }
-        : { enabled: false as const },
+      link:
+        env.VITE_AUTH_LOGIN_URL && env.VITE_AUTH_LOGOUT_URL
+          ? {
+              enabled: true as const,
+              loginUrl: env.VITE_AUTH_LOGIN_URL,
+              logoutUrl: env.VITE_AUTH_LOGOUT_URL,
+            }
+          : { enabled: false as const },
     };
   }),
 
@@ -174,6 +178,12 @@ export const appRouter = router({
     const hasUsers = await checkIfUserExists();
 
     ctx.res.appendHeader("Set-Cookie", await destroySession(session));
+
+    if (ctx.userId && env.VITE_AUTH_LOGOUT_URL) {
+      return {
+        redirect: env.VITE_AUTH_LOGOUT_URL,
+      };
+    }
 
     return {
       redirect: hasUsers ? "/login" : "/setup",

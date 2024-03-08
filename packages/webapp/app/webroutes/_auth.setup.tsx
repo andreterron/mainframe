@@ -6,16 +6,20 @@ import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { useLogout } from "../lib/use-logout";
 
 export default function AuthSignup() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>();
 
   const { data: authInfo } = trpc.authInfo.useQuery();
+  const { data: authEnabled, isLoading: loadingAuthEnabled } =
+    trpc.authEnabled.useQuery();
   const hasUsers = authInfo?.hasUsers ?? false;
   const isLoggedIn = authInfo?.isLoggedIn ?? false;
 
   const signup = trpc.signup.useMutation();
+  const logout = useLogout();
 
   const navigate = useNavigate();
   async function handleSubmit(username: string, password: string) {
@@ -34,6 +38,10 @@ export default function AuthSignup() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (loadingAuthEnabled) {
+    return null;
   }
 
   return (
@@ -55,36 +63,45 @@ export default function AuthSignup() {
         }}
       >
         <div className="grid gap-2">
-          <div className="grid gap-1">
-            <Label htmlFor="email">Username</Label>
-            <Input
-              id="username"
-              type="text"
-              autoCapitalize="none"
-              autoComplete="username"
-              autoCorrect="off"
-              placeholder="memex"
-              disabled={loading}
-            />
-          </div>
-          <div className="grid gap-1">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              name="password"
-              placeholder="•••••••••••••"
-              autoComplete="new-password"
-              required
-              disabled={loading}
-            />
-          </div>
-          <Button disabled={loading}>
-            {/* {loading && (
+          {authEnabled?.pass.enabled ? (
+            <>
+              <div className="grid gap-1">
+                <Label htmlFor="email">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  autoCapitalize="none"
+                  autoComplete="username"
+                  autoCorrect="off"
+                  placeholder="memex"
+                  disabled={loading}
+                />
+              </div>
+              <div className="grid gap-1">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  name="password"
+                  placeholder="•••••••••••••"
+                  autoComplete="new-password"
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <Button disabled={loading}>
+                {/* {loading && (
               <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
             )} */}
-            Sign up
-          </Button>
+                Sign up
+              </Button>
+            </>
+          ) : null}
+          {authEnabled?.link.enabled ? (
+            <Button asChild>
+              <a href={authEnabled.link.loginUrl}>Login with Hello</a>
+            </Button>
+          ) : null}
           <div className="mt-2 text-sm text-rose-700">
             {error ?? <>&nbsp;</>}
           </div>
@@ -99,12 +116,12 @@ export default function AuthSignup() {
                   Go to dashboard
                 </Link>{" "}
                 <span className="text-gray-500">•</span>{" "}
-                <Link
+                <button
                   className="underline text-gray-500 hover:text-neutral-900"
-                  to="/logout"
+                  onClick={() => logout.mutate()}
                 >
                   Logout
-                </Link>
+                </button>
               </div>
             </div>
           ) : hasUsers ? (
