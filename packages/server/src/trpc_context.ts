@@ -10,7 +10,12 @@ export interface CreateContextHooks {
 
 export function createContext(hooks: CreateContextHooks) {
   return ({ req, res }: CreateExpressContextOptions) => {
-    return { req, res, userId: hooks.trpcGetUserId?.({ req, res }) };
+    return {
+      req,
+      res,
+      userId: hooks.trpcGetUserId?.({ req, res }),
+      db: req.db,
+    };
   };
 }
 

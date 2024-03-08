@@ -1,9 +1,13 @@
 import { hash } from "bcryptjs";
-import { db } from "../db/db.server";
 import { usersTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
+import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
-export async function createUserAccount(username: string, password: string) {
+export async function createUserAccount(
+  db: BetterSQLite3Database,
+  username: string,
+  password: string,
+) {
   const hashed = await hash(password, 10);
   const [inserted] = await db
     .insert(usersTable)
@@ -16,6 +20,7 @@ export async function createUserAccount(username: string, password: string) {
 }
 
 export async function validateUserAccount(
+  db: BetterSQLite3Database,
   username: string,
   password: string,
 ): Promise<{ id: string } | null> {

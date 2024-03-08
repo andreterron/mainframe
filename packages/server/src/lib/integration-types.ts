@@ -1,9 +1,10 @@
 import { Dataset, AuthType } from "@mainframe-so/shared";
+import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 import { Request, Response } from "express";
 
 export interface IntegrationTable {
   name: string;
-  get?: (dataset: Dataset) => Promise<any>;
+  get?: (dataset: Dataset, db: BetterSQLite3Database) => Promise<any>;
   rowId?: (dataset: Dataset, row: any) => string;
 }
 
@@ -26,8 +27,13 @@ export interface Integration {
     baseUrl: string,
     dataset: Dataset,
     query: { code: string },
+    db: BetterSQLite3Database,
   ) => Promise<void>;
-  setupWebhooks?: (dataset: Dataset, baseApiUrl: string) => Promise<any>;
+  setupWebhooks?: (
+    db: BetterSQLite3Database,
+    dataset: Dataset,
+    baseApiUrl: string,
+  ) => Promise<any>;
   webhook?: (
     dataset: Dataset,
     // TODO: Migrate away from express

@@ -1,6 +1,5 @@
 import { Request, Router } from "express";
 import { getIntegrationForDataset } from "./lib/integrations";
-import { db } from "./db/db.server";
 import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
 
@@ -27,7 +26,7 @@ oauthRouter.get("/start/:dataset_id", async (req, res) => {
     return;
   }
 
-  const [dataset] = await db
+  const [dataset] = await req.db
     .select()
     .from(datasetsTable)
     .where(eq(datasetsTable.id, datasetId))
@@ -73,7 +72,7 @@ oauthRouter.get("/callback/:dataset_id", async (req, res) => {
     return;
   }
 
-  const [dataset] = await db
+  const [dataset] = await req.db
     .select()
     .from(datasetsTable)
     .where(eq(datasetsTable.id, datasetId))
@@ -97,7 +96,7 @@ oauthRouter.get("/callback/:dataset_id", async (req, res) => {
   const baseUrl = getBaseUrl(req);
 
   try {
-    await integration.oauthCallback(baseUrl, dataset, req.query as any);
+    await integration.oauthCallback(baseUrl, dataset, req.query as any, req.db);
     res.redirect(`/dataset/${dataset.id}`);
   } catch (e) {
     console.error(e);

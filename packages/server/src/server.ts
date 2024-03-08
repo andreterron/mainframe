@@ -22,9 +22,25 @@ import { apiRouter } from "./api";
 import { oauthRouter } from "./oauth_router";
 import { ip } from "address";
 import chalk from "chalk";
+import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
 export interface SetupServerHooks extends CreateContextHooks {
   express?: (app: Express) => void;
+  getDB?: (
+    req: express.Request,
+  ) =>
+    | Promise<BetterSQLite3Database | undefined>
+    | BetterSQLite3Database
+    | undefined;
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      // TODO: This is optional
+      db: BetterSQLite3Database;
+    }
+  }
 }
 
 export function setupServer(hooks: SetupServerHooks = {}) {
@@ -40,7 +56,7 @@ export function setupServer(hooks: SetupServerHooks = {}) {
     for (let dataset of datasets) {
       const integration = getIntegrationForDataset(dataset);
       if (integration?.setupWebhooks) {
-        await integration.setupWebhooks(dataset, baseApiUrl);
+        await integration.setupWebhooks(db, dataset, baseApiUrl);
       }
     }
   }
@@ -50,7 +66,7 @@ export function setupServer(hooks: SetupServerHooks = {}) {
     "*/10 * * * *",
     async (now) => {
       try {
-        await syncAll();
+        await syncAll(db);
       } catch (e) {
         console.error(e);
       }
@@ -63,6 +79,19 @@ export function setupServer(hooks: SetupServerHooks = {}) {
   const app = express();
 
   hooks.express?.(app);
+
+  app.use(async (req, _res, next) => {
+    if (hooks.getDB) {
+      const hookDB = await hooks.getDB(req);
+      if (hookDB) {
+        req.db = hookDB;
+      }
+    }
+    if (!req.db) {
+      req.db = db;
+    }
+    next();
+  });
 
   app.get("/healthcheck", (req, res) => {
     res.json({ success: true });
@@ -85,7 +114,8 @@ export function setupServer(hooks: SetupServerHooks = {}) {
         console.log(
           `Received webhook request for dataset ${req.params.dataset_id}`,
         );
-        const [dataset] = await db
+        // TODO: This req.db might not exist
+        const [dataset] = await req.db
           .select()
           .from(datasetsTable)
           .where(eq(datasetsTable.id, req.params.dataset_id))

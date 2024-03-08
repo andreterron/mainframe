@@ -1,11 +1,15 @@
 import { deserialize } from "../../utils/serialization";
-import { db } from "../../db/db.server";
 import { Integration } from "../integration-types";
 import { Dataset } from "@mainframe-so/shared";
 import { rowsTable, tablesTable } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
+import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
-async function getProjectChildren(dataset: Dataset, urlPath: string) {
+async function getProjectChildren(
+  db: BetterSQLite3Database,
+  dataset: Dataset,
+  urlPath: string,
+) {
   try {
     const rows = await db
       .select({
@@ -84,8 +88,8 @@ export const posthog: Integration = {
     },
     dashboards: {
       name: "Dashboards",
-      async get(dataset) {
-        return getProjectChildren(dataset, "dashboards");
+      async get(dataset, db) {
+        return getProjectChildren(db, dataset, "dashboards");
       },
       rowId(dataset, row) {
         return `${row.id}`;
@@ -93,8 +97,8 @@ export const posthog: Integration = {
     },
     insights: {
       name: "Insights",
-      async get(dataset) {
-        return getProjectChildren(dataset, "insights");
+      async get(dataset, db) {
+        return getProjectChildren(db, dataset, "insights");
       },
       rowId(dataset, row) {
         return `${row.id}`;

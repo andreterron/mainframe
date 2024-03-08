@@ -1,9 +1,9 @@
-import { db } from "./db/db.server";
 import { sessionsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
 import { env } from "./lib/env.server";
 import { CookieSerializeOptions, parse, serialize } from "cookie";
 import cookieSignature from "cookie-signature";
+import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
 export interface MainframeSession {
   id: string;
@@ -74,6 +74,7 @@ function serializeSessionCookie(
 }
 
 async function updateData(
+  db: BetterSQLite3Database,
   id: string,
   data: MainframeSession["data"],
   expires: Date | undefined,
@@ -88,11 +89,13 @@ async function updateData(
     .where(eq(sessionsTable.id, id));
 }
 
-async function deleteData(id: string) {
+async function deleteData(db: BetterSQLite3Database, id: string) {
   await db.delete(sessionsTable).where(eq(sessionsTable.id, id));
 }
 
-async function createSession(): Promise<MainframeSession> {
+async function createSession(
+  db: BetterSQLite3Database,
+): Promise<MainframeSession> {
   // TODO: Remove dynamic import
   const { nanoid } = await import("nanoid");
   const id = nanoid(32);
@@ -110,6 +113,7 @@ async function createSession(): Promise<MainframeSession> {
 }
 
 export async function getSessionFromId(
+  db: BetterSQLite3Database,
   sessionId: string,
 ): Promise<MainframeSession | undefined> {
   const [row] = await db
@@ -130,27 +134,32 @@ export async function getSessionFromId(
   };
 }
 
-export async function getSessionFromIdOrCreate(sessionId: string) {
-  const session = await getSessionFromId(sessionId);
+export async function getSessionFromIdOrCreate(
+  db: BetterSQLite3Database,
+  sessionId: string,
+) {
+  const session = await getSessionFromId(db, sessionId);
 
-  return session ?? createSession();
+  return session ?? createSession(db);
 }
 
 export async function getSessionFromCookies(
+  db: BetterSQLite3Database,
   cookieHeader?: string | null | undefined,
   options?: any,
 ): Promise<MainframeSession> {
   const sessionId = getSessionIdFromCookieHeader(cookieHeader);
 
   if (!sessionId) {
-    return createSession();
+    return createSession(db);
   }
 
-  return getSessionFromIdOrCreate(sessionId);
+  return getSessionFromIdOrCreate(db, sessionId);
 }
 
 export async function commitSession(
   session: MainframeSession,
+  db: BetterSQLite3Database,
   options?: CookieSerializeOptions,
 ) {
   // Update row
@@ -163,7 +172,7 @@ export async function commitSession(
       ? options.expires
       : cookieSettings.expires;
 
-  await updateData(id, data, expires);
+  await updateData(db, id, data, expires);
 
   let serializedCookie = serializeSessionCookie(session.id, options);
   if (serializedCookie.length > 4096) {
@@ -177,10 +186,11 @@ export async function commitSession(
 
 export async function destroySession(
   session: MainframeSession,
+  db: BetterSQLite3Database,
   options?: CookieSerializeOptions,
 ) {
   // Delete row
-  await deleteData(session.id);
+  await deleteData(db, session.id);
   return serializeSessionCookie("", {
     ...options,
     maxAge: undefined,

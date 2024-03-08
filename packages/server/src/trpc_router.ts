@@ -9,7 +9,6 @@ import {
   zDatasetPatch,
   ClientIntegration,
 } from "@mainframe-so/shared";
-import { db } from "./db/db.server";
 import { z } from "zod";
 import { Context } from "./trpc_context";
 import { and, eq } from "drizzle-orm";
@@ -52,7 +51,7 @@ async function getUserIdFromCtx(ctx: Context) {
     return { userId: ctx.userId };
   }
 
-  const session = await getSessionFromCookies(ctx.req.header("cookie"));
+  const session = await getSessionFromCookies(ctx.db, ctx.req.header("cookie"));
   const userId = session.data.userId;
   return { userId, session };
 }
@@ -100,7 +99,7 @@ export const appRouter = router({
   // Auth
   // TODO: Disable auth procedures if username/password auth isn't enabled
   authInfo: t.procedure.query(async ({ ctx }) => {
-    const hasUsers = await checkIfUserExists();
+    const hasUsers = await checkIfUserExists(ctx.db);
 
     let { userId } = await getUserIdFromCtx(ctx);
 
@@ -127,7 +126,7 @@ export const appRouter = router({
 
       const { username, password } = input;
 
-      const account = await validateUserAccount(username, password);
+      const account = await validateUserAccount(ctx.db, username, password);
 
       if (!account) {
         throw new TRPCError({
@@ -137,11 +136,11 @@ export const appRouter = router({
       }
 
       // Don't pass the cookie header here, because we always want a fresh session
-      const session = await getSessionFromCookies();
+      const session = await getSessionFromCookies(ctx.db);
 
       session.data.userId = account.id;
 
-      ctx.res.appendHeader("Set-Cookie", await commitSession(session));
+      ctx.res.appendHeader("Set-Cookie", await commitSession(session, ctx.db));
 
       return {
         redirect: "/",
@@ -163,7 +162,7 @@ export const appRouter = router({
         });
       }
 
-      const hasUsers = await checkIfUserExists();
+      const hasUsers = await checkIfUserExists(ctx.db);
 
       if (hasUsers) {
         throw new TRPCError({
@@ -175,25 +174,28 @@ export const appRouter = router({
       const { username, password } = input;
 
       // TODO: This can fail if the username already exists
-      const account = await createUserAccount(username, password);
+      const account = await createUserAccount(ctx.db, username, password);
 
       // Don't pass the cookie header here, because we always want a fresh session
-      const session = await getSessionFromCookies();
+      const session = await getSessionFromCookies(ctx.db);
 
       session.data.userId = account.id;
 
-      ctx.res.appendHeader("Set-Cookie", await commitSession(session));
+      ctx.res.appendHeader("Set-Cookie", await commitSession(session, ctx.db));
 
       return {
         redirect: "/",
       };
     }),
   logout: t.procedure.mutation(async ({ ctx }) => {
-    const session = await getSessionFromCookies(ctx.req.header("Cookie"));
+    const session = await getSessionFromCookies(
+      ctx.db,
+      ctx.req.header("Cookie"),
+    );
 
-    const hasUsers = await checkIfUserExists();
+    const hasUsers = await checkIfUserExists(ctx.db);
 
-    ctx.res.appendHeader("Set-Cookie", await destroySession(session));
+    ctx.res.appendHeader("Set-Cookie", await destroySession(session, ctx.db));
 
     if (ctx.userId && env.VITE_AUTH_LOGOUT_URL) {
       return {
@@ -207,14 +209,14 @@ export const appRouter = router({
   }),
 
   // Dataset
-  datasetsAll: protectedProcedure.query(async () => {
-    const datasets = await db.select().from(datasetsTable);
+  datasetsAll: protectedProcedure.query(async ({ ctx }) => {
+    const datasets = await ctx.db.select().from(datasetsTable);
     return datasets;
   }),
   datasetsGet: protectedProcedure
     .input(z.object({ id: z.string().nonempty() }))
-    .query(async ({ input }) => {
-      const [dataset] = await db
+    .query(async ({ input, ctx }) => {
+      const [dataset] = await ctx.db
         .select()
         .from(datasetsTable)
         .where(eq(datasetsTable.id, input.id))
@@ -228,8 +230,8 @@ export const appRouter = router({
     }),
   datasetsCreate: protectedProcedure
     .input(zDatasetInsert)
-    .mutation(async ({ input }) => {
-      const [dataset] = await db
+    .mutation(async ({ input, ctx }) => {
+      const [dataset] = await ctx.db
         .insert(datasetsTable)
         .values(input)
         .returning();
@@ -238,14 +240,14 @@ export const appRouter = router({
         throw new TRPCError({ code: "CONFLICT" });
       }
 
-      void syncDataset(dataset).catch((e) => console.error(e));
+      void syncDataset(ctx.db, dataset).catch((e) => console.error(e));
 
       return dataset;
     }),
   datasetsUpdate: protectedProcedure
     .input(z.object({ id: z.string(), patch: zDatasetPatch }))
-    .mutation(async ({ input }) => {
-      const [dataset] = await db
+    .mutation(async ({ input, ctx }) => {
+      const [dataset] = await ctx.db
         .update(datasetsTable)
         .set(input.patch)
         .where(eq(datasetsTable.id, input.id))
@@ -255,14 +257,14 @@ export const appRouter = router({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      void syncDataset(dataset).catch((e) => console.error(e));
+      void syncDataset(ctx.db, dataset).catch((e) => console.error(e));
 
       return dataset;
     }),
   datasetsDelete: protectedProcedure
     .input(z.object({ id: z.string() }))
-    .mutation(async ({ input }) => {
-      await db.delete(datasetsTable).where(eq(datasetsTable.id, input.id));
+    .mutation(async ({ input, ctx }) => {
+      await ctx.db.delete(datasetsTable).where(eq(datasetsTable.id, input.id));
     }),
 
   // Object
@@ -274,7 +276,7 @@ export const appRouter = router({
         objectId: z.string().optional(),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const { datasetId, objectId } = input;
 
       if (!datasetId || !objectId) {
@@ -283,12 +285,12 @@ export const appRouter = router({
       }
 
       let [[dataset], [object]] = await Promise.all([
-        db
+        ctx.db
           .select()
           .from(datasetsTable)
           .where(eq(datasetsTable.id, datasetId))
           .limit(1),
-        db
+        ctx.db
           .select()
           .from(objectsTable)
           .where(
@@ -303,13 +305,13 @@ export const appRouter = router({
       const objectDefinition = getDatasetObject(dataset, objectId);
 
       const syncPromise = objectDefinition
-        ? syncObject(dataset, objectDefinition)
+        ? syncObject(ctx.db, dataset, objectDefinition)
         : null;
 
       if (!object) {
         await syncPromise;
 
-        [object] = await db
+        [object] = await ctx.db
           .select()
           .from(objectsTable)
           .where(
@@ -340,13 +342,13 @@ export const appRouter = router({
         tableId: z.string().optional(),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       const { datasetId, tableId } = input;
       if (!datasetId || !tableId) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      const [dataset] = await db
+      const [dataset] = await ctx.db
         .select()
         .from(datasetsTable)
         .where(eq(datasetsTable.id, datasetId))
@@ -363,7 +365,7 @@ export const appRouter = router({
       }
 
       // Upsert table
-      const tableRows = await db
+      const tableRows = await ctx.db
         .insert(tablesTable)
         .values({
           datasetId: dataset.id,
@@ -376,7 +378,7 @@ export const appRouter = router({
         })
         .returning({ id: tablesTable.id, view: tablesTable.view });
 
-      const rows = await db
+      const rows = await ctx.db
         .select({ id: rowsTable.id, data: rowsTable.data })
         .from(rowsTable)
         .innerJoin(tablesTable, eq(tablesTable.id, rowsTable.tableId))
@@ -389,7 +391,7 @@ export const appRouter = router({
         .limit(ROW_LIMIT);
 
       // Trigger sync of this table in the background
-      void syncTable(dataset, table).catch((e) => console.error(e));
+      void syncTable(ctx.db, dataset, table).catch((e) => console.error(e));
 
       return {
         dataset,
@@ -406,10 +408,10 @@ export const appRouter = router({
         view: z.string().nonempty(),
       }),
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { datasetId, tableId, view } = input;
 
-      const returned = await db
+      const returned = await ctx.db
         .update(tablesTable)
         .set({ view: view })
         .where(
@@ -432,11 +434,11 @@ export const appRouter = router({
         rowId: z.string().optional(),
       }),
     )
-    .query(async ({ input: { rowId } }) => {
+    .query(async ({ input: { rowId }, ctx }) => {
       if (!rowId) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
-      const [row] = await db
+      const [row] = await ctx.db
         .select({ data: rowsTable.data })
         .from(rowsTable)
         .where(eq(rowsTable.id, rowId))
@@ -448,7 +450,7 @@ export const appRouter = router({
     }),
 
   getApiKey: protectedProcedure.query(async ({ ctx }) => {
-    const [apiKey] = await db
+    const [apiKey] = await ctx.db
       .select({ id: sessionsTable.id })
       .from(sessionsTable)
       .where(
@@ -465,7 +467,7 @@ export const appRouter = router({
     const { nanoid } = await import("nanoid");
     const id = nanoid(32);
 
-    const [newApiKey] = await db
+    const [newApiKey] = await ctx.db
       .insert(sessionsTable)
       .values({
         id,

@@ -12,12 +12,13 @@ import {
   tablesTable,
   Dataset,
 } from "@mainframe-so/shared";
-import { db } from "./db/db.server";
 import { and, eq } from "drizzle-orm";
 import { deserialize, serialize } from "./utils/serialization";
 import { writeOperation } from "./lib/operations";
+import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
 export async function updateRowFromTableType(
+  db: BetterSQLite3Database,
   dataset: Dataset,
   tableKey: string,
   data: any,
@@ -44,10 +45,15 @@ export async function updateRowFromTableType(
 
   const id = table.rowId(dataset, data);
 
-  await updateRow(data, id, dbTable.id);
+  await updateRow(db, data, id, dbTable.id);
 }
 
-export async function updateRow(data: any, id: string, tableId: string) {
+export async function updateRow(
+  db: BetterSQLite3Database,
+  data: any,
+  id: string,
+  tableId: string,
+) {
   const [existing] = await db
     .select()
     .from(rowsTable)
@@ -71,6 +77,7 @@ export async function updateRow(data: any, id: string, tableId: string) {
 }
 
 export async function updateObject(
+  db: BetterSQLite3Database,
   dataset: Dataset,
   data: any,
   id: string | null,
@@ -115,6 +122,7 @@ export async function updateObject(
 }
 
 export async function syncObject(
+  db: BetterSQLite3Database,
   dataset: Dataset,
   objectDefinition: IntegrationObject & { id: string },
 ) {
@@ -126,6 +134,7 @@ export async function syncObject(
   const data = await objectDefinition.get(dataset);
 
   await updateObject(
+    db,
     dataset,
     data,
     data ? objectDefinition.objId(dataset, data) : null,
@@ -134,6 +143,7 @@ export async function syncObject(
 }
 
 export async function syncTable(
+  db: BetterSQLite3Database,
   dataset: Dataset,
   table: IntegrationTable & { id: string },
 ) {
@@ -142,7 +152,7 @@ export async function syncTable(
   }
 
   // Call fetch on each table
-  const data = await table.get(dataset);
+  const data = await table.get(dataset, db);
 
   // Save the rows on the DB
   if (!Array.isArray(data)) {
@@ -170,14 +180,14 @@ export async function syncTable(
   for (let rowData of data) {
     const id = table.rowId(dataset, rowData);
 
-    const result = await updateRow(rowData, id, dbTable.id);
+    const result = await updateRow(db, rowData, id, dbTable.id);
     if (result) {
       updated++;
     }
   }
 }
 
-export async function syncDataset(dataset: Dataset) {
+export async function syncDataset(db: BetterSQLite3Database, dataset: Dataset) {
   if (
     !dataset.integrationType ||
     (!dataset.credentials?.token && !dataset.credentials?.accessToken)
@@ -189,22 +199,22 @@ export async function syncDataset(dataset: Dataset) {
   const objects = getObjectsForDataset(dataset);
 
   for (let object of objects) {
-    await syncObject(dataset, object);
+    await syncObject(db, dataset, object);
   }
 
   // Load all tables
   const tables = getTablesForDataset(dataset);
 
   for (let table of tables) {
-    await syncTable(dataset, table);
+    await syncTable(db, dataset, table);
   }
 }
 
-export async function syncAll() {
+export async function syncAll(db: BetterSQLite3Database) {
   // Load all datasets
   const datasets = await db.select().from(datasetsTable);
 
   for (let dataset of datasets) {
-    await syncDataset(dataset);
+    await syncDataset(db, dataset);
   }
 }

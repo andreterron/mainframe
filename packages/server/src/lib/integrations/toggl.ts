@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { db } from "../../db/db.server";
 import { Integration } from "../integration-types";
 import { Dataset, Row } from "@mainframe-so/shared";
 import { syncTable, updateObject, updateRowFromTableType } from "../../sync";
@@ -100,7 +99,7 @@ export const toggl: Integration = {
   authType: "token",
   authSetupDocs:
     "https://github.com/andreterron/mainframe/blob/main/packages/docs/integrations/toggl.md",
-  setupWebhooks: async (dataset: Dataset, baseApiUrl: string) => {
+  setupWebhooks: async (db, dataset: Dataset, baseApiUrl: string) => {
     // Remove trailing slashes
     const normalizedBaseApiUrl = baseApiUrl.replace(/\/+$/, "");
     if (!normalizedBaseApiUrl) {
@@ -176,7 +175,7 @@ export const toggl: Integration = {
           continue;
         }
 
-        await syncTable(dataset, table);
+        await syncTable(db, dataset, table);
       }
 
       if (webhookToThis) {
@@ -225,7 +224,7 @@ export const toggl: Integration = {
     // The reason is that we'll get a "ping" event before saving the subscription to the DB
     let webhook: Row | undefined;
     try {
-      [webhook] = await db
+      [webhook] = await req.db
         .select({
           id: rowsTable.id,
           sourceId: rowsTable.sourceId,
@@ -279,6 +278,7 @@ export const toggl: Integration = {
       const table = getDatasetTable(dataset, "timeEntries");
       if (table?.rowId) {
         await updateRowFromTableType(
+          req.db,
           json.payload,
           table.rowId(dataset, json.payload),
           json.payload,
@@ -289,7 +289,7 @@ export const toggl: Integration = {
       }
 
       // Update currentTimeEntry if needed
-      let [currentEntryRow] = await db
+      let [currentEntryRow] = await req.db
         .select({
           id: objectsTable.id,
           sourceId: objectsTable.sourceId,
@@ -314,6 +314,7 @@ export const toggl: Integration = {
           deserialize(currentEntryRow?.data ?? null)?.id === json.payload.id)
       ) {
         await updateObject(
+          req.db,
           dataset,
           json.metadata.action === "deleted" || json.payload.stop
             ? null
@@ -401,7 +402,7 @@ export const toggl: Integration = {
     // },
     webhooks: {
       name: "Webhook Subscriptions",
-      get: async (dataset: Dataset) => {
+      get: async (dataset: Dataset, db) => {
         try {
           const rows = await db
             .select({

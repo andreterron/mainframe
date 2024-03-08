@@ -1,11 +1,11 @@
 import { Integration } from "../integration-types";
 import { Dataset } from "@mainframe-so/shared";
 import { google as api, calendar_v3 } from "googleapis";
-import { db } from "../../db/db.server";
 import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
+import { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
 
-async function getAuth(dataset: Dataset) {
+async function getAuth(dataset: Dataset, db: BetterSQLite3Database) {
   if (
     !dataset.credentials ||
     !dataset.credentials.clientId ||
@@ -71,7 +71,7 @@ export const google: Integration = {
       scope: "https://www.googleapis.com/auth/calendar.readonly",
     });
   },
-  async oauthCallback(baseUrl, dataset, query) {
+  async oauthCallback(baseUrl, dataset, query, db) {
     if (
       !dataset.credentials ||
       !dataset.credentials.clientId ||
@@ -103,8 +103,8 @@ export const google: Integration = {
   tables: {
     events: {
       name: "Events",
-      get: async (dataset: Dataset) => {
-        const oauth2Client = await getAuth(dataset);
+      get: async (dataset: Dataset, db) => {
+        const oauth2Client = await getAuth(dataset, db);
         if (!oauth2Client) {
           console.error("Failed to get oauth2Client for Google");
           return [];
@@ -134,8 +134,8 @@ export const google: Integration = {
     },
     calendars: {
       name: "Calendars",
-      get: async (dataset: Dataset) => {
-        const oauth2Client = await getAuth(dataset);
+      get: async (dataset: Dataset, db) => {
+        const oauth2Client = await getAuth(dataset, db);
         if (!oauth2Client) {
           console.error("Failed to get oauth2Client for Google");
           return [];

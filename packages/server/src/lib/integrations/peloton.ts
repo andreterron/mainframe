@@ -1,5 +1,4 @@
 import { and, eq } from "drizzle-orm";
-import { db } from "../../db/db.server";
 import { objectsTable } from "@mainframe-so/shared";
 import { Integration } from "../integration-types";
 import { Dataset } from "@mainframe-so/shared";
@@ -29,7 +28,7 @@ export const peloton: Integration = {
   tables: {
     workouts: {
       name: "Workouts",
-      async get(dataset) {
+      async get(dataset, db) {
         if (!dataset.credentials?.token) return [];
         try {
           const [user] = await db

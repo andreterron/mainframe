@@ -4,7 +4,6 @@ import {
   getSessionFromId,
   getSessionIdFromCookieHeader,
 } from "./sessions.server";
-import { db } from "./db/db.server";
 import { datasetsTable, objectsTable, rowsTable } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
 import { deserializeData } from "./utils/serialization";
@@ -32,7 +31,9 @@ apiRouter.use(async (req, res, next) => {
     parseBearerHeader(authorization) ??
     getSessionIdFromCookieHeader(req.header("cookie"));
 
-  const session = sessionId ? await getSessionFromId(sessionId) : undefined;
+  const session = sessionId
+    ? await getSessionFromId(req.db, sessionId)
+    : undefined;
 
   if (!session?.data.userId) {
     res.sendStatus(401);
@@ -42,7 +43,7 @@ apiRouter.use(async (req, res, next) => {
 });
 
 apiRouter.get("/table/:table_id/rows", async (req, res) => {
-  const rows = await db
+  const rows = await req.db
     .select({ id: rowsTable.id, data: rowsTable.data })
     .from(rowsTable)
     .where(eq(rowsTable.tableId, req.params.table_id))
@@ -53,7 +54,7 @@ apiRouter.get("/table/:table_id/rows", async (req, res) => {
 });
 
 apiRouter.get("/object/:dataset_id/:object_type", async (req, res) => {
-  const [object] = await db
+  const [object] = await req.db
     .select({ id: objectsTable.id, data: objectsTable.data })
     .from(objectsTable)
     .where(
@@ -66,7 +67,7 @@ apiRouter.get("/object/:dataset_id/:object_type", async (req, res) => {
 
   res.contentType("application/json");
   res.send(JSON.stringify(deserializeData(object)));
-  // const rows = await db
+  // const rows = await req.db
   //     .select({ id: rowsTable.id, data: rowsTable.data })
   //     .from(rowsTable)
   //     .where(
@@ -81,7 +82,7 @@ apiRouter.post(
   bodyParser.json(),
   async (req, res) => {
     // Get the dataset info
-    const [dataset] = await db
+    const [dataset] = await req.db
       .select()
       .from(datasetsTable)
       .where(eq(datasetsTable.id, req.params.dataset_id))
