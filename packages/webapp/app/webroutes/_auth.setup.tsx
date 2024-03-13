@@ -7,6 +7,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useLogout } from "../lib/use-logout";
+import { env } from "../lib/env_client";
 
 export default function AuthSignup() {
   const [loading, setLoading] = useState(false);
@@ -50,9 +51,11 @@ export default function AuthSignup() {
         <h1 className="text-2xl font-semibold tracking-tight">
           Create an account
         </h1>
-        <p className="text-sm text-muted-foreground">
-          This protects access to your database
-        </p>
+        {env.VITE_AUTH_PASS && (
+          <p className="text-sm text-muted-foreground">
+            This protects access to your database
+          </p>
+        )}
       </div>
       <form
         onSubmit={(e) => {

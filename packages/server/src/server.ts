@@ -43,7 +43,7 @@ declare global {
 export function setupServer(hooks: SetupServerHooks = {}) {
   const t = initTRPC.context<Context>().create();
 
-  const port = env.PORT || 8777;
+  const port = env.PORT || 8745;
 
   async function setupWebhooks(baseApiUrl: string) {
     // Get all datasets

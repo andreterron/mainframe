@@ -48,22 +48,21 @@ const router = t.router;
 
 async function getUserIdFromCtx(ctx: Context) {
   if (ctx.userId) {
-    return { userId: ctx.userId };
+    return { userId: ctx.userId, trpcAccess: true };
   }
 
+  // When self-hosting, only "admin" sessions can use the trpc endpoints.
   const session = await getSessionFromCookies(ctx.db, ctx.req.header("cookie"));
   const userId = session.data.userId;
-  return { userId, session };
+  return { userId, trpcAccess: session.data.type === "admin" };
 }
 
 const isAuthed = t.middleware(async (opts) => {
   const { ctx } = opts;
 
-  let { userId, session } = await getUserIdFromCtx(ctx);
+  let { userId, trpcAccess } = await getUserIdFromCtx(ctx);
 
-  // TODO: (session && session.data.type !== "admin") restricts access to
-  // admins, but only when using password auth. This likely needs a refactor
-  if (!userId || (session && session.data.type !== "admin")) {
+  if (!userId || !trpcAccess) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
@@ -97,7 +96,6 @@ export const appRouter = router({
   }),
 
   // Auth
-  // TODO: Disable auth procedures if username/password auth isn't enabled
   authInfo: t.procedure.query(async ({ ctx }) => {
     const hasUsers = await checkIfUserExists(ctx.db);
 
