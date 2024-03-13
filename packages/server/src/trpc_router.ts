@@ -85,11 +85,11 @@ export const appRouter = router({
     return {
       pass: { enabled: env.VITE_AUTH_PASS },
       link:
-        env.VITE_AUTH_LOGIN_URL && env.VITE_AUTH_LOGOUT_URL
+        env.AUTH_LOGIN_URL && env.AUTH_LOGOUT_URL
           ? {
               enabled: true as const,
-              loginUrl: env.VITE_AUTH_LOGIN_URL,
-              logoutUrl: env.VITE_AUTH_LOGOUT_URL,
+              loginUrl: env.AUTH_LOGIN_URL,
+              logoutUrl: env.AUTH_LOGOUT_URL,
             }
           : { enabled: false as const },
     };
@@ -195,9 +195,9 @@ export const appRouter = router({
 
     ctx.res.appendHeader("Set-Cookie", await destroySession(session, ctx.db));
 
-    if (ctx.userId && env.VITE_AUTH_LOGOUT_URL) {
+    if (ctx.userId && env.AUTH_LOGOUT_URL) {
       return {
-        redirect: env.VITE_AUTH_LOGOUT_URL,
+        redirect: env.AUTH_LOGOUT_URL,
       };
     }
 
