@@ -11,7 +11,6 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "start": "node scripts/generate-env.mjs && npm run db:migrate && npm run dev",
-    "notstart": "pwd && node scripts/generate-env.mjs && ls && (cd packages/webapp && ls && npm run db:migrate && npm run dev)",
     "db:migrate": "tsx server/db/migrate.ts",
     "db:generate": "drizzle-kit generate:sqlite",
     "db:drop": "drizzle-kit drop"
