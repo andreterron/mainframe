@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
-import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
-import { Dataset } from "../lib/types";
+import { NavLink, Outlet, useNavigate, useNavigation } from "react-router-dom";
+import { Dataset } from "@mainframe-so/shared";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 import { trpc } from "../lib/trpc_client";
+import { useLogout } from "../lib/use-logout";
+import { Loader2Icon } from "lucide-react";
 
 export function SidebarButton({ dataset }: { dataset: Dataset }) {
   const type = dataset.integrationType;
@@ -66,6 +68,8 @@ export function SidebarButton({ dataset }: { dataset: Dataset }) {
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const logout = useLogout();
+  const navigation = useNavigation();
 
   const { data: authInfo, isFetching } = trpc.authInfo.useQuery();
   const { data: datasets, refetch } = trpc.datasetsAll.useQuery();
@@ -164,16 +168,25 @@ export default function Dashboard() {
             </li>
           </ul>
           <div className="flex gap-2">
-            <Link
-              to="/logout"
+            <button
+              onClick={() => {
+                logout.mutate();
+              }}
               className={clsx([
                 "flex w-0 flex-1 items-center gap-1.5 p-2 rounded-lg",
                 "text-slate-600 hover:text-sky-600",
                 "hover:bg-sky-300/40",
               ])}
+              disabled={logout.isLoading}
             >
-              Logout
-            </Link>
+              Logout{" "}
+              <Loader2Icon
+                className={clsx(
+                  "animate-spin ml-1 w-4 h-4 transition-opacity delay-75",
+                  logout.isLoading || logout.data ? "opacity-100" : "opacity-0",
+                )}
+              />
+            </button>
             <a
               href="https://discord.gg/HUS4y59Dxw"
               target="_blank"
@@ -195,7 +208,7 @@ export default function Dashboard() {
                 fill="currentColor"
                 className="w-4 h-4"
               >
-                <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
                 <g
                   id="SVGRepo_tracerCarrier"
                   strokeLinecap="round"

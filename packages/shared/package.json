@@ -1,0 +1,25 @@
+{
+  "name": "@mainframe-so/shared",
+  "version": "0.1.0",
+  "description": "",
+  "types": "dist/index.d.ts",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^4.9.3"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.28.5",
+    "drizzle-zod": "^0.5.1",
+    "zod": "^3.21.4"
+  }
+}
