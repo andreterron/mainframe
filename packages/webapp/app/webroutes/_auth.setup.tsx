@@ -8,6 +8,7 @@ import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { useLogout } from "../lib/use-logout";
 import { env } from "../lib/env_client";
+import { LoaderIcon } from "lucide-react";
 
 export default function AuthSignup() {
   const [loading, setLoading] = useState(false);
@@ -93,9 +94,9 @@ export default function AuthSignup() {
                 />
               </div>
               <Button disabled={loading}>
-                {/* {loading && (
-              <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />
-            )} */}
+                {loading && (
+                  <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Sign up
               </Button>
             </>
