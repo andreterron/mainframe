@@ -97,13 +97,20 @@ export const appRouter = router({
 
   // Auth
   authInfo: t.procedure.query(async ({ ctx }) => {
-    const hasUsers = await checkIfUserExists(ctx.db);
+    let hasUsers = false;
+    let isLoggedIn = false;
 
-    let { userId } = await getUserIdFromCtx(ctx);
+    if (env.VITE_AUTH_PASS) {
+      hasUsers = await checkIfUserExists(ctx.db);
+
+      let { userId } = await getUserIdFromCtx(ctx);
+
+      isLoggedIn = !!userId;
+    }
 
     return {
       hasUsers,
-      isLoggedIn: !!userId,
+      isLoggedIn,
     };
   }),
   login: t.procedure
@@ -186,14 +193,25 @@ export const appRouter = router({
       };
     }),
   logout: t.procedure.mutation(async ({ ctx }) => {
-    const session = await getSessionFromCookies(
-      ctx.db,
-      ctx.req.header("Cookie"),
-    );
+    let hasUsers = false;
 
-    const hasUsers = await checkIfUserExists(ctx.db);
+    if (env.VITE_AUTH_PASS) {
+      try {
+        const session = await getSessionFromCookies(
+          ctx.db,
+          ctx.req.header("Cookie"),
+        );
 
-    ctx.res.appendHeader("Set-Cookie", await destroySession(session, ctx.db));
+        hasUsers = await checkIfUserExists(ctx.db);
+
+        ctx.res.appendHeader(
+          "Set-Cookie",
+          await destroySession(session, ctx.db),
+        );
+      } catch (e) {
+        console.error(e);
+      }
+    }
 
     if (ctx.userId && env.AUTH_LOGOUT_URL) {
       return {
@@ -448,6 +466,9 @@ export const appRouter = router({
     }),
 
   getApiKey: protectedProcedure.query(async ({ ctx }) => {
+    if (!env.VITE_AUTH_PASS) {
+      return undefined;
+    }
     const [apiKey] = await ctx.db
       .select({ id: sessionsTable.id })
       .from(sessionsTable)

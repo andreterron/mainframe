@@ -3,7 +3,7 @@ import closeWithGrace from "close-with-grace";
 import { db } from "./db/db.server";
 import { getIntegrationForDataset } from "./lib/integrations";
 import express, { Express } from "express";
-import { text } from "body-parser";
+import { json, text } from "body-parser";
 import { env } from "./lib/env.server";
 import { ZodError } from "zod";
 import type { Server } from "http";
@@ -22,13 +22,14 @@ import { apiRouter } from "./api";
 import { oauthRouter } from "./oauth_router";
 import { ip } from "address";
 import chalk from "chalk";
-import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
+import { Client } from "@libsql/client";
 
 export interface SetupServerHooks extends CreateContextHooks {
   express?: (app: Express) => void;
   getDB?: (
     req: express.Request,
-  ) => Promise<LibSQLDatabase | undefined> | LibSQLDatabase | undefined;
+  ) => Promise<Client | undefined> | Client | undefined;
 }
 
 declare global {
@@ -79,12 +80,17 @@ export function setupServer(hooks: SetupServerHooks = {}) {
 
   app.use(async (req, _res, next) => {
     if (hooks.getDB) {
-      const hookDB = await hooks.getDB(req);
-      if (hookDB) {
-        req.db = hookDB;
+      try {
+        const hookDB = await hooks.getDB(req);
+        if (hookDB) {
+          const client = hookDB;
+          req.db = drizzle(client);
+        }
+      } catch (e) {
+        console.log("Failed to use hook to create DB");
+        console.error(e);
       }
-    }
-    if (!req.db) {
+    } else {
       req.db = db;
     }
     next();
@@ -140,9 +146,13 @@ export function setupServer(hooks: SetupServerHooks = {}) {
   app.use(
     "/trpc",
     cors({ credentials: true, origin: "http://localhost:8744" }),
+    json(),
     trpcExpress.createExpressMiddleware({
       router: appRouter,
       createContext: createContext(hooks),
+      onError: ({ error, path }) => {
+        console.error(path, error);
+      },
     }),
   );
 

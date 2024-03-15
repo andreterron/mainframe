@@ -2,6 +2,7 @@ import { hash } from "bcryptjs";
 import { usersTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
 import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { env } from "./env.server";
 
 export async function createUserAccount(
   db: LibSQLDatabase,
@@ -24,6 +25,9 @@ export async function validateUserAccount(
   username: string,
   password: string,
 ): Promise<{ id: string } | null> {
+  if (!env.VITE_AUTH_PASS) {
+    return null;
+  }
   const [user] = await db
     .select({ id: usersTable.id, password: usersTable.password })
     .from(usersTable)
