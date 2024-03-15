@@ -51,10 +51,20 @@ async function getUserIdFromCtx(ctx: Context) {
     return { userId: ctx.userId, trpcAccess: true };
   }
 
-  // When self-hosting, only "admin" sessions can use the trpc endpoints.
-  const session = await getSessionFromCookies(ctx.db, ctx.req.header("cookie"));
-  const userId = session.data.userId;
-  return { userId, trpcAccess: session.data.type === "admin" };
+  if (env.VITE_AUTH_PASS) {
+    // When self-hosting, only "admin" sessions can use the trpc endpoints.
+    const session = await getSessionFromCookies(
+      ctx.db,
+      ctx.req.header("cookie"),
+    );
+    const userId = session.data.userId;
+    return { userId, trpcAccess: session.data.type === "admin" };
+  }
+
+  return {
+    userId: undefined,
+    trpcAccess: false,
+  };
 }
 
 const isAuthed = t.middleware(async (opts) => {
@@ -97,16 +107,13 @@ export const appRouter = router({
 
   // Auth
   authInfo: t.procedure.query(async ({ ctx }) => {
-    let hasUsers = false;
-    let isLoggedIn = false;
+    const hasUsers = env.VITE_AUTH_PASS
+      ? await checkIfUserExists(ctx.db)
+      : false;
 
-    if (env.VITE_AUTH_PASS) {
-      hasUsers = await checkIfUserExists(ctx.db);
+    const { userId } = await getUserIdFromCtx(ctx);
 
-      let { userId } = await getUserIdFromCtx(ctx);
-
-      isLoggedIn = !!userId;
-    }
+    const isLoggedIn = !!userId;
 
     return {
       hasUsers,
