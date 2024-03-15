@@ -145,7 +145,7 @@ export function setupServer(hooks: SetupServerHooks = {}) {
 
   app.use(
     "/trpc",
-    cors({ credentials: true, origin: "http://localhost:8744" }),
+    cors({ credentials: true, origin: env.APP_URL }),
     json(),
     trpcExpress.createExpressMiddleware({
       router: appRouter,

@@ -1,4 +1,4 @@
-import { bool, envsafe, num, str } from "envsafe";
+import { bool, envsafe, num, str, url } from "envsafe";
 import dotenv from "dotenv";
 
 if (typeof window === "undefined") {
@@ -12,6 +12,7 @@ export const env = envsafe({
   COOKIE_SECRET: str({ default: "", allowEmpty: true }),
   AUTH_LOGIN_URL: str({ default: "", allowEmpty: true }),
   AUTH_LOGOUT_URL: str({ default: "", allowEmpty: true }),
+  APP_URL: url({ default: "http://localhost:8744" }),
 
   VITE_AUTH_PASS: bool({ default: true }),
 });

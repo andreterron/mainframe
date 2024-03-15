@@ -1,6 +1,7 @@
 {
   "name": "@mainframe-so/server",
-  "version": "0.1.0",
+  "version": "0.4.2",
+  "private": false,
   "description": "",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -30,6 +31,7 @@
   "dependencies": {
     "@libsql/client": "^0.5.6",
     "@mainframe-so/shared": "*",
+    "@trpc/server": "^10.38.1",
     "address": "^2.0.1",
     "bcryptjs": "^2.4.3",
     "chalk": "^5.3.0",
