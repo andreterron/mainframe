@@ -63,6 +63,7 @@ export function setupServer(hooks: SetupServerHooks = {}) {
   const task = cron.schedule(
     "*/10 * * * *",
     async (now) => {
+      // TODO: Iterate over every `db`
       try {
         await syncAll(db);
       } catch (e) {
@@ -70,7 +71,8 @@ export function setupServer(hooks: SetupServerHooks = {}) {
       }
     },
     {
-      runOnInit: true,
+      runOnInit: env.VITE_AUTH_PASS,
+      scheduled: env.VITE_AUTH_PASS,
     },
   );
 
