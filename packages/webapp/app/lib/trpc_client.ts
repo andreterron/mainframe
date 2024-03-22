@@ -37,7 +37,7 @@ export const useRootTRPCClient = () => {
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: env.VITE_TRPC_URL || "http://localhost:8745/trpc",
+          url: env.VITE_TRPC_URL,
           fetch(url, options) {
             return fetch(url, {
               ...options,

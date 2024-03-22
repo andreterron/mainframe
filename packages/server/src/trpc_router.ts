@@ -473,6 +473,9 @@ export const appRouter = router({
     }),
 
   getApiKey: protectedProcedure.query(async ({ ctx }) => {
+    if (ctx.userId && ctx.hooks.getApiKey) {
+      return (await ctx.hooks.getApiKey(ctx.userId)) ?? null;
+    }
     if (!env.VITE_AUTH_PASS) {
       return undefined;
     }
@@ -486,7 +489,7 @@ export const appRouter = router({
         ),
       );
     if (apiKey) {
-      return apiKey;
+      return apiKey.id;
     }
 
     // TODO: Remove dynamic import
@@ -504,7 +507,7 @@ export const appRouter = router({
         id: sessionsTable.id,
       });
 
-    return newApiKey;
+    return newApiKey?.id;
   }),
 
   // Integrations

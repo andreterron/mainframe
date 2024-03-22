@@ -5,16 +5,23 @@ export interface CreateContextHooks {
   trpcGetUserId?: ({
     req,
     res,
-  }: CreateExpressContextOptions) => string | undefined;
+  }: CreateExpressContextOptions) =>
+    | Promise<string | undefined>
+    | string
+    | undefined;
+  getApiKey?: (
+    userId: string | undefined,
+  ) => Promise<string | undefined> | string | undefined;
 }
 
 export function createContext(hooks: CreateContextHooks) {
-  return ({ req, res }: CreateExpressContextOptions) => {
+  return async ({ req, res }: CreateExpressContextOptions) => {
     return {
       req,
       res,
-      userId: hooks.trpcGetUserId?.({ req, res }),
+      userId: await hooks.trpcGetUserId?.({ req, res }),
       db: req.db,
+      hooks,
     };
   };
 }

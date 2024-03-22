@@ -1,8 +1,9 @@
-import { bool, envsafe, str } from "envsafe";
+import { bool, envsafe, url } from "envsafe";
 
 export const env = envsafe(
   {
-    VITE_TRPC_URL: str({ default: "", allowEmpty: true }),
+    VITE_API_URL: url({ default: "http://localhost:8745" }),
+    VITE_TRPC_URL: url({ default: "http://localhost:8745/trpc" }),
     VITE_AUTH_PASS: bool({ default: true }),
   },
   {

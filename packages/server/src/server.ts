@@ -18,14 +18,14 @@ import { Context, CreateContextHooks, createContext } from "./trpc_context";
 import { appRouter } from "./trpc_router";
 export type { AppRouter } from "./trpc_router";
 import cors from "cors";
-import { apiRouter } from "./api";
+import { buildApiRouter, ApiRouterHooks } from "./api";
 import { oauthRouter } from "./oauth_router";
 import { ip } from "address";
 import chalk from "chalk";
 import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
 import { Client } from "@libsql/client";
 
-export interface SetupServerHooks extends CreateContextHooks {
+export interface SetupServerHooks extends CreateContextHooks, ApiRouterHooks {
   express?: (app: Express) => void;
   getDB?: (
     req: express.Request,
@@ -158,7 +158,11 @@ export function setupServer(hooks: SetupServerHooks = {}) {
     }),
   );
 
-  app.use("/api", apiRouter);
+  app.use(
+    "/api",
+    cors({ credentials: true, origin: env.APP_URL }),
+    buildApiRouter(hooks),
+  );
   app.use("/oauth", oauthRouter);
 
   app.use(

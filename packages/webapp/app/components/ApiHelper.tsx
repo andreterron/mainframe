@@ -20,6 +20,7 @@ import { CopyToClipboard } from "react-copy-to-clipboard";
 import { trpc } from "../lib/trpc_client";
 import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
+import { env } from "../lib/env_client";
 
 export function ApiHelper({
   children,
@@ -58,7 +59,7 @@ export function ApiHelper({
     };
   }, [copiedHeader]);
 
-  const apiUrl = `${location.origin}/api/${apiPath}`;
+  const apiUrl = `${env.VITE_API_URL}/api/${apiPath}`;
 
   const [showApiKey, setShowApiKey] = useState(false);
 
@@ -83,7 +84,9 @@ export function ApiHelper({
     refetchOnWindowFocus: false,
     queryKey: [apiUrl],
     queryFn: async (ctx) => {
-      const res = await fetch(ctx.queryKey[0]);
+      const res = await fetch(ctx.queryKey[0], {
+        credentials: "include",
+      });
 
       const status = res.status;
 
@@ -134,11 +137,11 @@ export function ApiHelper({
           </span>
           <code className="relative flex items-center gap-2 rounded bg-muted px-2 h-8 font-mono text-xs">
             <span>Authorization: Bearer </span>
-            {showApiKey && apiKey?.id ? (
+            {showApiKey && apiKey ? (
               <>
-                <span>{apiKey.id}</span>
+                <span>{apiKey}</span>
                 <CopyToClipboard
-                  text={apiKey.id}
+                  text={apiKey}
                   onCopy={() => setCopiedHeader(true)}
                 >
                   <Button
