@@ -1,9 +1,16 @@
 import { useNavigate } from "react-router-dom";
 import DatasetSetup from "../components/DatasetSetup";
 import { trpc } from "../lib/trpc_client";
+import { SadPath } from "../components/SadPath";
 
-export default function Index() {
+export default function NewPage() {
+  const {
+    data: integrations,
+    error: integrationsError,
+    isLoading: isIntegrationsLoading,
+  } = trpc.integrationsAll.useQuery();
   const navigate = useNavigate();
+
   const utils = trpc.useContext();
 
   const datasetsCreate = trpc.datasetsCreate.useMutation({
@@ -12,29 +19,37 @@ export default function Index() {
     },
   });
 
-  const { data: integrations } = trpc.integrationsAll.useQuery();
+  if (!integrations) {
+    return (
+      <SadPath
+        className="p-4"
+        error={integrationsError ?? undefined}
+        isLoading={isIntegrationsLoading}
+      />
+    );
+  }
 
-  async function setIntegrationType(integrationType: string) {
+  // Functions
+
+  const handleAddDataset = async (integrationType: string) => {
     const integration = integrations?.[integrationType];
     if (!integration) {
       console.error("Integration not found for type", integrationType);
       return;
     }
-
     const dataset = await datasetsCreate.mutateAsync({
       integrationType,
-      name: integration?.name,
+      name: integration.name,
     });
-
     navigate(`/dataset/${dataset.id}`);
-  }
-
-  // TODO: Consider a different UI if the user already has existing datasets
+  };
 
   return (
     <div className="flex flex-col p-4">
       <DatasetSetup
-        onIntegrationSelected={(type) => setIntegrationType(type)}
+        onIntegrationSelected={(type) => {
+          handleAddDataset(type);
+        }}
       />
     </div>
   );

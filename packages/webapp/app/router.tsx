@@ -9,7 +9,7 @@ import DatasetDetails from "./webroutes/_dashboard.dataset.$id._index";
 import DatasetObjectDetails from "./webroutes/_dashboard.dataset.$id.object.$object_id";
 import DatasetTableDetails from "./webroutes/_dashboard.dataset.$id.table.$table_id";
 import DatasetRowDetails from "./webroutes/_dashboard.row.$row_id";
-import Index from "./webroutes/_dashboard._index";
+import NewPage from "./webroutes/_dashboard.new";
 
 export const router = createBrowserRouter([
   {
@@ -34,7 +34,11 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Index />,
+        element: <NewPage />,
+      },
+      {
+        path: "/new",
+        element: <NewPage />,
       },
       {
         path: "/dataset/:id",

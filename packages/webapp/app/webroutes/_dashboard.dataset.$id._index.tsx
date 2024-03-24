@@ -58,7 +58,7 @@ export default function DatasetDetails() {
       id,
       patch: {
         integrationType,
-        name: dataset.name ? undefined : integration?.name,
+        name: dataset.name ? undefined : integration.name,
       },
     });
   }

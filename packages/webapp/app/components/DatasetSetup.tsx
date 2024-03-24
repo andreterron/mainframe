@@ -54,7 +54,7 @@ export default function DatasetSetup({
   const { data: integrations } = trpc.integrationsAll.useQuery();
   return (
     <div className="flex flex-col items-start gap-4">
-      <DatasetHeader dataset={dataset}>Import</DatasetHeader>
+      <DatasetHeader dataset={dataset}>New Dataset</DatasetHeader>
       <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {(integrations ? Object.entries(integrations) : []).map(
           ([key, { name }]) => (

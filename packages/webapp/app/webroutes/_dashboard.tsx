@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import clsx from "clsx";
-import { NavLink, Outlet, useNavigate, useNavigation } from "react-router-dom";
+import {
+  Link,
+  NavLink,
+  Outlet,
+  useMatch,
+  useNavigate,
+  useNavigation,
+} from "react-router-dom";
 import { Dataset } from "@mainframe-so/shared";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 import { trpc } from "../lib/trpc_client";
@@ -70,6 +77,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const logout = useLogout();
   const navigation = useNavigation();
+  const isIndexPath = useMatch("/");
 
   const { data: authInfo, isFetching } = trpc.authInfo.useQuery();
   const { data: datasets, refetch } = trpc.datasetsAll.useQuery();
@@ -135,36 +143,42 @@ export default function Dashboard() {
               );
             })}
             <li>
-              <button
-                onClick={() => handleAddDataset()}
+              <NavLink
+                // onClick={() => handleAddDataset()}
+                to="/new"
                 className="block w-full group py-1 cursor-pointer"
               >
-                <span
-                  className={clsx([
-                    "flex w-full items-center gap-1.5 p-2 rounded-lg",
-                    "text-slate-400 group-hover:text-sky-600",
-                    "group-hover:bg-sky-300/40",
-                  ])}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    className="humbleicons hi-plus w-5 h-5"
+                {({ isActive }) => (
+                  <span
+                    className={clsx([
+                      "flex w-full items-center gap-1.5 p-2 rounded-lg",
+                      "group-hover:bg-sky-300/40",
+                      "relative before:border before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:rounded-lg",
+                      isActive || isIndexPath
+                        ? "before:bg-white before:border-gray-400 shadow-0-2"
+                        : "before:bg-transparent before:border-transparent shadow-0 group-hover:text-sky-600",
+                    ])}
                   >
-                    <g
+                    <svg
                       xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
                       stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeWidth="2"
+                      viewBox="0 0 24 24"
+                      className="relative humbleicons hi-plus w-5 h-5"
                     >
-                      <path d="M12 19V5M19 12H5" />
-                    </g>
-                  </svg>
-                  <span className="">New Dataset</span>
-                </span>
-              </button>
+                      <g
+                        xmlns="http://www.w3.org/2000/svg"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeWidth="2"
+                      >
+                        <path d="M12 19V5M19 12H5" />
+                      </g>
+                    </svg>
+                    <span className="relative ">New Dataset</span>
+                  </span>
+                )}
+              </NavLink>
             </li>
           </ul>
           <div className="flex gap-2">
