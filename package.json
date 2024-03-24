@@ -19,7 +19,7 @@
     "concurrently": "^8.2.0",
     "drizzle-kit": "^0.19.13",
     "nanoid": "^4.0.2",
-    "turbo": "^1.12.5"
+    "turbo": "^1.13.0"
   },
   "dependencies": {
     "body-parser": "^1.20.2"
