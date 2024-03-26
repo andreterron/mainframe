@@ -4,12 +4,12 @@ import AuthPage from "./webroutes/_auth";
 import AuthLogin from "./webroutes/_auth.login";
 import AuthLogout from "./webroutes/_auth.logout";
 import AuthSignup from "./webroutes/_auth.setup";
-import Dashboard from "./webroutes/_dashboard";
-import DatasetDetails from "./webroutes/_dashboard.dataset.$id._index";
-import DatasetObjectDetails from "./webroutes/_dashboard.dataset.$id.object.$object_id";
-import DatasetTableDetails from "./webroutes/_dashboard.dataset.$id.table.$table_id";
-import DatasetRowDetails from "./webroutes/_dashboard.row.$row_id";
-import NewPage from "./webroutes/_dashboard.new";
+import AppPages from "./webroutes/_app";
+import DatasetDetails from "./webroutes/_app.dataset.$id._index";
+import DatasetObjectDetails from "./webroutes/_app.dataset.$id.object.$object_id";
+import DatasetTableDetails from "./webroutes/_app.dataset.$id.table.$table_id";
+import DatasetRowDetails from "./webroutes/_app.row.$row_id";
+import NewPage from "./webroutes/_app.new";
 
 export const router = createBrowserRouter([
   {
@@ -30,7 +30,7 @@ export const router = createBrowserRouter([
     ],
   },
   {
-    element: <Dashboard />,
+    element: <AppPages />,
     children: [
       {
         path: "/",
