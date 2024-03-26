@@ -22,6 +22,7 @@
     "turbo": "^1.13.0"
   },
   "dependencies": {
+    "@radix-ui/react-avatar": "^1.0.4",
     "body-parser": "^1.20.2"
   }
 }
