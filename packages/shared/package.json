@@ -1,6 +1,6 @@
 {
   "name": "@mainframe-so/shared",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "private": false,
   "description": "",
   "types": "dist/index.d.ts",
