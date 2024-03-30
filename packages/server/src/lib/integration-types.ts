@@ -18,6 +18,11 @@ export interface IntegrationObject {
 export interface Integration {
   name: string;
   authType: AuthType;
+  authTypes?: {
+    nango?: {
+      integrationId: string;
+    };
+  };
   authSetupDocs?: string;
   getOAuthUrl?: (
     baseUrl: string,

@@ -1,5 +1,9 @@
 import { Dataset, ClientIntegration } from "@mainframe-so/shared";
 import { DatasetHeader } from "./DatasetHeader";
+import { Button } from "./ui/button";
+import Nango from "@nangohq/frontend";
+import { env } from "../lib/env_client";
+import { trpc } from "../lib/trpc_client";
 
 export default function DatasetTokenInput({
   onSubmit,
@@ -16,18 +20,62 @@ export default function DatasetTokenInput({
   dataset: Dataset;
   integration: ClientIntegration;
 }) {
+  const utils = trpc.useContext();
+  const checkNangoIntegration = trpc.checkNangoIntegration.useMutation({
+    onSettled() {
+      utils.datasetsGet.invalidate();
+    },
+  });
+
+  const handleNangoConnection = async (integrationId: string) => {
+    if (!env.VITE_NANGO_PUBLIC_KEY) {
+      return;
+    }
+    const nango = new Nango({
+      publicKey: env.VITE_NANGO_PUBLIC_KEY,
+    });
+    try {
+      await nango.auth(integrationId, dataset.id);
+
+      // Inform the backend that this is connected
+      await checkNangoIntegration.mutateAsync({ datasetId: dataset.id });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  const nangoIntegration = integration.authTypes?.nango;
   return (
     <div className="flex flex-col gap-8 items-start">
       <DatasetHeader dataset={dataset}>{dataset.name}</DatasetHeader>
+      {nangoIntegration && env.VITE_NANGO_PUBLIC_KEY ? (
+        <>
+          <Button
+            onClick={() =>
+              handleNangoConnection(nangoIntegration.integrationId)
+            }
+          >
+            Connect to {integration.name}
+          </Button>
+          <div className="flex w-80 items-center text-gray-400 gap-2">
+            <hr className="h-px flex-1 bg-gray-400" />
+            <span className="text-xs">or</span>
+            <hr className="h-px flex-1 bg-gray-400" />
+          </div>
+          {/* TODO: Add an indicator that this is an advanced flow */}
+          <h2 className="text-lg font-bold ">Use your keys</h2>
+        </>
+      ) : null}
       {integration.authSetupDocs && (
-        <a
-          href={integration.authSetupDocs}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-700 py-1 px-2 rounded border"
-        >
-          Documentation →
-        </a>
+        <Button asChild variant="outline" size="sm">
+          <a
+            href={integration.authSetupDocs}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-700"
+          >
+            Documentation →
+          </a>
+        </Button>
       )}
       <form
         autoComplete="off"

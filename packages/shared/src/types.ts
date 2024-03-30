@@ -22,4 +22,5 @@ export interface DatasetCredentials {
   refreshToken?: string;
   clientId?: string;
   clientSecret?: string;
+  nangoIntegrationId?: string;
 }

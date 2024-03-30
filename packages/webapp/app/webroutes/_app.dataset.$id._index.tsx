@@ -81,7 +81,8 @@ export default function DatasetDetails() {
       ) : integrations?.[dataset.integrationType] ? (
         integrations?.[dataset.integrationType].authType !== "none" &&
         !dataset.credentials?.token &&
-        !dataset.credentials?.accessToken ? (
+        !dataset.credentials?.accessToken &&
+        !dataset.credentials?.nangoIntegrationId ? (
           <DatasetTokenInput
             onSubmit={(creds) => setCredentials(creds)}
             dataset={dataset}

@@ -22,6 +22,7 @@ import {
   createClientIntegration,
   getDatasetObject,
   getDatasetTable,
+  getIntegrationForDataset,
 } from "./lib/integrations";
 import { deserializeData } from "./utils/serialization";
 import { ROW_LIMIT } from "./utils/constants";
@@ -37,6 +38,8 @@ import { zotero } from "./lib/integrations/zotero";
 import { notion } from "./lib/integrations/notion";
 import { oura } from "./lib/integrations/oura";
 import { env } from "./lib/env.server";
+import { nango } from "./lib/nango";
+import { integrations } from "googleapis/build/src/apis/integrations";
 
 /**
  * Initialization of tRPC backend
@@ -524,6 +527,54 @@ export const appRouter = router({
       oura: createClientIntegration(oura),
     };
   }),
+
+  checkNangoIntegration: protectedProcedure
+    .input(z.object({ datasetId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      if (!nango) {
+        // TODO: Different error
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      let [dataset] = await ctx.db
+        .select()
+        .from(datasetsTable)
+        .where(eq(datasetsTable.id, input.datasetId))
+        .limit(1);
+
+      if (!dataset) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const integration = getIntegrationForDataset(dataset);
+
+      const nangoIntegrationId = integration?.authTypes?.nango?.integrationId;
+
+      if (!nangoIntegrationId) {
+        // TODO: Different error
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const nangoConnection = await nango.getConnection(
+        nangoIntegrationId,
+        dataset.id,
+      );
+
+      if (!nangoConnection) {
+        // TODO: Error
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      // Inform the DB that the connection is valid
+      await ctx.db
+        .update(datasetsTable)
+        .set({
+          credentials: {
+            nangoIntegrationId,
+          },
+        })
+        .where(eq(datasetsTable.id, input.datasetId));
+    }),
 });
 
 // Export type router type signature,

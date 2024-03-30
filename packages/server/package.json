@@ -31,6 +31,7 @@
   "dependencies": {
     "@libsql/client": "^0.5.6",
     "@mainframe-so/shared": "*",
+    "@nangohq/node": "^0.39.13",
     "@trpc/server": "^10.38.1",
     "address": "^2.0.1",
     "bcryptjs": "^2.4.3",

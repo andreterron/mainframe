@@ -13,6 +13,7 @@ export const env = envsafe({
   AUTH_LOGIN_URL: str({ default: "", allowEmpty: true }),
   AUTH_LOGOUT_URL: str({ default: "", allowEmpty: true }),
   APP_URL: url({ default: "http://localhost:8744" }),
+  NANGO_PRIVATE_KEY: str({ default: "", allowEmpty: true }),
 
   VITE_AUTH_PASS: bool({ default: true }),
 });
