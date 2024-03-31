@@ -328,8 +328,9 @@ export const appRouter = router({
           .limit(1),
       ]);
 
+      const objectDefinition = getDatasetObject(dataset, objectType);
+
       if (!object) {
-        const objectDefinition = getDatasetObject(dataset, objectType);
         if (objectDefinition)
           await syncObject(ctx.db, dataset, objectDefinition);
 
@@ -351,7 +352,10 @@ export const appRouter = router({
       }
 
       return {
-        object: deserializeData(object),
+        object: {
+          ...deserializeData(object),
+          name: objectDefinition?.name || object.objectType,
+        },
         dataset,
       };
     }),
@@ -398,7 +402,11 @@ export const appRouter = router({
           target: [tablesTable.datasetId, tablesTable.key],
           set: { key: tableId },
         })
-        .returning({ id: tablesTable.id, view: tablesTable.view });
+        .returning({
+          id: tablesTable.id,
+          view: tablesTable.view,
+          name: tablesTable.name,
+        });
 
       const rows = await ctx.db
         .select({ id: rowsTable.id, data: rowsTable.data })

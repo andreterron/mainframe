@@ -14,7 +14,7 @@ export function DatasetPage({
   return (
     <div className="flex flex-col gap-8 items-start">
       <DatasetHeader dataset={dataset}>{dataset.name}</DatasetHeader>
-      <div className="flex flex-col gap-1">
+      <div className="flex flex-col gap-1 p-4">
         {objects.map((obj) => (
           <Link
             to={`/dataset/${dataset.id}/object/${obj.id}`}

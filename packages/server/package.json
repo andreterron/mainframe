@@ -1,13 +1,14 @@
 {
   "name": "@mainframe-so/server",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "private": false,
   "description": "",
   "main": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "scripts": {
     "dev": "tsx watch --clear-screen=false src/app.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "publish-package": "npm publish"
   },
   "exports": {
     ".": "./src/index.ts"

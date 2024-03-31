@@ -1,6 +1,6 @@
 {
   "name": "root",
-  "version": "0.3.0",
+  "version": "0.4.7",
   "author": "Andre Terron (https://andreterron.com)",
   "private": true,
   "license": "MIT",
@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
+    "publish-package": "turbo run publish-package",
     "start": "node scripts/generate-env.mjs && npm run db:migrate && npm run dev",
     "db:migrate": "tsx server/db/migrate-local.ts",
     "db:generate": "drizzle-kit generate:sqlite",

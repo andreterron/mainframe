@@ -72,11 +72,10 @@ export default function DatasetDetails() {
   }
 
   return (
-    <div className="flex flex-col p-4">
+    <div className="flex flex-col">
       {!dataset.integrationType ? (
         <DatasetSetup
           onIntegrationSelected={(type) => setIntegrationType(type)}
-          dataset={dataset}
         />
       ) : integrations?.[dataset.integrationType] ? (
         integrations?.[dataset.integrationType].authType !== "none" &&
@@ -95,7 +94,7 @@ export default function DatasetDetails() {
           />
         )
       ) : (
-        <span>Error: Integration not found</span>
+        <span className="p-4">Error: Integration not found</span>
       )}
     </div>
   );

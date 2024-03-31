@@ -11,7 +11,7 @@ import {
 } from "@tanstack/react-table";
 import { ColumnMenu } from "../components/ColumnMenu";
 import { Code2Icon, EyeIcon, EyeOffIcon, MoreVerticalIcon } from "lucide-react";
-import { Button } from "../components/ui/button";
+import { Button, buttonVariants } from "../components/ui/button";
 import {
   Popover,
   PopoverContent,
@@ -25,6 +25,14 @@ import { SadPath } from "../components/SadPath";
 import { ApiHelper } from "../components/ApiHelper";
 import { useTable } from "../lib/data/table";
 import { RowType } from "../lib/types";
+import { PageHeader } from "../components/PageHeader";
+import { DatasetBreadcrumb } from "../components/DatasetHeader.DatasetBreadcrumb";
+import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "../components/ui/breadcrumb";
 
 const colHelper = createColumnHelper<RowType>();
 
@@ -175,15 +183,33 @@ export default function DatasetTableDetails() {
   return (
     <div className="flex flex-col relative max-h-screen overflow-y-auto">
       <div className="flex flex-col gap-8 items-start">
-        <div className="flex w-full items-center p-4">
-          <h1 className="text-2xl font-medium flex-1">{dataset?.name}</h1>
+        <PageHeader
+          title={dbTable.name}
+          breadcrumb={
+            <DatasetBreadcrumb dataset={dataset}>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{dbTable.name}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </DatasetBreadcrumb>
+          }
+        >
           <ApiHelper apiPath={`table/${dbTable.id}/rows`}>
-            <button className="ml-2 inline-flex justify-center rounded-md bg-black bg-opacity-0 p-1.5 text-sm font-medium hover:bg-opacity-5 data-[state=open]:bg-opacity-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-opacity-75">
+            <Button variant="ghost" size="icon" title="Code">
               <Code2Icon className="h-4 w-4" />
-            </button>
+            </Button>
           </ApiHelper>
           <Popover>
-            <PopoverTrigger className="ml-2 inline-flex justify-center rounded-md bg-black bg-opacity-0 p-1.5 text-sm font-medium hover:bg-opacity-5 data-[state=open]:bg-opacity-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-opacity-75">
+            <PopoverTrigger
+              title="More"
+              className={cn(
+                buttonVariants({
+                  variant: "ghost",
+                  size: "icon",
+                  className: "data-[state=open]:bg-accent",
+                }),
+              )}
+            >
               <MoreVerticalIcon className="h-4 w-4" />
             </PopoverTrigger>
             <PopoverContent className="w-auto px-0 py-1">
@@ -220,7 +246,7 @@ export default function DatasetTableDetails() {
                                 ))}
                         </DropdownMenuContent>
                     </DropdownMenu> */}
-        </div>
+        </PageHeader>
         <div></div>
         <div className="max-w-full overflow-auto">
           {rows.length === 0 ? (

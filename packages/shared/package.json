@@ -1,13 +1,14 @@
 {
   "name": "@mainframe-so/shared",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "private": false,
   "description": "",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsc --watch",
-    "build": "tsc"
+    "build": "tsc",
+    "publish-package": "npm publish"
   },
   "exports": {
     ".": "./src/index.ts"

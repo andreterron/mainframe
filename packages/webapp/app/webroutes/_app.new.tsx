@@ -45,7 +45,7 @@ export default function NewPage() {
   };
 
   return (
-    <div className="flex flex-col p-4">
+    <div className="flex flex-col">
       <DatasetSetup
         onIntegrationSelected={(type) => {
           handleAddDataset(type);

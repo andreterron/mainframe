@@ -1,7 +1,6 @@
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 import { trpc } from "../lib/trpc_client";
-import { Dataset } from "@mainframe-so/shared";
-import { DatasetHeader } from "./DatasetHeader";
+import { PageHeader } from "./PageHeader";
 
 function IntegrationButton({
   name,
@@ -46,16 +45,14 @@ function IntegrationButton({
 
 export default function DatasetSetup({
   onIntegrationSelected,
-  dataset,
 }: {
   onIntegrationSelected: (type: string) => void;
-  dataset?: Dataset;
 }) {
   const { data: integrations } = trpc.integrationsAll.useQuery();
   return (
     <div className="flex flex-col items-start gap-4">
-      <DatasetHeader dataset={dataset}>New Dataset</DatasetHeader>
-      <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <PageHeader title="New Dataset" />
+      <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
         {(integrations ? Object.entries(integrations) : []).map(
           ([key, { name }]) => (
             <IntegrationButton
