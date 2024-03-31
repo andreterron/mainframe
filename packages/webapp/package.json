@@ -1,6 +1,6 @@
 {
   "name": "@mainframe-so/webapp",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "author": "Andre Terron (https://andreterron.com)",
   "private": true,
   "sideEffects": false,
