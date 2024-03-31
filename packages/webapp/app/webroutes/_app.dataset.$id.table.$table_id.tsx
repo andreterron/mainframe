@@ -105,7 +105,7 @@ export default function DatasetTableDetails() {
       colHelper.accessor<
         (originalRow: RowType, index: number) => any,
         { name: string }
-      >((k, i) => k.data[col] ?? null, {
+      >((row) => row.data[col], {
         id: col,
         meta: {
           name: col,
@@ -217,13 +217,13 @@ export default function DatasetTableDetails() {
               <Separator className="w-full h-px bg-border" />
               <div className="flex flex-col gap-1 px-4 py-2">
                 {table.getVisibleLeafColumns().map((column) => (
-                  <ColumnMenuItem column={column} />
+                  <ColumnMenuItem key={column.id} column={column} />
                 ))}
                 {table
                   .getAllFlatColumns()
                   .filter((c) => !c.getIsVisible())
                   .map((column) => (
-                    <ColumnMenuItem column={column} />
+                    <ColumnMenuItem key={column.id} column={column} />
                   ))}
               </div>
             </PopoverContent>
