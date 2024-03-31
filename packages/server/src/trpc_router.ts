@@ -299,13 +299,13 @@ export const appRouter = router({
     .input(
       z.object({
         datasetId: z.string().optional(),
-        objectId: z.string().optional(),
+        objectType: z.string().optional(),
       }),
     )
     .query(async ({ input, ctx }) => {
-      const { datasetId, objectId } = input;
+      const { datasetId, objectType } = input;
 
-      if (!datasetId || !objectId) {
+      if (!datasetId || !objectType) {
         // TODO: Review
         throw new TRPCError({ code: "NOT_FOUND" });
       }
@@ -321,28 +321,24 @@ export const appRouter = router({
           .from(objectsTable)
           .where(
             and(
-              eq(objectsTable.objectType, objectId),
+              eq(objectsTable.objectType, objectType),
               eq(objectsTable.datasetId, datasetId),
             ),
           )
           .limit(1),
       ]);
 
-      const objectDefinition = getDatasetObject(dataset, objectId);
-
-      const syncPromise = objectDefinition
-        ? syncObject(ctx.db, dataset, objectDefinition)
-        : null;
-
       if (!object) {
-        await syncPromise;
+        const objectDefinition = getDatasetObject(dataset, objectType);
+        if (objectDefinition)
+          await syncObject(ctx.db, dataset, objectDefinition);
 
         [object] = await ctx.db
           .select()
           .from(objectsTable)
           .where(
             and(
-              eq(objectsTable.objectType, objectId),
+              eq(objectsTable.objectType, objectType),
               eq(objectsTable.datasetId, datasetId),
             ),
           )
@@ -415,9 +411,6 @@ export const appRouter = router({
           ),
         )
         .limit(ROW_LIMIT);
-
-      // Trigger sync of this table in the background
-      void syncTable(ctx.db, dataset, table).catch((e) => console.error(e));
 
       return {
         dataset,
@@ -574,6 +567,70 @@ export const appRouter = router({
           },
         })
         .where(eq(datasetsTable.id, input.datasetId));
+    }),
+
+  syncDataset: protectedProcedure
+    .input(z.object({ datasetId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      let [dataset] = await ctx.db
+        .select()
+        .from(datasetsTable)
+        .where(eq(datasetsTable.id, input.datasetId))
+        .limit(1);
+
+      if (!dataset) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      await syncDataset(ctx.db, dataset);
+    }),
+
+  syncTable: protectedProcedure
+    .input(z.object({ datasetId: z.string(), tableId: z.string() }))
+    .mutation(async ({ input: { datasetId, tableId }, ctx }) => {
+      const [dataset] = await ctx.db
+        .select()
+        .from(datasetsTable)
+        .where(eq(datasetsTable.id, datasetId))
+        .limit(1);
+
+      if (!dataset) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const table = getDatasetTable(dataset, tableId);
+
+      if (!table) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      await syncTable(ctx.db, dataset, table);
+    }),
+
+  syncObject: protectedProcedure
+    .input(z.object({ datasetId: z.string(), objectType: z.string() }))
+    .mutation(async ({ input: { datasetId, objectType }, ctx }) => {
+      if (!datasetId || !objectType) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      let [dataset] = await ctx.db
+        .select()
+        .from(datasetsTable)
+        .where(eq(datasetsTable.id, datasetId))
+        .limit(1);
+
+      if (!dataset) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const objectDefinition = getDatasetObject(dataset, objectType);
+
+      if (!objectDefinition) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      await syncObject(ctx.db, dataset, objectDefinition);
     }),
 });
 

@@ -5,6 +5,7 @@ import type {
   rowsTable,
   tablesTable,
 } from "./db/schema";
+import { z } from "zod";
 
 export type Dataset = InferSelectModel<typeof datasetsTable>;
 
@@ -24,3 +25,30 @@ export interface DatasetCredentials {
   clientSecret?: string;
   nangoIntegrationId?: string;
 }
+
+// Operations
+
+export const zRowOperation = z.object({
+  type: z.literal("row"),
+  tableId: z.string(),
+  data: z.any(),
+});
+
+export const zObjectOperation = z.object({
+  type: z.literal("object"),
+  datasetId: z.string(),
+  objectType: z.string(),
+  data: z.any(),
+});
+
+export const zTableOperation = z.object({
+  type: z.literal("table"),
+  datasetId: z.string(),
+  tableId: z.string(),
+});
+
+export type Operation =
+  | z.infer<typeof zRowOperation>
+  | z.infer<typeof zObjectOperation>
+  | z.infer<typeof zTableOperation>
+  | { type: "ping" };

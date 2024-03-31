@@ -1,18 +1,15 @@
 import { useParams } from "react-router-dom";
-import { trpc } from "../lib/trpc_client";
 import { SadPath } from "../components/SadPath";
 import { ApiHelper } from "../components/ApiHelper";
 import { Code2Icon } from "lucide-react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import codeStyleLight from "react-syntax-highlighter/dist/esm/styles/hljs/docco";
+import { useObject } from "../lib/data/object";
 
 export default function DatasetObjectDetails() {
   const { id: datasetId, object_id: objectId } = useParams();
 
-  const { data, error, isLoading } = trpc.getObjectAndDataset.useQuery({
-    datasetId,
-    objectId,
-  });
+  const { data, error, isLoading } = useObject(datasetId, objectId);
 
   if (!data) {
     return (

@@ -6,12 +6,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { RowType } from "../lib/types";
 
-export function ColumnMenu({
-  header,
-}: {
-  header: Header<Record<string, any>, unknown>;
-}) {
+export function ColumnMenu({ header }: { header: Header<RowType, unknown> }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="ml-2 opacity-0 data-[state=open]:opacity-100 group-hover:opacity-100 focus-visible:opacity-100 inline-flex justify-center rounded-md text-gray-400 bg-black bg-opacity-0 p-1.5 text-sm font-medium hover:bg-opacity-5 data-[state=open]:bg-opacity-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-opacity-75">

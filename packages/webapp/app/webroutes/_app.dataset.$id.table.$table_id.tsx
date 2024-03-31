@@ -23,14 +23,12 @@ import { cn } from "../lib/utils";
 import { trpc } from "../lib/trpc_client";
 import { SadPath } from "../components/SadPath";
 import { ApiHelper } from "../components/ApiHelper";
+import { useTable } from "../lib/data/table";
+import { RowType } from "../lib/types";
 
-const colHelper = createColumnHelper<Record<string, any>>();
+const colHelper = createColumnHelper<RowType>();
 
-function ColumnMenuItem({
-  column,
-}: {
-  column: Column<Record<string, any>, unknown>;
-}) {
+function ColumnMenuItem({ column }: { column: Column<RowType, unknown> }) {
   const name = (column.columnDef.meta as any)?.name;
   if (!name) return null;
   return (
@@ -63,10 +61,7 @@ export default function DatasetTableDetails() {
   const params = useParams();
   const datasetId = params.id;
   const tableId = params.table_id;
-  const { data, error, isLoading } = trpc.tablesPageLoader.useQuery({
-    datasetId,
-    tableId,
-  });
+  const { data, error, isLoading } = useTable(datasetId, tableId);
   const dataset = data?.dataset,
     rows = data?.rows,
     dbTable = data?.table;
@@ -99,7 +94,11 @@ export default function DatasetTableDetails() {
       Object.keys(row.data).forEach((key) => columnsSet.add(key)),
     );
     const cols = [...columnsSet].map((col) =>
-      colHelper.accessor<`data.${string}`, { name: string }>(`data.${col}`, {
+      colHelper.accessor<
+        (originalRow: RowType, index: number) => any,
+        { name: string }
+      >((k, i) => k.data[col] ?? null, {
+        id: col,
         meta: {
           name: col,
         },

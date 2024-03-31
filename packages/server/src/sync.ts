@@ -147,43 +147,53 @@ export async function syncTable(
   dataset: Dataset,
   table: IntegrationTable & { id: string },
 ) {
-  if (!table.get) {
-    return;
-  }
-
-  // Call fetch on each table
-  const data = await table.get(dataset, db);
-
-  // Save the rows on the DB
-  if (!Array.isArray(data)) {
-    console.error("Data is not an array");
-    return;
-  }
-
-  // Upsert table
-  let [dbTable] = await db
-    .insert(tablesTable)
-    .values({ datasetId: dataset.id, name: table.name, key: table.id })
-    .onConflictDoUpdate({
-      target: [tablesTable.datasetId, tablesTable.key],
-      set: { name: table.name },
-    })
-    .returning();
-
-  if (!table.rowId || !dbTable) {
-    console.log("Find the id", data[0]);
-    return;
-  }
-
-  let updated = 0;
-
-  for (let rowData of data) {
-    const id = table.rowId(dataset, rowData);
-
-    const result = await updateRow(db, rowData, id, dbTable.id);
-    if (result) {
-      updated++;
+  try {
+    if (!table.get) {
+      return;
     }
+
+    // Call fetch on each table
+    const data = await table.get(dataset, db);
+
+    // Save the rows on the DB
+    if (!Array.isArray(data)) {
+      console.error("Data is not an array");
+      return;
+    }
+
+    // Upsert table
+    let [dbTable] = await db
+      .insert(tablesTable)
+      .values({ datasetId: dataset.id, name: table.name, key: table.id })
+      .onConflictDoUpdate({
+        target: [tablesTable.datasetId, tablesTable.key],
+        set: { name: table.name },
+      })
+      .returning();
+
+    if (!table.rowId || !dbTable) {
+      console.log("Find the id", data[0]);
+      return;
+    }
+
+    let updated = 0;
+
+    for (let rowData of data) {
+      const id = table.rowId(dataset, rowData);
+
+      const result = await updateRow(db, rowData, id, dbTable.id);
+      if (result) {
+        updated++;
+      }
+    }
+
+    await writeOperation({
+      type: "table",
+      datasetId: dataset.id,
+      tableId: table.id,
+    });
+  } catch (e) {
+    console.error(e);
   }
 }
 

@@ -26,6 +26,7 @@ const cookieSettings: CookieSerializeOptions = {
   //       localhost or or over a home network
   // TODO: overwrite `secure` when using https.
   secure: false,
+  path: "/",
 };
 
 // NOTE: Prefer using `getSessionFromCookies`. This function doesn't create a new session
