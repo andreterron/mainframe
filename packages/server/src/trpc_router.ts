@@ -466,8 +466,22 @@ export const appRouter = router({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
       const [row] = await ctx.db
-        .select({ data: rowsTable.data })
+        .select({
+          data: rowsTable.data,
+          table: {
+            id: tablesTable.id,
+            name: tablesTable.name,
+            key: tablesTable.key,
+          },
+          dataset: {
+            id: datasetsTable.id,
+            name: datasetsTable.name,
+            integrationType: datasetsTable.integrationType,
+          },
+        })
         .from(rowsTable)
+        .innerJoin(tablesTable, eq(tablesTable.id, rowsTable.tableId))
+        .innerJoin(datasetsTable, eq(datasetsTable.id, tablesTable.datasetId))
         .where(eq(rowsTable.id, rowId))
         .limit(1);
       if (!row) {
