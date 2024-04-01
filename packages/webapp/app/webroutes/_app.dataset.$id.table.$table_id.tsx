@@ -10,7 +10,13 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { ColumnMenu } from "../components/ColumnMenu";
-import { Code2Icon, EyeIcon, EyeOffIcon, MoreVerticalIcon } from "lucide-react";
+import {
+  EyeIcon,
+  EyeOffIcon,
+  GlobeIcon,
+  MoreVerticalIcon,
+  SheetIcon,
+} from "lucide-react";
 import { Button, buttonVariants } from "../components/ui/button";
 import {
   Popover,
@@ -22,17 +28,22 @@ import { Label } from "../components/ui/label";
 import { cn } from "../lib/utils";
 import { trpc } from "../lib/trpc_client";
 import { SadPath } from "../components/SadPath";
-import { ApiHelper } from "../components/ApiHelper";
 import { useTable } from "../lib/data/table";
 import { RowType } from "../lib/types";
 import { PageHeader } from "../components/PageHeader";
 import { DatasetBreadcrumb } from "../components/DatasetHeader.DatasetBreadcrumb";
 import {
   BreadcrumbItem,
-  BreadcrumbLink,
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "../components/ui/breadcrumb";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
+import { ApiRequestTab } from "../components/ApiRequestTab";
 
 const colHelper = createColumnHelper<RowType>();
 
@@ -182,7 +193,7 @@ export default function DatasetTableDetails() {
 
   return (
     <div className="flex flex-col relative max-h-screen overflow-y-auto">
-      <div className="flex flex-col gap-8 items-start">
+      <div className="flex flex-col items-start">
         <PageHeader
           title={dbTable.name}
           breadcrumb={
@@ -194,11 +205,6 @@ export default function DatasetTableDetails() {
             </DatasetBreadcrumb>
           }
         >
-          <ApiHelper apiPath={`table/${dbTable.id}/rows`}>
-            <Button variant="ghost" size="icon" title="Code">
-              <Code2Icon className="h-4 w-4" />
-            </Button>
-          </ApiHelper>
           <Popover>
             <PopoverTrigger
               title="More"
@@ -247,62 +253,78 @@ export default function DatasetTableDetails() {
                         </DropdownMenuContent>
                     </DropdownMenu> */}
         </PageHeader>
-        <div></div>
-        <div className="max-w-full overflow-auto">
-          {rows.length === 0 ? (
-            <span className="text-gray-500 mx-4">(Empty table)</span>
-          ) : (
-            <table className="text-sm text-left text-gray-500 dark:text-gray-400 border-separate border-spacing-0 border-t">
-              <thead className="text-sm text-gray-700 font-mono">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id} className="">
-                    {headerGroup.headers.map((header) => (
-                      <th
-                        key={header.id}
-                        scope="col"
-                        className="group box-border border-b bg-gray-50 dark:bg-gray-700 dark:text-gray-400 px-6 py-3 sticky top-0"
-                      >
-                        <span className="flex items-center">
-                          <span className="flex-grow overflow-hidden text-ellipsis">
-                            {header.isPlaceholder
-                              ? null
-                              : flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                )}
-                          </span>
-                          {header.column.id !== "_open" ? (
-                            <ColumnMenu header={header} />
-                          ) : null}
-                        </span>
-                      </th>
+        <Tabs defaultValue="table">
+          <TabsList className="w-96 grid grid-cols-2 m-4">
+            <TabsTrigger value="table">
+              <SheetIcon className="w-3.5 h-3.5 mr-1" />
+              Table
+            </TabsTrigger>
+            <TabsTrigger value="http">
+              <GlobeIcon className="w-3.5 h-3.5 mr-1" />
+              HTTP
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="table">
+            <div className="max-w-full overflow-auto">
+              {rows.length === 0 ? (
+                <span className="text-gray-500 mx-4">(Empty table)</span>
+              ) : (
+                <table className="text-sm text-left text-gray-500 dark:text-gray-400 border-separate border-spacing-0 border-t">
+                  <thead className="text-sm text-gray-700 font-mono">
+                    {table.getHeaderGroups().map((headerGroup) => (
+                      <tr key={headerGroup.id} className="">
+                        {headerGroup.headers.map((header) => (
+                          <th
+                            key={header.id}
+                            scope="col"
+                            className="group box-border border-b bg-gray-50 dark:bg-gray-700 dark:text-gray-400 px-6 py-3 sticky top-0"
+                          >
+                            <span className="flex items-center">
+                              <span className="flex-grow overflow-hidden text-ellipsis">
+                                {header.isPlaceholder
+                                  ? null
+                                  : flexRender(
+                                      header.column.columnDef.header,
+                                      header.getContext(),
+                                    )}
+                              </span>
+                              {header.column.id !== "_open" ? (
+                                <ColumnMenu header={header} />
+                              ) : null}
+                            </span>
+                          </th>
+                        ))}
+                      </tr>
                     ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody>
-                {table.getRowModel().rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="bg-white dark:bg-gray-800 dark:border-gray-700"
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <td
-                        key={cell.id}
-                        className="px-6 py-4 border-b font-mono whitespace-nowrap"
+                  </thead>
+                  <tbody>
+                    {table.getRowModel().rows.map((row) => (
+                      <tr
+                        key={row.id}
+                        className="bg-white dark:bg-gray-800 dark:border-gray-700"
                       >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext(),
-                        )}
-                      </td>
+                        {row.getVisibleCells().map((cell) => (
+                          <td
+                            key={cell.id}
+                            className="px-6 py-4 border-b font-mono whitespace-nowrap"
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </td>
+                        ))}
+                      </tr>
                     ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </TabsContent>
+          <TabsContent value="http" className="p-4">
+            <ApiRequestTab apiPath={`table/${dbTable.id}/rows`} />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
