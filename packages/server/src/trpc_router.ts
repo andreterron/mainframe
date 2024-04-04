@@ -40,12 +40,22 @@ import { oura } from "./lib/integrations/oura";
 import { env } from "./lib/env.server";
 import { nango } from "./lib/nango";
 import { integrations } from "googleapis/build/src/apis/integrations";
+import * as Sentry from "@sentry/node";
 
 /**
  * Initialization of tRPC backend
  * Should be done only once per backend!
  */
 const t = initTRPC.context<Context>().create();
+
+// const t = initTRPC.context().create();
+const sentryMiddleware = t.middleware(
+  Sentry.Handlers.trpcMiddleware({
+    // attachRpcInput: true, // defaults to false
+  }),
+);
+
+const procedure = t.procedure.use(sentryMiddleware);
 
 const router = t.router;
 
@@ -87,14 +97,14 @@ const isAuthed = t.middleware(async (opts) => {
   });
 });
 
-export const protectedProcedure = t.procedure.use(isAuthed);
+export const protectedProcedure = procedure.use(isAuthed);
 
 /**
  * Export reusable router and procedure helpers
  * that can be used throughout the router
  */
 export const appRouter = router({
-  authEnabled: t.procedure.query(async ({}) => {
+  authEnabled: procedure.query(async ({}) => {
     return {
       pass: { enabled: env.VITE_AUTH_PASS },
       link:
@@ -109,7 +119,7 @@ export const appRouter = router({
   }),
 
   // Auth
-  authInfo: t.procedure.query(async ({ ctx }) => {
+  authInfo: procedure.query(async ({ ctx }) => {
     const hasUsers = env.VITE_AUTH_PASS
       ? await checkIfUserExists(ctx.db)
       : false;
@@ -123,7 +133,7 @@ export const appRouter = router({
       isLoggedIn,
     };
   }),
-  login: t.procedure
+  login: procedure
     .input(
       z.object({
         username: z.string().nonempty(),
@@ -161,7 +171,7 @@ export const appRouter = router({
         redirect: "/",
       };
     }),
-  signup: t.procedure
+  signup: procedure
     .input(
       z.object({
         username: z.string().nonempty(),
@@ -202,7 +212,7 @@ export const appRouter = router({
         redirect: "/",
       };
     }),
-  logout: t.procedure.mutation(async ({ ctx }) => {
+  logout: procedure.mutation(async ({ ctx }) => {
     let hasUsers = false;
 
     if (env.VITE_AUTH_PASS) {
@@ -240,7 +250,7 @@ export const appRouter = router({
     return datasets;
   }),
   datasetsGet: protectedProcedure
-    .input(z.object({ id: z.string().nonempty() }))
+    .input(z.object({ id: z.string().min(1) }))
     .query(async ({ input, ctx }) => {
       const [dataset] = await ctx.db
         .select()
@@ -529,7 +539,7 @@ export const appRouter = router({
   }),
 
   // Integrations
-  integrationsAll: t.procedure.query((): Record<string, ClientIntegration> => {
+  integrationsAll: procedure.query((): Record<string, ClientIntegration> => {
     return {
       google: createClientIntegration(google),
       toggl: createClientIntegration(toggl),
