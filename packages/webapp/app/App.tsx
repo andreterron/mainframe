@@ -3,9 +3,8 @@ import { trpc, useRootQueryClient, useRootTRPCClient } from "./lib/trpc_client";
 import { RouterProvider } from "react-router-dom";
 import { router } from "./router";
 import { OperationsProvider } from "./lib/hooks/use-operations";
-import "./lib/analytics";
 import { PostHogProvider } from "posthog-js/react";
-import posthog from "posthog-js";
+import { posthog } from "./lib/analytics";
 
 function App() {
   const queryClient = useRootQueryClient();

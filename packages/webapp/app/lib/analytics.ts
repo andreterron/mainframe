@@ -3,7 +3,7 @@ import { env } from "./env_client";
 export const posthog = env.VITE_POSTHOG_KEY
   ? (await import("posthog-js")).default.init(env.VITE_POSTHOG_KEY, {
       api_host: "https://app.posthog.com",
-    })
+    }) ?? undefined
   : undefined;
 
 async function initSentry() {
