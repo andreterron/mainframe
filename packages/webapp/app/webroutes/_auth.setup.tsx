@@ -143,24 +143,25 @@ export default function AuthSignup() {
           )}
         </div>
       </form>
-      {/* TODO: Terms of Service and Privacy Policy */}
-      {/* <p className="px-8 text-center text-sm text-muted-foreground">
-        By clicking continue, you agree to our{" "}
-        <Link
-          href="/terms"
-          className="underline underline-offset-4 hover:text-primary"
-        >
-          Terms of Service
-        </Link>{" "}
-        and{" "}
-        <Link
-          href="/privacy"
-          className="underline underline-offset-4 hover:text-primary"
-        >
-          Privacy Policy
-        </Link>
-        .
-      </p> */}
+      {authEnabled?.link.enabled ? (
+        <p className="px-8 text-center text-sm text-muted-foreground">
+          By clicking continue, you agree to our{" "}
+          <a
+            href="https://www.mainframe.so/terms"
+            className="underline hover:text-neutral-900"
+          >
+            Terms of Service
+          </a>{" "}
+          and{" "}
+          <a
+            href="https://www.mainframe.so/privacy"
+            className="underline hover:text-neutral-900"
+          >
+            Privacy Policy
+          </a>
+          .
+        </p>
+      ) : null}
     </div>
   );
 }
