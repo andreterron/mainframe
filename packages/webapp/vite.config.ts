@@ -12,10 +12,15 @@ export default defineConfig({
     port: 8744,
   },
 
-  plugins: [react(), sentryVitePlugin({
-    org: "mainframe",
-    project: "mainframe-client"
-  })],
+  plugins: [
+    react(),
+    sentryVitePlugin({
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      org: "mainframe",
+      project: "mainframe-client",
+      disable: !!process.env.SENTRY_AUTH_TOKEN,
+    }),
+  ],
 
   resolve: {
     alias: {
@@ -25,6 +30,6 @@ export default defineConfig({
   },
 
   build: {
-    sourcemap: true
-  }
+    sourcemap: true,
+  },
 });
