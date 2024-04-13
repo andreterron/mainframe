@@ -94,7 +94,7 @@ export default function AppPages() {
   }, [loc.pathname]);
 
   return (
-    <div>
+    <>
       <button
         data-drawer-target="default-sidebar"
         data-drawer-toggle="default-sidebar"
@@ -132,6 +132,6 @@ export default function AppPages() {
       <div className="sm:ml-64">
         <Outlet />
       </div>
-    </div>
+    </>
   );
 }

@@ -160,7 +160,16 @@ export function setupServer(hooks: SetupServerHooks = {}) {
 
   app.use(
     "/api",
-    cors({ credentials: true, origin: env.APP_URL }),
+    (req, res, next) => {
+      cors(
+        req.header("Origin") === env.APP_URL
+          ? {
+              credentials: req.header("Origin") === env.APP_URL,
+              origin: env.APP_URL,
+            }
+          : {},
+      )(req, res, next);
+    },
     buildApiRouter(hooks),
   );
   app.use("/oauth", oauthRouter);

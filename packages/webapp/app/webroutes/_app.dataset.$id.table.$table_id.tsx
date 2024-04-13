@@ -192,7 +192,7 @@ export default function DatasetTableDetails() {
   }
 
   return (
-    <div className="flex flex-col relative max-h-screen overflow-y-auto">
+    <div className="relative overflow-y-auto">
       <div className="flex flex-col items-start">
         <PageHeader
           title={dbTable.name}

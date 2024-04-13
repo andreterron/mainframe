@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { SadPath } from "../components/SadPath";
-import { BracesIcon, GlobeIcon } from "lucide-react";
+import { BracesIcon, GlobeIcon, PlayIcon } from "lucide-react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import codeStyleLight from "react-syntax-highlighter/dist/esm/styles/hljs/docco";
 import { useObject } from "../lib/data/object";
@@ -18,6 +18,7 @@ import {
   TabsTrigger,
 } from "../components/ui/tabs";
 import { ApiRequestTab } from "../components/ApiRequestTab";
+import { SandpackPlaygroundTab } from "../components/SandpackPlaygroundTab";
 
 export default function DatasetObjectDetails() {
   const { id: datasetId, object_id: objectId } = useParams();
@@ -37,7 +38,7 @@ export default function DatasetObjectDetails() {
   const { dataset, object: objectData } = data;
 
   return (
-    <div className="flex flex-col relative max-h-screen overflow-y-auto">
+    <div className="relative overflow-y-auto">
       <div className="flex flex-col items-start">
         <PageHeader
           title={objectData.name}
@@ -50,9 +51,9 @@ export default function DatasetObjectDetails() {
             </DatasetBreadcrumb>
           }
         />
-        <div className="">
-          <Tabs defaultValue="json">
-            <TabsList className="w-96 grid grid-cols-2 m-4">
+        <div className="w-full">
+          <Tabs defaultValue="json" className="flex flex-col w-full">
+            <TabsList className="grid grid-cols-3 m-4 self-start">
               <TabsTrigger value="json">
                 <BracesIcon className="w-3.5 h-3.5 mr-1" />
                 JSON
@@ -60,6 +61,10 @@ export default function DatasetObjectDetails() {
               <TabsTrigger value="http">
                 <GlobeIcon className="w-3.5 h-3.5 mr-1" />
                 HTTP
+              </TabsTrigger>
+              <TabsTrigger value="playground">
+                <PlayIcon className="w-3.5 h-3.5 mr-1" />
+                Playground
               </TabsTrigger>
             </TabsList>
             <TabsContent value="json">
@@ -78,6 +83,12 @@ export default function DatasetObjectDetails() {
             <TabsContent value="http" className="p-4">
               <ApiRequestTab
                 apiPath={`object/${dataset.id}/${objectData.objectType}`}
+              />
+            </TabsContent>
+            <TabsContent value="playground" className="p-4">
+              <SandpackPlaygroundTab
+                datasetId={data.dataset.id}
+                objectType={data.object.objectType}
               />
             </TabsContent>
           </Tabs>
