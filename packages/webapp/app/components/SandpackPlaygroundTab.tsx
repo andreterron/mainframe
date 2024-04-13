@@ -1,15 +1,11 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import {
   Sandpack,
   SandpackFiles,
   SandpackProvider,
-  useSandpack,
 } from "@codesandbox/sandpack-react";
 import { env } from "../lib/env_client";
 import { trpc } from "../lib/trpc_client";
-// TODO: Move to use npm's package
-import mainframeReactRaw from "../../../react/dist/index?raw";
-import mainframeReactPackageJsonRaw from "../../../react/package.json";
 
 // TODO: Typescript https://codesandbox.io/p/sandbox/github/danilowoz/sandpack-tsserver/tree/main/?file=/src/sandpack-components/codemirror-extensions.ts
 
@@ -38,14 +34,15 @@ export function SandpackClient({
   datasetId: string;
   objectType: string;
 }) {
-  const { data: apiKey, isInitialLoading } = trpc.getApiKey.useQuery(
-    undefined,
-    {
-      retry: false,
-    },
-  );
-  const [files] = useState<SandpackFiles>({
-    "App.tsx": `import { useMainframeObject } from "@mainframe-so/react";
+  const { data: apiKey } = trpc.getApiKey.useQuery(undefined, {
+    retry: false,
+  });
+  const files = useMemo<SandpackFiles | undefined>(
+    () =>
+      !apiKey
+        ? undefined
+        : {
+            "App.tsx": `import { useMainframeObject } from "@mainframe-so/react";
 
 // TODO: Get environment variables from your app
 import { env } from "./env.ts";
@@ -63,43 +60,32 @@ export default function App(): JSX.Element {
     <pre>{JSON.stringify(data, null, 4)}</pre>
   </>);
 }`,
-    // TODO: Move secrets to a login
-    "env.ts": {
-      hidden: true,
-      code: envCode(apiKey ?? ""),
-    },
-    "/node_modules/@mainframe-so/react/package.json": {
-      hidden: true,
-      code: JSON.stringify({
-        name: "@design-system",
-        main: "./index.js",
-      }),
-    },
-    "/node_modules/@mainframe-so/react/index.js": {
-      hidden: true,
-      code: mainframeReactRaw,
-    },
-  });
-
-  const { sandpack } = useSandpack();
-
-  useEffect(() => {
-    sandpack.updateFile("env.ts", envCode(apiKey ?? ""));
-  }, [apiKey]);
+            // TODO: Move secrets to a login
+            "env.ts": {
+              hidden: true,
+              code: envCode(apiKey ?? ""),
+            },
+          },
+    [datasetId, objectType, apiKey],
+  );
 
   return (
     <div>
-      <Sandpack
-        customSetup={{
-          dependencies: mainframeReactPackageJsonRaw.dependencies,
-        }}
-        options={{
-          editorHeight: "480px",
-          showTabs: false,
-        }}
-        files={files}
-        template="react-ts"
-      />
+      {files ? (
+        <Sandpack
+          customSetup={{
+            dependencies: {
+              "@mainframe-so/react": "^0.4.9",
+            },
+          }}
+          options={{
+            editorHeight: "480px",
+            showTabs: false,
+          }}
+          files={files}
+          template="react-ts"
+        />
+      ) : null}
     </div>
   );
 }
