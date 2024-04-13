@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@codesandbox/sandpack-react": "^2.13.7",
+    "@mainframe-so/react": "*",
     "@mainframe-so/shared": "*",
     "@nangohq/frontend": "^0.39.13",
     "@radix-ui/react-dialog": "^1.0.5",
