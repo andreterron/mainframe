@@ -19,6 +19,7 @@ import {
 } from "../components/ui/tabs";
 import { ApiRequestTab } from "../components/ApiRequestTab";
 import { SandpackPlaygroundTab } from "../components/SandpackPlaygroundTab";
+import { env } from "../lib/env_client";
 
 export default function DatasetObjectDetails() {
   const { id: datasetId, object_id: objectId } = useParams();
@@ -58,13 +59,13 @@ export default function DatasetObjectDetails() {
                 <BracesIcon className="w-3.5 h-3.5 mr-1" />
                 JSON
               </TabsTrigger>
-              <TabsTrigger value="http">
-                <GlobeIcon className="w-3.5 h-3.5 mr-1" />
-                HTTP
-              </TabsTrigger>
               <TabsTrigger value="playground">
                 <PlayIcon className="w-3.5 h-3.5 mr-1" />
                 Playground
+              </TabsTrigger>
+              <TabsTrigger value="http">
+                <GlobeIcon className="w-3.5 h-3.5 mr-1" />
+                HTTP
               </TabsTrigger>
             </TabsList>
             <TabsContent value="json">
@@ -87,8 +88,24 @@ export default function DatasetObjectDetails() {
             </TabsContent>
             <TabsContent value="playground" className="p-4">
               <SandpackPlaygroundTab
-                datasetId={data.dataset.id}
-                objectType={data.object.objectType}
+                appTsxCode={`import { useMainframeObject } from "@mainframe-so/react";
+
+// TODO: Get environment variables from your app
+import { env } from "./env.ts";
+
+export default function App(): JSX.Element {
+  const { data } = useMainframeObject({
+    datasetId: "${data.dataset.id}",
+    objectType: "${data.object.objectType}",
+    apiUrl: "${env.VITE_API_URL}",
+    apiKey: env.API_KEY
+  });
+
+  return (<>
+    <h1>Hello world!</h1>
+    <pre>{JSON.stringify(data, null, 4)}</pre>
+  </>);
+}`}
               />
             </TabsContent>
           </Tabs>

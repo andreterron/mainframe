@@ -15,6 +15,7 @@ import {
   EyeOffIcon,
   GlobeIcon,
   MoreVerticalIcon,
+  PlayIcon,
   SheetIcon,
 } from "lucide-react";
 import { Button, buttonVariants } from "../components/ui/button";
@@ -44,6 +45,8 @@ import {
   TabsTrigger,
 } from "../components/ui/tabs";
 import { ApiRequestTab } from "../components/ApiRequestTab";
+import { SandpackPlaygroundTab } from "../components/SandpackPlaygroundTab";
+import { env } from "../lib/env_client";
 
 const colHelper = createColumnHelper<RowType>();
 
@@ -253,11 +256,15 @@ export default function DatasetTableDetails() {
                         </DropdownMenuContent>
                     </DropdownMenu> */}
         </PageHeader>
-        <Tabs defaultValue="table">
-          <TabsList className="w-96 grid grid-cols-2 m-4">
+        <Tabs defaultValue="table" className="flex flex-col w-full">
+          <TabsList className="grid grid-cols-3 m-4 self-start">
             <TabsTrigger value="table">
               <SheetIcon className="w-3.5 h-3.5 mr-1" />
               Table
+            </TabsTrigger>
+            <TabsTrigger value="playground">
+              <PlayIcon className="w-3.5 h-3.5 mr-1" />
+              Playground
             </TabsTrigger>
             <TabsTrigger value="http">
               <GlobeIcon className="w-3.5 h-3.5 mr-1" />
@@ -323,6 +330,27 @@ export default function DatasetTableDetails() {
           </TabsContent>
           <TabsContent value="http" className="p-4">
             <ApiRequestTab apiPath={`table/${dbTable.id}/rows`} />
+          </TabsContent>
+          <TabsContent value="playground" className="p-4">
+            <SandpackPlaygroundTab
+              appTsxCode={`import { useMainframeTable } from "@mainframe-so/react";
+
+// TODO: Get environment variables from your app
+import { env } from "./env.ts";
+
+export default function App(): JSX.Element {
+  const { data } = useMainframeTable({
+    tableId: "${dbTable.id}",
+    apiUrl: "${env.VITE_API_URL}",
+    apiKey: env.API_KEY
+  });
+
+  return (<>
+    <h1>Hello world!</h1>
+    <pre>{JSON.stringify(data, null, 4)}</pre>
+  </>);
+}`}
+            />
           </TabsContent>
         </Tabs>
       </div>
