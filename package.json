@@ -12,7 +12,7 @@
     "build": "turbo run build",
     "publish-package": "turbo run publish-package",
     "start": "node scripts/generate-env.mjs && npm run db:migrate && npm run dev",
-    "db:migrate": "tsx server/db/migrate-local.ts",
+    "db:migrate": "tsx packages/server/src/db/migrate-local.ts",
     "db:generate": "drizzle-kit generate:sqlite",
     "db:drop": "drizzle-kit drop"
   },
