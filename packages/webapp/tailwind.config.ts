@@ -13,7 +13,7 @@ export default {
     },
     extend: {
       boxShadow: {
-        "0-2": "0 2px 0 0 rgba(156, 163, 175,1)",
+        "0-2": "0 2px 0 0 hsl(var(--primary))",
         "0": "0 0 0 0 rgba(156, 163, 175,1)",
       },
       colors: {
