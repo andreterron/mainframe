@@ -34,7 +34,7 @@ export function SidebarButton({
           className={cn([
             "flex items-center gap-1.5 px-2 py-2 rounded-lg",
             "text-slate-900",
-            "group-hover:bg-sky-300/40",
+            "group-hover:bg-slate-300/40",
             "relative before:border before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:rounded-lg",
             (isActive ? isActive(isNavLinkActive) : isNavLinkActive)
               ? "before:bg-white before:border-slate-900 shadow-0-2 text-black"
@@ -178,8 +178,8 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
             }}
             className={cn([
               "flex w-0 flex-1 items-center gap-1.5 p-2 rounded-lg",
-              "text-slate-600 hover:text-sky-600",
-              "hover:bg-sky-300/40",
+              "text-sm text-slate-500 hover:text-slate-500",
+              "hover:bg-slate-300/40",
             ])}
             disabled={logout.isLoading}
           >
@@ -198,8 +198,8 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
             title="Discord"
             className={cn([
               "flex items-center justify-center gap-1.5 p-2 rounded-lg",
-              "text-slate-600 hover:text-sky-600",
-              "hover:bg-sky-300/40",
+              "text-slate-400 hover:text-slate-900",
+              "",
               "h-10 w-10 text-center",
             ])}
             onClick={() => {}}
