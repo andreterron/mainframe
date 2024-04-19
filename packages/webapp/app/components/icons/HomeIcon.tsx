@@ -80,9 +80,9 @@ export function HomeIcon({ className, ...props }: ComponentProps<"svg">) {
           <linearGradient
             id="paint0_linear_125_498"
             x1="9"
-            y1="0"
+            y1="18"
             x2="9"
-            y2="18"
+            y2="0"
             gradientUnits="userSpaceOnUse"
           >
             <stop stop-color="#E0F2FE" />
