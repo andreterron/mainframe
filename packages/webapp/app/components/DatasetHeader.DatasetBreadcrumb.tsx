@@ -25,7 +25,7 @@ export function DatasetBreadcrumb({
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink to="/">
-            <HomeIcon className="w-4 h-4" />
+            <HomeIcon className="w-5 h-5" />
           </BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbSeparator />
