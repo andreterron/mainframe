@@ -108,12 +108,12 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
     <aside
       id="default-sidebar"
       className={cn([
-        "fixed top-0 left-0 z-40 w-64 h-screen transition-transform sm:translate-x-0 border-r-2 border-gray-400",
+        "fixed top-0 left-0 z-40 w-64 h-screen transition-transform sm:translate-x-0",
         sidebarOpen ? "" : "-translate-x-full",
       ])}
       aria-label="Sidebar"
     >
-      <div className="h-full flex flex-col px-3 py-4 overflow-y-auto bg-gradient-to-b from-sky-100 to-sky-200">
+      <div className="h-full flex flex-col px-3 py-4 overflow-y-auto bg-gradient-to-b from-sky-50 to-emerald-50">
         <Link
           to="/"
           className="grow-0 shrink-0 mb-2 self-start border-b-2 pb-1 px-1 mx-1.5 pt-1.5 w-auto inline-block transition-colors duration-200 border-gray-400 hover:border-amber-400 dark:border-gray-700 hover:dark:border-amber-700"
