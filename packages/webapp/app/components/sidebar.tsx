@@ -32,17 +32,17 @@ export function SidebarButton({
       {({ isActive: isNavLinkActive }) => (
         <span
           className={cn([
-            "flex items-center gap-1.5 px-2 py-1.5 rounded-lg",
+            "flex items-center gap-1.5 px-2 py-2 rounded-lg",
             "text-slate-900",
-            "group-hover:bg-sky-300/40",
+            "group-hover:bg-slate-300/40",
             "relative before:border before:absolute before:top-0 before:left-0 before:right-0 before:bottom-0 before:rounded-lg",
             (isActive ? isActive(isNavLinkActive) : isNavLinkActive)
-              ? "before:bg-white before:border-gray-400 shadow-0-2 text-black"
+              ? "before:bg-white before:border-slate-900 shadow-0-2 text-black"
               : "before:bg-transparent before:border-transparent shadow-0 text-black/60",
           ])}
         >
           {icon}
-          <span className="relative whitespace-nowrap overflow-hidden text-ellipsis">
+          <span className="relative whitespace-nowrap overflow-hidden text-ellipsis text-sm">
             {name({ isActive: isNavLinkActive })}
           </span>
         </span>
@@ -108,21 +108,21 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
     <aside
       id="default-sidebar"
       className={cn([
-        "fixed top-0 left-0 z-40 w-64 h-screen transition-transform sm:translate-x-0 border-r-2 border-gray-400",
+        "fixed top-0 left-0 z-40 w-64 h-screen transition-transform sm:translate-x-0",
         sidebarOpen ? "" : "-translate-x-full",
       ])}
       aria-label="Sidebar"
     >
-      <div className="h-full flex flex-col px-3 py-4 overflow-y-auto bg-gradient-to-b from-sky-100 to-sky-200">
+      <div className="h-full flex flex-col px-3 py-4 overflow-y-auto bg-gradient-to-b from-sky-50 to-emerald-50">
         <Link
           to="/"
-          className="grow-0 shrink-0 mb-2 self-start border-b-2 pb-1 px-1 mx-1.5 pt-1.5 w-auto inline-block transition-colors duration-200 border-gray-400 hover:border-amber-400 dark:border-gray-700 hover:dark:border-amber-700"
+          className="grow-0 shrink-0 mb-2 self-start pb-1 px-1 mx-1.5 pt-1.5 w-auto inline-block transition-colors duration-200 border-gray-400 hover:border-amber-400 dark:border-gray-700 hover:dark:border-amber-700"
         >
           <svg
             viewBox="0 0 342 50"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="h-[24px]"
+            className="h-[18px]"
           >
             <title>Mainframe</title>
             <path
@@ -131,7 +131,7 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
             />
           </svg>
         </Link>
-        <section className="pt-2">
+        <section className="pt-8">
           <SidebarButton
             href="/new"
             isActive={(isActive) => isActive || !!isIndexPath}
@@ -178,8 +178,8 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
             }}
             className={cn([
               "flex w-0 flex-1 items-center gap-1.5 p-2 rounded-lg",
-              "text-slate-600 hover:text-sky-600",
-              "hover:bg-sky-300/40",
+              "text-sm text-slate-500 hover:text-slate-500",
+              "hover:bg-slate-300/40",
             ])}
             disabled={logout.isLoading}
           >
@@ -198,8 +198,8 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
             title="Discord"
             className={cn([
               "flex items-center justify-center gap-1.5 p-2 rounded-lg",
-              "text-slate-600 hover:text-sky-600",
-              "hover:bg-sky-300/40",
+              "text-slate-400 hover:text-slate-900",
+              "",
               "h-10 w-10 text-center",
             ])}
             onClick={() => {}}
