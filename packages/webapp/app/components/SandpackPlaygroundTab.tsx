@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 import {
   Sandpack,
   SandpackFiles,
@@ -17,13 +17,17 @@ function envCode(apiKey: string) {
   return `export const env = ${JSON.stringify({ API_KEY: apiKey })}`;
 }
 
-export function SandpackPlaygroundTab({ appTsxCode }: { appTsxCode: string }) {
+export const SandpackPlaygroundTab = memo(function ({
+  appTsxCode,
+}: {
+  appTsxCode: string;
+}) {
   return (
     <SandpackProvider template="react-ts">
       <SandpackClient appTsxCode={appTsxCode} />
     </SandpackProvider>
   );
-}
+});
 
 export function SandpackClient({ appTsxCode }: { appTsxCode: string }) {
   const { data: apiKey } = trpc.getApiKey.useQuery(undefined, {
