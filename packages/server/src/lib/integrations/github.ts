@@ -29,12 +29,15 @@ export const github: Integration = {
       name: "Repos",
       get: async (dataset: Dataset) => {
         if (!dataset.credentials?.token) return [];
-        const res = await fetch(`https://api.github.com/user/repos`, {
-          headers: {
-            Authorization: `Bearer ${dataset.credentials.token}`,
-            "X-GitHub-Api-Version": "2022-11-28",
+        const res = await fetch(
+          `https://api.github.com/user/repos?per_page=100`,
+          {
+            headers: {
+              Authorization: `Bearer ${dataset.credentials.token}`,
+              "X-GitHub-Api-Version": "2022-11-28",
+            },
           },
-        });
+        );
         return res.json();
       },
       rowId(dataset, row) {
