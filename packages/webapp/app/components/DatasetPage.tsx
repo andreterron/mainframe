@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Dataset, ClientIntegration } from "@mainframe-so/shared";
 import { DatasetHeader } from "./DatasetHeader";
+import { getDatasetCredentialsKeys } from "../lib/data/credentials";
 
 export function DatasetPage({
   dataset,
@@ -15,6 +16,30 @@ export function DatasetPage({
     <div className="flex flex-col gap-8 items-start">
       <DatasetHeader dataset={dataset}>{dataset.name}</DatasetHeader>
       <div className="flex flex-col gap-1 p-4">
+        {getDatasetCredentialsKeys(dataset.credentials).length > 0 ? (
+          <Link
+            to={`/dataset/${dataset.id}/credentials`}
+            className="flex items-center gap-3 cursor-pointer select-none text-gray-900 bg-white focus:outline-none hover:bg-gray-100 active:bg-gray-200 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg px-4 py-2 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              className="humbleicons hi-document flex-grow-0 flex-shrink-0 w-5 h-5"
+            >
+              <path
+                xmlns="http://www.w3.org/2000/svg"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 14v2m-4-6V8a4 4 0 118 0v2m-9 9h10a1 1 0 001-1v-7a1 1 0 00-1-1H7a1 1 0 00-1 1v7a1 1 0 001 1z"
+              />
+            </svg>
+            <span>Credentials</span>
+          </Link>
+        ) : null}
         {objects.map((obj) => (
           <Link
             to={`/dataset/${dataset.id}/object/${obj.id}`}

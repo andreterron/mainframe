@@ -1,13 +1,13 @@
 {
   "include": ["app/**/*.ts", "app/**/*.tsx", "server/**/*.ts"],
   "compilerOptions": {
-    "lib": ["DOM", "DOM.Iterable", "ES2020"],
+    "lib": ["DOM", "DOM.Iterable", "ES2021"],
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "target": "ES2020",
+    "target": "ES2021",
     "strict": true,
     "allowJs": true,
     "module": "ESNext",

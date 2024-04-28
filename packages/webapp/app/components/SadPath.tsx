@@ -8,12 +8,12 @@ export function SadPath({
   isLoading = false,
 }: {
   className?: string | undefined;
-  error?: TRPCClientErrorLike<AppRouter> | undefined;
+  error?: TRPCClientErrorLike<AppRouter> | undefined | null;
   isLoading?: boolean;
 }) {
   return (
     <div className={className}>
-      {isTrpcNotFoundError(error) ? (
+      {isTrpcNotFoundError(error ?? undefined) ? (
         <span>Not Found</span>
       ) : isLoading ? (
         <span className="animate-loading-fade-in">Loading...</span>
