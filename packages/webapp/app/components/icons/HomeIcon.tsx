@@ -50,9 +50,9 @@ export function HomeIcon({ className, ...props }: ComponentProps<"svg">) {
             width="10.5"
             height="8.5"
             filterUnits="userSpaceOnUse"
-            color-interpolation-filters="sRGB"
+            colorInterpolationFilters="sRGB"
           >
-            <feFlood flood-opacity="0" result="BackgroundImageFix" />
+            <feFlood floodOpacity="0" result="BackgroundImageFix" />
             <feColorMatrix
               in="SourceAlpha"
               type="matrix"
@@ -85,8 +85,8 @@ export function HomeIcon({ className, ...props }: ComponentProps<"svg">) {
             y2="0"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stop-color="#E0F2FE" />
-            <stop offset="1" stop-color="#D1FAE5" />
+            <stop stopColor="#E0F2FE" />
+            <stop offset="1" stopColor="#D1FAE5" />
           </linearGradient>
         </defs>
       </svg>
