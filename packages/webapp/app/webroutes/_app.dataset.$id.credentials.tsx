@@ -1,6 +1,12 @@
 import { useParams } from "react-router-dom";
 import { SadPath } from "../components/SadPath";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
+import {
+  EyeIcon,
+  EyeOffIcon,
+  LockIcon,
+  GlobeIcon,
+  PlayIcon,
+} from "lucide-react";
 import { PageHeader } from "../components/PageHeader";
 import { DatasetBreadcrumb } from "../components/DatasetHeader.DatasetBreadcrumb";
 import {
@@ -14,6 +20,15 @@ import { Label } from "../components/ui/label";
 import { Button } from "../components/ui/button";
 import { useState } from "react";
 import { getDatasetCredentialsKeys } from "../lib/data/credentials";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
+import { ApiRequestTab } from "../components/ApiRequestTab";
+import { SandpackPlaygroundTab } from "../components/SandpackPlaygroundTab";
+import { env } from "../lib/env_client";
 
 export function formatCredentialKey(str: string): string {
   return str
@@ -96,21 +111,68 @@ export default function DatasetCredentials() {
             </DatasetBreadcrumb>
           }
         />
-        <div className="w-full max-w-xl px-4 pb-4">
-          {/* TODO: For nango, add a button to get the latest access token */}
-          {getDatasetCredentialsKeys(dataset.credentials).map((key) => (
-            <div className="w-full">
-              <Label htmlFor={key}>{formatCredentialKey(key)}</Label>
-              <HiddenReadonlyInput
-                id={key}
-                value={
-                  dataset.credentials?.[
-                    key as keyof typeof dataset.credentials
-                  ] ?? ""
-                }
+        <div className="w-full">
+          <Tabs defaultValue="credentials" className="flex flex-col w-full">
+            <TabsList className="grid grid-cols-3 m-4 self-start">
+              <TabsTrigger value="credentials">
+                <LockIcon className="w-3.5 h-3.5 mr-1" />
+                Credentials
+              </TabsTrigger>
+              <TabsTrigger value="playground">
+                <PlayIcon className="w-3.5 h-3.5 mr-1" />
+                Playground
+              </TabsTrigger>
+              <TabsTrigger value="http">
+                <GlobeIcon className="w-3.5 h-3.5 mr-1" />
+                HTTP
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="credentials">
+              <div className="w-full max-w-xl px-4 pb-4">
+                {getDatasetCredentialsKeys(dataset.credentials).map((key) => (
+                  <div className="w-full">
+                    <Label htmlFor={key}>{formatCredentialKey(key)}</Label>
+                    <HiddenReadonlyInput
+                      id={key}
+                      value={
+                        dataset.credentials?.[
+                          key as keyof typeof dataset.credentials
+                        ] ?? ""
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
+            <TabsContent value="http" className="p-4">
+              <ApiRequestTab apiPath={`credentials/${dataset.id}`} />
+            </TabsContent>
+            <TabsContent value="playground" className="p-4">
+              <SandpackPlaygroundTab
+                appTsxCode={`import { useMainframeCredentials } from "@mainframe-so/react";
+
+// TODO: Get environment variables from your app
+import { env } from "./env.ts";
+
+export default function App(): JSX.Element {
+  const { data } = useMainframeCredentials({
+    datasetId: "${dataset.id}",
+    apiUrl: "${env.VITE_API_URL}",
+    apiKey: env.API_KEY,
+    args: []
+  }, async (creds) => {
+    // Use credentials to do something here
+    return null;
+  });
+
+  return (<>
+    <h1>Hello world!</h1>
+    <pre>{JSON.stringify(data, null, 4)}</pre>
+  </>);
+}`}
               />
-            </div>
-          ))}
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

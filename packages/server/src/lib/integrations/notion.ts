@@ -1,21 +1,5 @@
-import { AuthModes } from "@nangohq/node";
+import { getTokenFromDataset } from "../integration-token";
 import { Integration } from "../integration-types";
-import { nango } from "../nango";
-import { Dataset } from "@mainframe-so/shared";
-
-async function getTokenFromDataset(dataset: Dataset) {
-  if (dataset.credentials?.nangoIntegrationId) {
-    const connection = await nango?.getConnection(
-      dataset.credentials?.nangoIntegrationId,
-      dataset.id,
-      false,
-    );
-    if (connection?.credentials.type === AuthModes.OAuth2) {
-      return connection.credentials.access_token;
-    }
-  }
-  return dataset.credentials?.token;
-}
 
 export const notion: Integration = {
   name: "Notion",

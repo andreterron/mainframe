@@ -63,3 +63,40 @@ export function useMainframeObject<T = any>({
   );
   return { data: data?.data, ...props };
 }
+
+export type CredentialsObject = { token: string };
+
+export function useMainframeCredentials<ARGS extends any[] = [], T = any>(
+  {
+    datasetId,
+    args = [] as any[] as ARGS,
+    apiUrl = "https://api.mainframe.so",
+    apiKey,
+  }: {
+    datasetId: string;
+    args?: ARGS;
+    apiUrl?: string;
+    apiKey: string;
+  },
+  callback: (creds: CredentialsObject, ...args: ARGS) => Promise<T> | T,
+) {
+  const { data, ...props } = useSWR(
+    apiKey
+      ? {
+          kind: "mainframe",
+          url: `${apiUrl}/api/credentials/${datasetId}`,
+          apiKey,
+        }
+      : null,
+    async ({ url, apiKey }) => {
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+        },
+      });
+      const creds = (await res.json()) as CredentialsObject;
+      return await callback(creds, ...args);
+    },
+  );
+  return { data, ...props };
+}

@@ -16,6 +16,7 @@ import { getIntegrationFromType } from "./lib/integrations";
 import bodyParser from "body-parser";
 import { env } from "./lib/env.server";
 import express from "express";
+import { getTokenFromDataset } from "./lib/integration-token";
 
 export interface ApiRouterHooks {
   getUserIdFromBearerToken?(
@@ -74,6 +75,20 @@ export function buildApiRouter(hooks: ApiRouterHooks) {
 
     res.contentType("application/json");
     res.send(JSON.stringify(rows.map(deserializeData)));
+  });
+
+  apiRouter.get("/credentials/:dataset_id", async (req, res) => {
+    // Get the dataset info
+    const [dataset] = await req.db
+      .select()
+      .from(datasetsTable)
+      .where(eq(datasetsTable.id, req.params.dataset_id))
+      .limit(1);
+
+    const token = await getTokenFromDataset(dataset);
+
+    res.contentType("application/json");
+    res.send(JSON.stringify({ token }));
   });
 
   apiRouter.get("/object/:dataset_id/:object_type", async (req, res) => {
