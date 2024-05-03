@@ -1,7 +1,9 @@
+import { Component, SheetIcon } from "lucide-react";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 import { trpc } from "../lib/trpc_client";
 import { PageHeader } from "./PageHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import TemplateCard from "./TemplateCard";
 
 function IntegrationButton({
   name,
@@ -50,24 +52,46 @@ export default function DatasetSetup({
   onIntegrationSelected: (type: string) => void;
 }) {
   const { data: integrations } = trpc.integrationsAll.useQuery();
+  console.log(integrations);
   return (
     <div className="flex flex-col items-start gap-4">
       <PageHeader title="New Dataset" />
       <Tabs defaultValue="components" className="flex flex-col w-full">
         <TabsList className="grid grid-cols-2 m-4 self-start">
           <TabsTrigger value="components">
-            {/* <SheetIcon className="w-3.5 h-3.5 mr-1" /> */}
+            <Component className="w-3.5 h-3.5 mr-1" />
             Components
           </TabsTrigger>
           <TabsTrigger value="dataset">
-            {/* <PlayIcon className="w-3.5 h-3.5 mr-1" /> */}
+            <SheetIcon className="w-3.5 h-3.5 mr-1" />
             Dataset
           </TabsTrigger>
         </TabsList>
         <TabsContent value="components">
-          <div className="max-w-full overflow-auto">Hello</div>
+          <div className="flex flex-wrap max-w-full overflow-auto px-4 gap-6 mt-8">
+            <TemplateCard
+              title="Dev Activity Chart"
+              description="A chart visualizing team or repo activity."
+              imgSrc="https://ouch-cdn2.icons8.com/DlrLzA4-weIluOT-U-Zsvtia_P6Tr61Cf5eWT9rcWEA/rs:fit:368:534/czM6Ly9pY29uczgu/b3VjaC1wcm9kLmFz/c2V0cy9wbmcvODYz/L2Q2OTdhNDA0LTRl/YWYtNGIxYS04OGE0/LTI5ZGM5NmE4ZjFj/Ni5wbmc.png"
+            />
+            <TemplateCard
+              title="Dev Activity Chart"
+              description="A chart visualizing team or repo activity."
+              imgSrc="https://ouch-cdn2.icons8.com/DlrLzA4-weIluOT-U-Zsvtia_P6Tr61Cf5eWT9rcWEA/rs:fit:368:534/czM6Ly9pY29uczgu/b3VjaC1wcm9kLmFz/c2V0cy9wbmcvODYz/L2Q2OTdhNDA0LTRl/YWYtNGIxYS04OGE0/LTI5ZGM5NmE4ZjFj/Ni5wbmc.png"
+            />
+            <TemplateCard
+              title="Dev Activity Chart"
+              description="A chart visualizing team or repo activity."
+              imgSrc="https://ouch-cdn2.icons8.com/DlrLzA4-weIluOT-U-Zsvtia_P6Tr61Cf5eWT9rcWEA/rs:fit:368:534/czM6Ly9pY29uczgu/b3VjaC1wcm9kLmFz/c2V0cy9wbmcvODYz/L2Q2OTdhNDA0LTRl/YWYtNGIxYS04OGE0/LTI5ZGM5NmE4ZjFj/Ni5wbmc.png"
+            />
+            <TemplateCard
+              title="Dev Activity Chart"
+              description="A chart visualizing team or repo activity."
+              imgSrc="https://ouch-cdn2.icons8.com/DlrLzA4-weIluOT-U-Zsvtia_P6Tr61Cf5eWT9rcWEA/rs:fit:368:534/czM6Ly9pY29uczgu/b3VjaC1wcm9kLmFz/c2V0cy9wbmcvODYz/L2Q2OTdhNDA0LTRl/YWYtNGIxYS04OGE0/LTI5ZGM5NmE4ZjFj/Ni5wbmc.png"
+            />
+          </div>
         </TabsContent>
-        <TabsContent value="dataset" className="p-4">
+        <TabsContent value="dataset">
           <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
             {(integrations ? Object.entries(integrations) : []).map(
               ([key, { name }]) => (
