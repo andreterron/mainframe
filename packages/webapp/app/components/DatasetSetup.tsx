@@ -68,25 +68,25 @@ export default function DatasetSetup({
           </TabsTrigger>
         </TabsList>
         <TabsContent value="components">
-          <div className="flex flex-wrap max-w-full overflow-auto px-4 gap-6 mt-8">
+          <div className="flex flex-wrap max-w-full overflow-auto px-4 gap-6 mt-4">
             <TemplateCard
-              title="Dev Activity Chart"
+              title="Repo Activity"
               description="A chart visualizing team or repo activity."
               imgSrc="https://ouch-cdn2.icons8.com/DlrLzA4-weIluOT-U-Zsvtia_P6Tr61Cf5eWT9rcWEA/rs:fit:368:534/czM6Ly9pY29uczgu/b3VjaC1wcm9kLmFz/c2V0cy9wbmcvODYz/L2Q2OTdhNDA0LTRl/YWYtNGIxYS04OGE0/LTI5ZGM5NmE4ZjFj/Ni5wbmc.png"
             />
             <TemplateCard
-              title="Dev Activity Chart"
-              description="A chart visualizing team or repo activity."
+              title="Repo +/- Lines"
+              description="A bar chart showing added/deleted lines of code."
               imgSrc="https://ouch-cdn2.icons8.com/DlrLzA4-weIluOT-U-Zsvtia_P6Tr61Cf5eWT9rcWEA/rs:fit:368:534/czM6Ly9pY29uczgu/b3VjaC1wcm9kLmFz/c2V0cy9wbmcvODYz/L2Q2OTdhNDA0LTRl/YWYtNGIxYS04OGE0/LTI5ZGM5NmE4ZjFj/Ni5wbmc.png"
             />
             <TemplateCard
-              title="Dev Activity Chart"
-              description="A chart visualizing team or repo activity."
+              title="Issues Completed"
+              description="A line graph showing cumulative issues completed throughout the month."
               imgSrc="https://ouch-cdn2.icons8.com/DlrLzA4-weIluOT-U-Zsvtia_P6Tr61Cf5eWT9rcWEA/rs:fit:368:534/czM6Ly9pY29uczgu/b3VjaC1wcm9kLmFz/c2V0cy9wbmcvODYz/L2Q2OTdhNDA0LTRl/YWYtNGIxYS04OGE0/LTI5ZGM5NmE4ZjFj/Ni5wbmc.png"
             />
             <TemplateCard
-              title="Dev Activity Chart"
-              description="A chart visualizing team or repo activity."
+              title="Codebase Structure"
+              description="A bubble chart to visualize the codebase structure of a repo."
               imgSrc="https://ouch-cdn2.icons8.com/DlrLzA4-weIluOT-U-Zsvtia_P6Tr61Cf5eWT9rcWEA/rs:fit:368:534/czM6Ly9pY29uczgu/b3VjaC1wcm9kLmFz/c2V0cy9wbmcvODYz/L2Q2OTdhNDA0LTRl/YWYtNGIxYS04OGE0/LTI5ZGM5NmE4ZjFj/Ni5wbmc.png"
             />
           </div>

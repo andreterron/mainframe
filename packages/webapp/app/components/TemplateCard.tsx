@@ -13,7 +13,7 @@ export default function TemplateCard({
         <img src={imgSrc} alt="template" className="" />
       </div>
       <p className="text-md font-semibold mt-2">{title}</p>
-      <p>{description}</p>
+      <p className="text-sm text-slate-500">{description}</p>
     </div>
   );
 }
