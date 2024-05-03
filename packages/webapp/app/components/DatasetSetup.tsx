@@ -1,6 +1,7 @@
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 import { trpc } from "../lib/trpc_client";
 import { PageHeader } from "./PageHeader";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 function IntegrationButton({
   name,
@@ -52,18 +53,35 @@ export default function DatasetSetup({
   return (
     <div className="flex flex-col items-start gap-4">
       <PageHeader title="New Dataset" />
-      <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
-        {(integrations ? Object.entries(integrations) : []).map(
-          ([key, { name }]) => (
-            <IntegrationButton
-              key={key}
-              name={name}
-              type={key}
-              onClick={() => onIntegrationSelected(key)}
-            />
-          ),
-        )}
-      </div>
+      <Tabs defaultValue="components" className="flex flex-col w-full">
+        <TabsList className="grid grid-cols-2 m-4 self-start">
+          <TabsTrigger value="components">
+            {/* <SheetIcon className="w-3.5 h-3.5 mr-1" /> */}
+            Components
+          </TabsTrigger>
+          <TabsTrigger value="dataset">
+            {/* <PlayIcon className="w-3.5 h-3.5 mr-1" /> */}
+            Dataset
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="components">
+          <div className="max-w-full overflow-auto">Hello</div>
+        </TabsContent>
+        <TabsContent value="dataset" className="p-4">
+          <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
+            {(integrations ? Object.entries(integrations) : []).map(
+              ([key, { name }]) => (
+                <IntegrationButton
+                  key={key}
+                  name={name}
+                  type={key}
+                  onClick={() => onIntegrationSelected(key)}
+                />
+              ),
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
