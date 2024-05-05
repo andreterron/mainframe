@@ -47,6 +47,7 @@ import {
 import { ApiRequestTab } from "../components/ApiRequestTab";
 import { SandpackPlaygroundTab } from "../components/SandpackPlaygroundTab";
 import { env } from "../lib/env_client";
+import { WebStandardsPlaygroundTab } from "../components/WebStandardPlayground";
 
 const colHelper = createColumnHelper<RowType>();
 
@@ -332,7 +333,7 @@ export default function DatasetTableDetails() {
             <ApiRequestTab apiPath={`table/${dbTable.id}/rows`} />
           </TabsContent>
           <TabsContent value="playground" className="p-4">
-            <SandpackPlaygroundTab
+            <WebStandardsPlaygroundTab
               appTsxCode={`import { useMainframeTable } from "@mainframe-so/react";
 
 // TODO: Get environment variables from your app
@@ -341,13 +342,16 @@ import { env } from "./env.ts";
 export default function App(): JSX.Element {
   const { data } = useMainframeTable({
     tableId: "${dbTable.id}",
-    apiUrl: "${env.VITE_API_URL}",
-    apiKey: env.API_KEY
-  });
+    apiKey: env.API_KEY,
+    ${
+      env.VITE_API_URL === "https://api.mainframe.so"
+        ? ""
+        : `apiUrl: "${env.VITE_API_URL}",\n  `
+    }});
 
   return (<>
     <h1>Hello world!</h1>
-    <pre>{JSON.stringify(data, null, 4)}</pre>
+    <pre>{JSON.stringify(data ?? null, null, 4)}</pre>
   </>);
 }`}
             />

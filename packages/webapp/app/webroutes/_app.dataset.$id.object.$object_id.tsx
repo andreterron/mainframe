@@ -18,7 +18,7 @@ import {
   TabsTrigger,
 } from "../components/ui/tabs";
 import { ApiRequestTab } from "../components/ApiRequestTab";
-import { SandpackPlaygroundTab } from "../components/SandpackPlaygroundTab";
+import { WebStandardsPlaygroundTab } from "../components/WebStandardPlayground";
 import { env } from "../lib/env_client";
 
 export default function DatasetObjectDetails() {
@@ -87,7 +87,7 @@ export default function DatasetObjectDetails() {
               />
             </TabsContent>
             <TabsContent value="playground" className="p-4">
-              <SandpackPlaygroundTab
+              <WebStandardsPlaygroundTab
                 appTsxCode={`import { useMainframeObject } from "@mainframe-so/react";
 
 // TODO: Get environment variables from your app
@@ -97,13 +97,16 @@ export default function App(): JSX.Element {
   const { data } = useMainframeObject({
     datasetId: "${data.dataset.id}",
     objectType: "${data.object.objectType}",
-    apiUrl: "${env.VITE_API_URL}",
-    apiKey: env.API_KEY
-  });
+    apiKey: env.API_KEY,
+    ${
+      env.VITE_API_URL === "https://api.mainframe.so"
+        ? ""
+        : `apiUrl: "${env.VITE_API_URL}",\n  `
+    }});
 
   return (<>
     <h1>Hello world!</h1>
-    <pre>{JSON.stringify(data, null, 4)}</pre>
+    <pre>{JSON.stringify(data ?? null, null, 4)}</pre>
   </>);
 }`}
               />

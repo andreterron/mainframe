@@ -1,0 +1,7 @@
+.playground .cm-content {
+  @apply py-3;
+}
+
+.playground .cm-line {
+  @apply px-3;
+}

@@ -27,8 +27,8 @@ import {
   TabsTrigger,
 } from "../components/ui/tabs";
 import { ApiRequestTab } from "../components/ApiRequestTab";
-import { SandpackPlaygroundTab } from "../components/SandpackPlaygroundTab";
 import { env } from "../lib/env_client";
+import { WebStandardsPlaygroundTab } from "../components/WebStandardPlayground";
 
 export function formatCredentialKey(str: string): string {
   return str
@@ -148,7 +148,7 @@ export default function DatasetCredentials() {
               <ApiRequestTab apiPath={`credentials/${dataset.id}`} />
             </TabsContent>
             <TabsContent value="playground" className="p-4">
-              <SandpackPlaygroundTab
+              <WebStandardsPlaygroundTab
                 appTsxCode={`import { useMainframeCredentials } from "@mainframe-so/react";
 
 // TODO: Get environment variables from your app
@@ -157,17 +157,20 @@ import { env } from "./env.ts";
 export default function App(): JSX.Element {
   const { data } = useMainframeCredentials({
     datasetId: "${dataset.id}",
-    apiUrl: "${env.VITE_API_URL}",
     apiKey: env.API_KEY,
-    args: []
-  }, async (creds) => {
+    args: [],
+    ${
+      env.VITE_API_URL === "https://api.mainframe.so"
+        ? ""
+        : `apiUrl: "${env.VITE_API_URL}",\n  `
+    }}, async (creds) => {
     // Use credentials to do something here
     return null;
   });
 
   return (<>
     <h1>Hello world!</h1>
-    <pre>{JSON.stringify(data, null, 4)}</pre>
+    <pre>{JSON.stringify(data ?? null, null, 4)}</pre>
   </>);
 }`}
               />
