@@ -11,6 +11,8 @@ import DatasetTableDetails from "./webroutes/_app.dataset.$id.table.$table_id";
 import DatasetRowDetails from "./webroutes/_app.row.$row_id";
 import NewPage from "./webroutes/_app.new";
 import DatasetCredentials from "./webroutes/_app.dataset.$id.credentials";
+import DashboardPage from "./webroutes/_app.dashboard";
+import TemplatePage from "./webroutes/_app.template.$id";
 
 export const router = createBrowserRouter([
   {
@@ -40,6 +42,14 @@ export const router = createBrowserRouter([
       {
         path: "/new",
         element: <NewPage />,
+      },
+      {
+        path: "/template/:id",
+        element: <TemplatePage />,
+      },
+      {
+        path: "/dashboard",
+        element: <DashboardPage />,
       },
       {
         path: "/dataset/:id",

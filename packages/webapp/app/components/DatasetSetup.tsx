@@ -1,6 +1,9 @@
+import { ComponentIcon, SheetIcon } from "lucide-react";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 import { trpc } from "../lib/trpc_client";
 import { PageHeader } from "./PageHeader";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { TemplateCard } from "./TemplateCard";
 
 function IntegrationButton({
   name,
@@ -51,19 +54,42 @@ export default function DatasetSetup({
   const { data: integrations } = trpc.integrationsAll.useQuery();
   return (
     <div className="flex flex-col items-start gap-4">
-      <PageHeader title="New Dataset" />
-      <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
-        {(integrations ? Object.entries(integrations) : []).map(
-          ([key, { name }]) => (
-            <IntegrationButton
-              key={key}
-              name={name}
-              type={key}
-              onClick={() => onIntegrationSelected(key)}
-            />
-          ),
-        )}
-      </div>
+      <PageHeader title="Create New" />
+
+      <Tabs defaultValue="component" className="w-full">
+        <TabsList className="m-4 self-start">
+          <TabsTrigger value="component">
+            <ComponentIcon className="w-3.5 h-3.5 mr-1" />
+            Component
+          </TabsTrigger>
+          <TabsTrigger value="dataset">
+            <SheetIcon className="w-3.5 h-3.5 mr-1" />
+            Dataset
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="component">
+          <div className="w-full grid md:grid-cols-3 lg:grid-cols-4 gap-4 px-4">
+            <TemplateCard />
+            <TemplateCard />
+            <TemplateCard />
+            <TemplateCard />
+          </div>
+        </TabsContent>
+        <TabsContent value="dataset">
+          <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
+            {(integrations ? Object.entries(integrations) : []).map(
+              ([key, { name }]) => (
+                <IntegrationButton
+                  key={key}
+                  name={name}
+                  type={key}
+                  onClick={() => onIntegrationSelected(key)}
+                />
+              ),
+            )}
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
