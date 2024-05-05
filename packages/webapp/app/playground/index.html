@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mainframe Preview</title>
+    <script>
+      let scriptElement;
+
+      window.addEventListener("message", (event) => {
+        if (event.origin !== "https://app.mainframe.so") {
+          return;
+        }
+
+        const { type, value } = event.data;
+
+        if (type === "script") {
+          let newElement = document.createElement("script");
+          newElement.setAttribute("type", "module");
+          newElement.text = value;
+          if (scriptElement) {
+            scriptElement.replaceWith(newElement);
+          } else {
+            document.body.appendChild(newElement);
+          }
+          scriptElement = newElement;
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
