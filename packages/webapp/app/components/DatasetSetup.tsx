@@ -68,7 +68,7 @@ export default function DatasetSetup({
           </TabsTrigger>
         </TabsList>
         <TabsContent value="component">
-          <div className="w-full grid md:grid-cols-3 lg:grid-cols-4 gap-4 px-4">
+          <div className="w-full grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 px-4">
             <TemplateCard />
             <TemplateCard />
             <TemplateCard />
