@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mainframe Preview</title>
+    <!-- Patch to fix SWR requesting react@18.2.0 -->
+    <script type="importmap">
+      {
+        "imports": {
+          "https://esm.sh/stable/react@18.2.0/": "https://esm.sh/stable/react@18.3.1/"
+        }
+      }
+    </script>
     <script>
       let scriptElement;
 

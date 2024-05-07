@@ -1,6 +1,6 @@
-/** @jsxImportSource https://esm.sh/react@18.2.0 **/
-import React from "react@18.2.0"
-import ReactDOM from "react-dom@18.2.0/client"
+/** @jsxImportSource https://esm.sh/react **/
+import React from "react"
+import ReactDOM from "react-dom/client"
 import App from "./App.tsx"
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
