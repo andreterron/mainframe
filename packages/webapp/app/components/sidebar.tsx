@@ -135,7 +135,7 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
           <SidebarButton
             href="/new"
             isActive={(isActive) => isActive || !!isIndexPath}
-            name={() => "New Dataset"}
+            name={() => "Create New"}
             icon={
               <svg
                 xmlns="http://www.w3.org/2000/svg"

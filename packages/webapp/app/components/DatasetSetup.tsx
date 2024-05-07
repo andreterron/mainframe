@@ -17,7 +17,7 @@ function IntegrationButton({
   const icon = type ? datasetIcon(type) : undefined;
   return (
     <button
-      className="border shadow rounded-lg py-2 px-4 flex items-center gap-2"
+      className="border rounded-lg py-4 px-4 flex items-center gap-2 hover:border-slate-950 hover:shadow-0-2"
       onClick={onClick}
     >
       {icon ? (
@@ -55,7 +55,7 @@ export default function DatasetSetup({
   console.log(integrations);
   return (
     <div className="flex flex-col items-start gap-4">
-      <PageHeader title="New Dataset" />
+      <PageHeader title="Create New" />
       <Tabs defaultValue="components" className="flex flex-col w-full">
         <TabsList className="grid grid-cols-2 m-4 self-start">
           <TabsTrigger value="components">
@@ -68,7 +68,7 @@ export default function DatasetSetup({
           </TabsTrigger>
         </TabsList>
         <TabsContent value="components">
-          <div className="flex flex-wrap max-w-full overflow-auto px-4 gap-6 mt-4">
+          <div className="grid lg:grid-cols-3 xl:grid-cols-4 max-w-full overflow-auto px-4 gap-6 mt-4">
             <TemplateCard
               title="Repo Activity"
               description="A chart visualizing team or repo activity."
@@ -92,7 +92,7 @@ export default function DatasetSetup({
           </div>
         </TabsContent>
         <TabsContent value="dataset">
-          <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
+          <div className="w-full max-w-7xl grid md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
             {(integrations ? Object.entries(integrations) : []).map(
               ([key, { name }]) => (
                 <IntegrationButton
