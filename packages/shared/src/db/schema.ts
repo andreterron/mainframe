@@ -161,3 +161,12 @@ export const sessionsTable = sqliteTable("sessions", {
     .notNull()
     .default("admin"),
 });
+
+export const componentsTable = sqliteTable("components", {
+  id: text("id")
+    .default(sql`(lower(hex(randomblob(16))))`)
+    .notNull()
+    .primaryKey(),
+  name: text("name").notNull().default(""),
+  code: text("code").notNull().default(""),
+});

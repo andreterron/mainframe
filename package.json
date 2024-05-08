@@ -1,6 +1,6 @@
 {
   "name": "root",
-  "version": "0.4.12",
+  "version": "0.4.15",
   "author": "Andre Terron (https://andreterron.com)",
   "private": true,
   "license": "MIT",
@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.0",
-    "drizzle-kit": "^0.19.13",
+    "drizzle-kit": "^0.20.18",
     "nanoid": "^4.0.2",
     "turbo": "^1.13.0"
   },

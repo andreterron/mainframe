@@ -62,7 +62,7 @@ export function SandpackClient({ appTsxCode }: { appTsxCode: string }) {
           customSetup={{
             dependencies: {
               // NOTE: Comment the packages below for local dependencies
-              "@mainframe-so/react": "^0.4.12",
+              "@mainframe-so/react": "^0.4.15",
               // NOTE: Uncomment the packages below for local dependencies
               // ...mainframeReactPkgJsonRaw.dependencies,
             },

@@ -5,6 +5,7 @@
     "composite": false,
     "declaration": true,
     "declarationMap": true,
+    "resolveJsonModule": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "inlineSources": false,
