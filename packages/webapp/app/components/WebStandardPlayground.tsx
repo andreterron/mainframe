@@ -3,7 +3,7 @@ import { Card } from "./ui/card";
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import "../codemirror.css";
-import { tomorrow } from "thememirror";
+import { tomorrow, coolGlow } from "thememirror";
 import { Button } from "./ui/button";
 import { PlayIcon, PlusSquareIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
