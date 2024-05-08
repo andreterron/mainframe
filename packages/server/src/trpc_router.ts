@@ -8,6 +8,7 @@ import {
   zDatasetInsert,
   zDatasetPatch,
   ClientIntegration,
+  componentsTable,
 } from "@mainframe-so/shared";
 import { z } from "zod";
 import { Context } from "./trpc_context";
@@ -663,6 +664,86 @@ export const appRouter = router({
       }
 
       await syncObject(ctx.db, dataset, objectDefinition);
+    }),
+
+  getAllComponents: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.db.select().from(componentsTable).limit(40);
+  }),
+
+  getComponent: protectedProcedure
+    .input(
+      z.object({
+        componentId: z.string(),
+      }),
+    )
+    .query(async ({ input: { componentId }, ctx }) => {
+      if (!componentId) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      let [component] = await ctx.db
+        .select()
+        .from(componentsTable)
+        .where(eq(componentsTable.id, componentId))
+        .limit(1);
+
+      if (!component) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return component;
+    }),
+
+  addComponentToDashboard: protectedProcedure
+    .input(z.object({ code: z.string().min(1) }))
+    .mutation(async ({ input: { code }, ctx }) => {
+      let [component] = await ctx.db
+        .insert(componentsTable)
+        .values({ code })
+        .returning();
+
+      if (!component) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create component",
+        });
+      }
+
+      return component;
+    }),
+
+  updateComponent: protectedProcedure
+    .input(z.object({ id: z.string().min(1), code: z.string().min(1) }))
+    .mutation(async ({ input: { id, code }, ctx }) => {
+      let [component] = await ctx.db
+        .update(componentsTable)
+        .set({ code })
+        .where(eq(componentsTable.id, id))
+        .returning();
+
+      if (!component) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to save component",
+        });
+      }
+
+      return component;
+    }),
+
+  deleteComponent: protectedProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .mutation(async ({ input: { id }, ctx }) => {
+      let [component] = await ctx.db
+        .delete(componentsTable)
+        .where(eq(componentsTable.id, id))
+        .returning();
+
+      if (!component) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+        });
+      }
     }),
 });
 
