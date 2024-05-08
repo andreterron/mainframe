@@ -1,11 +1,11 @@
-import { memo, useCallback } from "react";
+import { memo, useCallback, useState } from "react";
 import { Card } from "./ui/card";
 import CodeMirror, { ViewUpdate } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import "../codemirror.css";
 import { tomorrow } from "thememirror";
 import { Button } from "./ui/button";
-import { PlusSquareIcon } from "lucide-react";
+import { PlayIcon, PlusSquareIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useComponentPreview } from "./ComponentPreview";
 import { trpc } from "../lib/trpc_client";
@@ -18,8 +18,10 @@ export const WebStandardsPlaygroundTab = memo(function ({
   componentId?: string;
 }) {
   const navigate = useNavigate();
+  const [savedCode, setSavedCode] = useState(appTsxCode);
 
-  const { code, setCode, codeRef, iframe } = useComponentPreview(appTsxCode);
+  const { code, setCode, codeRef, iframe, run, dirty } =
+    useComponentPreview(appTsxCode);
 
   const addComponentToDashboard = trpc.addComponentToDashboard.useMutation();
   const updateComponent = trpc.updateComponent.useMutation();
@@ -43,6 +45,7 @@ export const WebStandardsPlaygroundTab = memo(function ({
         id: componentId,
         code,
       });
+      setSavedCode(code);
     }
   }
 
@@ -67,9 +70,24 @@ export const WebStandardsPlaygroundTab = memo(function ({
 
         <div className="flex flex-col">
           <div className="shrink-0 grow-0 border-b p-1 flex items-center text-muted-foreground">
+            <Button
+              variant={dirty ? "default" : "secondary"}
+              size="xs"
+              className="text-xs"
+              onClick={() => {
+                run();
+              }}
+            >
+              <PlayIcon className="w-3 h-3 mr-1" />
+              Run
+            </Button>
             <div className="flex-1" />
             <Button
-              variant="ghost"
+              variant={
+                componentId && !dirty && code !== savedCode
+                  ? "default"
+                  : "ghost"
+              }
               size="xs"
               className="text-xs"
               onClick={handleSaveComponent}

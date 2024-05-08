@@ -14,7 +14,7 @@ export function ComponentCard({
 
   return (
     <Link to={`/dashboard/${component.id}`}>
-      <Card className="h-72 pointer-events-none">{iframe}</Card>
+      <Card className="h-72 pointer-events-none overflow-hidden">{iframe}</Card>
     </Link>
   );
 }

@@ -32,6 +32,7 @@ function envCode(apiKey: string) {
 
 export function useComponentPreview(initialCode: string) {
   const [code, setCode] = useState(initialCode);
+  const [codeExecuted, setCodeExecuted] = useState(initialCode);
   const codeRef = useRef(code);
   // TODO: Cache the build output. So we don't need to build on iframe onload
   // const buildOutputRef = useRef<string | undefined>();
@@ -49,15 +50,25 @@ export function useComponentPreview(initialCode: string) {
         const abortController = new AbortController();
         abortSignalRef.current = abortController;
 
-        codePipeline(code, apiKey, iframeRef, abortController.signal).catch(
-          (e) => console.error(e),
-        );
+        codePipeline(code, apiKey, iframeRef, abortController.signal)
+          .then((resultingCode) => {
+            if (resultingCode !== undefined) {
+              setCodeExecuted(resultingCode);
+            }
+          })
+          .catch((e) => console.error(e));
       }
     },
     [apiKey, iframeRef],
   );
 
   useEffect(() => {
+    buildCode(codeRef.current);
+  }, [buildCode]);
+
+  const dirty = useMemo(() => code !== codeExecuted, [code, codeExecuted]);
+
+  const run = useCallback(() => {
     buildCode(codeRef.current);
   }, [buildCode]);
 
@@ -89,9 +100,10 @@ export function useComponentPreview(initialCode: string) {
     setCode: (code: string) => {
       codeRef.current = code;
       setCode(code);
-      buildCode(code);
     },
     iframe,
+    run,
+    dirty,
   };
 }
 
@@ -174,4 +186,6 @@ async function codePipeline(
     { type: "script", value: output },
     "*",
   );
+
+  return code;
 }
