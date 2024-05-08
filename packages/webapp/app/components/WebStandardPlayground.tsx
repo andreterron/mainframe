@@ -9,6 +9,10 @@ import { PlayIcon, PlusSquareIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useComponentPreview } from "./ComponentPreview";
 import { trpc } from "../lib/trpc_client";
+import { atom, useAtom } from "jotai";
+
+// HACK: This is used to cache the code changes when switching between dataset tabs
+export const codeAtom = atom("");
 
 export const WebStandardsPlaygroundTab = memo(function ({
   appTsxCode,
@@ -20,8 +24,11 @@ export const WebStandardsPlaygroundTab = memo(function ({
   const navigate = useNavigate();
   const [savedCode, setSavedCode] = useState(appTsxCode);
 
-  const { code, setCode, codeRef, iframe, run, dirty } =
-    useComponentPreview(appTsxCode);
+  const [codeCache, setCodeCache] = useAtom(codeAtom);
+
+  const { code, setCode, codeRef, iframe, run, dirty } = useComponentPreview(
+    codeCache || appTsxCode,
+  );
 
   const addComponentToDashboard = trpc.addComponentToDashboard.useMutation();
   const updateComponent = trpc.updateComponent.useMutation();
@@ -29,6 +36,7 @@ export const WebStandardsPlaygroundTab = memo(function ({
   const handleChange = useCallback(
     (value: string, _viewUpdate: ViewUpdate) => {
       setCode(value);
+      setCodeCache(value);
     },
     [setCode],
   );

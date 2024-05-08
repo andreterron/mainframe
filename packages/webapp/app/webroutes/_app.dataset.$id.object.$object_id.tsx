@@ -18,8 +18,12 @@ import {
   TabsTrigger,
 } from "../components/ui/tabs";
 import { ApiRequestTab } from "../components/ApiRequestTab";
-import { WebStandardsPlaygroundTab } from "../components/WebStandardPlayground";
+import {
+  WebStandardsPlaygroundTab,
+  codeAtom,
+} from "../components/WebStandardPlayground";
 import { env } from "../lib/env_client";
+import { ScopeProvider } from "jotai-scope";
 
 export default function DatasetObjectDetails() {
   const { id: datasetId, object_id: objectId } = useParams();
@@ -39,56 +43,57 @@ export default function DatasetObjectDetails() {
   const { dataset, object: objectData } = data;
 
   return (
-    <div className="relative overflow-y-auto">
-      <div className="flex flex-col items-start">
-        <PageHeader
-          title={objectData.name}
-          breadcrumb={
-            <DatasetBreadcrumb dataset={dataset}>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>{objectData.name}</BreadcrumbPage>
-              </BreadcrumbItem>
-            </DatasetBreadcrumb>
-          }
-        />
-        <div className="w-full">
-          <Tabs defaultValue="json" className="flex flex-col w-full">
-            <TabsList className="grid grid-cols-3 m-4 self-start">
-              <TabsTrigger value="json">
-                <BracesIcon className="w-3.5 h-3.5 mr-1" />
-                JSON
-              </TabsTrigger>
-              <TabsTrigger value="playground">
-                <PlayIcon className="w-3.5 h-3.5 mr-1" />
-                Playground
-              </TabsTrigger>
-              <TabsTrigger value="http">
-                <GlobeIcon className="w-3.5 h-3.5 mr-1" />
-                HTTP
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="json">
-              <pre className="whitespace-pre-wrap font-mono p-4">
-                <SyntaxHighlighter
-                  customStyle={{
-                    background: "transparent",
-                  }}
-                  language="json"
-                  style={codeStyleLight}
-                >
-                  {JSON.stringify(objectData.data, null, 4)}
-                </SyntaxHighlighter>
-              </pre>
-            </TabsContent>
-            <TabsContent value="http" className="p-4">
-              <ApiRequestTab
-                apiPath={`object/${dataset.id}/${objectData.objectType}`}
-              />
-            </TabsContent>
-            <TabsContent value="playground" className="p-4">
-              <WebStandardsPlaygroundTab
-                appTsxCode={`import { useMainframeObject } from "@mainframe-so/react";
+    <ScopeProvider atoms={[codeAtom]}>
+      <div className="relative overflow-y-auto">
+        <div className="flex flex-col items-start">
+          <PageHeader
+            title={objectData.name}
+            breadcrumb={
+              <DatasetBreadcrumb dataset={dataset}>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{objectData.name}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </DatasetBreadcrumb>
+            }
+          />
+          <div className="w-full">
+            <Tabs defaultValue="json" className="flex flex-col w-full">
+              <TabsList className="grid grid-cols-3 m-4 self-start">
+                <TabsTrigger value="json">
+                  <BracesIcon className="w-3.5 h-3.5 mr-1" />
+                  JSON
+                </TabsTrigger>
+                <TabsTrigger value="playground">
+                  <PlayIcon className="w-3.5 h-3.5 mr-1" />
+                  Playground
+                </TabsTrigger>
+                <TabsTrigger value="http">
+                  <GlobeIcon className="w-3.5 h-3.5 mr-1" />
+                  HTTP
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="json">
+                <pre className="whitespace-pre-wrap font-mono p-4">
+                  <SyntaxHighlighter
+                    customStyle={{
+                      background: "transparent",
+                    }}
+                    language="json"
+                    style={codeStyleLight}
+                  >
+                    {JSON.stringify(objectData.data, null, 4)}
+                  </SyntaxHighlighter>
+                </pre>
+              </TabsContent>
+              <TabsContent value="http" className="p-4">
+                <ApiRequestTab
+                  apiPath={`object/${dataset.id}/${objectData.objectType}`}
+                />
+              </TabsContent>
+              <TabsContent value="playground" className="p-4">
+                <WebStandardsPlaygroundTab
+                  appTsxCode={`import { useMainframeObject } from "@mainframe-so/react";
 
 // TODO: Get environment variables from your app
 import { env } from "./env.ts";
@@ -109,11 +114,12 @@ export default function App(): JSX.Element {
     <pre>{JSON.stringify(data ?? null, null, 4)}</pre>
   </>);
 }`}
-              />
-            </TabsContent>
-          </Tabs>
+                />
+              </TabsContent>
+            </Tabs>
+          </div>
         </div>
       </div>
-    </div>
+    </ScopeProvider>
   );
 }

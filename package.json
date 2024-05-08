@@ -27,6 +27,8 @@
     "@uiw/react-codemirror": "^4.22.0",
     "body-parser": "^1.20.2",
     "esbuild-wasm": "^0.20.2",
+    "jotai": "^2.8.0",
+    "jotai-scope": "^0.6.0",
     "thememirror": "^2.0.1"
   }
 }
