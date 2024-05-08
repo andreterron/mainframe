@@ -33,7 +33,6 @@ export default function DashboardComponentPage() {
   const handleDelete = async () => {
     if (component && confirm("Delete component?")) {
       await deleteComponent.mutateAsync({ id: component.id });
-      // TODO: Change this to be a route effect depending on (location,dataset)
       navigate("/dashboard");
     }
   };
