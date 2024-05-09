@@ -5,7 +5,7 @@ import { javascript } from "@codemirror/lang-javascript";
 import "../codemirror.css";
 import { tomorrow, coolGlow } from "thememirror";
 import { Button } from "./ui/button";
-import { PlayIcon, PlusSquareIcon } from "lucide-react";
+import { PlayIcon, Moon, PlusSquareIcon, Sun } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useComponentPreview } from "./useComponentPreview";
 import { trpc } from "../lib/trpc_client";
@@ -23,6 +23,7 @@ export const WebStandardsPlaygroundTab = memo(function ({
   appTsxCode: string;
   componentId?: string;
 }) {
+  const [theme, setTheme] = useState(tomorrow);
   const navigate = useNavigate();
   const [savedCode, setSavedCode] = useState(appTsxCode);
 
@@ -43,6 +44,10 @@ export const WebStandardsPlaygroundTab = memo(function ({
     [setCode],
   );
 
+  const toggleTheme = () => {
+    setTheme(theme === tomorrow ? coolGlow : tomorrow);
+  };
+
   async function handleSaveComponent() {
     const code = codeRef.current;
     if (!componentId) {
@@ -62,7 +67,19 @@ export const WebStandardsPlaygroundTab = memo(function ({
   // TODO: Mobile UI
   return (
     <>
-      <Card className="grid grid-cols-2 grid-rows-1 h-[480px] divide-x">
+      <Card className="grid grid-cols-2 grid-rows-1 h-[480px] divide-x relative">
+        <Button
+          className="absolute top-3 z-10 left-1/2 rounded-full bg-slate-100 w-7 h-7 px-1 -translate-x-10 opacity-80"
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+        >
+          {theme === tomorrow ? (
+            <Sun className="w-4 h-4" />
+          ) : (
+            <Moon className="w-4 h-4" />
+          )}
+        </Button>
         <CodeMirror
           className="font-mono rounded-l-lg overflow-hidden playground"
           value={code}
@@ -97,7 +114,7 @@ export const WebStandardsPlaygroundTab = memo(function ({
             autocompletion: false,
             highlightActiveLine: false,
           }}
-          theme={tomorrow}
+          theme={theme}
         />
 
         <div className="flex flex-col">
