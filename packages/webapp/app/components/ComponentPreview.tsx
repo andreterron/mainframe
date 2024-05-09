@@ -50,7 +50,7 @@ export function useComponentPreview(initialCode: string) {
         const abortController = new AbortController();
         abortSignalRef.current = abortController;
 
-        codePipeline(code, apiKey, iframeRef, abortController.signal)
+        return codePipeline(code, apiKey, iframeRef, abortController.signal)
           .then((resultingCode) => {
             if (resultingCode !== undefined) {
               setCodeExecuted(resultingCode);
@@ -68,9 +68,7 @@ export function useComponentPreview(initialCode: string) {
 
   const dirty = useMemo(() => code !== codeExecuted, [code, codeExecuted]);
 
-  const run = useCallback(() => {
-    buildCode(codeRef.current);
-  }, [buildCode]);
+  const run = useCallback(() => buildCode(codeRef.current), [buildCode]);
 
   const iframe = useMemo(() => {
     // TODO: These are the sandboxing parameters from observable. Consider

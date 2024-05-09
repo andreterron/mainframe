@@ -1,6 +1,6 @@
 import { memo, useCallback, useState } from "react";
 import { Card } from "./ui/card";
-import CodeMirror, { ViewUpdate } from "@uiw/react-codemirror";
+import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import "../codemirror.css";
 import { tomorrow } from "thememirror";
@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { useComponentPreview } from "./ComponentPreview";
 import { trpc } from "../lib/trpc_client";
 import { atom, useAtom } from "jotai";
+import { Prec } from "@codemirror/state";
+import { keymap, ViewUpdate } from "@codemirror/view";
 
 // HACK: This is used to cache the code changes when switching between dataset tabs
 export const codeAtom = atom("");
@@ -65,7 +67,29 @@ export const WebStandardsPlaygroundTab = memo(function ({
           className="font-mono rounded-l-lg overflow-hidden playground"
           value={code}
           height="100%"
-          extensions={[javascript({ jsx: true, typescript: true })]}
+          extensions={[
+            javascript({ jsx: true, typescript: true }),
+            Prec.highest(
+              keymap.of([
+                {
+                  key: "Mod-s",
+                  run: () => {
+                    run()?.then(() =>
+                      componentId ? handleSaveComponent() : null,
+                    );
+                    return true;
+                  },
+                },
+                {
+                  key: "Mod-Enter",
+                  run: () => {
+                    run();
+                    return true;
+                  },
+                },
+              ]),
+            ),
+          ]}
           onChange={handleChange}
           basicSetup={{
             foldGutter: false,
