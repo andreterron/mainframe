@@ -1,4 +1,4 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { Card } from "./ui/card";
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
@@ -23,7 +23,10 @@ export const WebStandardsPlaygroundTab = memo(function ({
   appTsxCode: string;
   componentId?: string;
 }) {
-  const [theme, setTheme] = useState(tomorrow);
+  const [playgroundTheme, setPlaygroundTheme] = useState(() => {
+    const savedThemeName = localStorage.getItem("playgroundTheme");
+    return savedThemeName === "coolGlow" ? coolGlow : tomorrow;
+  });
   const navigate = useNavigate();
   const [savedCode, setSavedCode] = useState(appTsxCode);
 
@@ -44,9 +47,15 @@ export const WebStandardsPlaygroundTab = memo(function ({
     [setCode],
   );
 
-  const toggleTheme = () => {
-    setTheme(theme === tomorrow ? coolGlow : tomorrow);
+  const togglePlaygroundTheme = () => {
+    setPlaygroundTheme(playgroundTheme === tomorrow ? coolGlow : tomorrow);
   };
+
+  useEffect(() => {
+    const playgroundThemeName =
+      playgroundTheme === coolGlow ? "coolGlow" : "tomorrow";
+    localStorage.setItem("playgroundTheme", playgroundThemeName);
+  }, [playgroundTheme]);
 
   async function handleSaveComponent() {
     const code = codeRef.current;
@@ -72,9 +81,9 @@ export const WebStandardsPlaygroundTab = memo(function ({
           className="absolute top-3 z-10 left-1/2 rounded-full bg-slate-100 w-7 h-7 px-1 -translate-x-10 opacity-80"
           variant="ghost"
           size="icon"
-          onClick={toggleTheme}
+          onClick={togglePlaygroundTheme}
         >
-          {theme === tomorrow ? (
+          {playgroundTheme === tomorrow ? (
             <Sun className="w-4 h-4" />
           ) : (
             <Moon className="w-4 h-4" />
@@ -114,7 +123,7 @@ export const WebStandardsPlaygroundTab = memo(function ({
             autocompletion: false,
             highlightActiveLine: false,
           }}
-          theme={theme}
+          theme={playgroundTheme}
         />
 
         <div className="flex flex-col">
