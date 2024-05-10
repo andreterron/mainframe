@@ -7,7 +7,7 @@ import { tomorrow } from "thememirror";
 import { Button } from "./ui/button";
 import { PlayIcon, PlusSquareIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useComponentPreview } from "./ComponentPreview";
+import { useComponentPreview } from "./useComponentPreview";
 import { trpc } from "../lib/trpc_client";
 import { atom, useAtom } from "jotai";
 import { Prec } from "@codemirror/state";

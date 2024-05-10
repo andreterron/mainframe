@@ -3,7 +3,7 @@ import { trpc } from "../lib/trpc_client";
 
 import { Link } from "react-router-dom";
 import { Card } from "../components/ui/card";
-import { useComponentPreview } from "../components/ComponentPreview";
+import { useComponentPreview } from "../components/useComponentPreview";
 
 export function ComponentCard({
   component,
