@@ -8,8 +8,9 @@ export interface AuthTypes {
 
 export interface ClientIntegration {
   name: string;
+  underReview: boolean;
   authTypes?: AuthTypes;
-  authType: AuthType;
+  authType?: AuthType;
   authSetupDocs?: string;
   objects: {
     id: string;

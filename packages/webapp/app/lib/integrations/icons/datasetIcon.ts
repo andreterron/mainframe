@@ -6,6 +6,7 @@ import gcal from "./google_calendar.png";
 import zotero from "./zotero.png";
 import notion from "./notion.png";
 import oura from "./oura.png";
+import spotify from "./spotify.png";
 
 export function datasetIcon(id: string) {
   switch (id) {
@@ -25,5 +26,7 @@ export function datasetIcon(id: string) {
       return notion;
     case "oura":
       return oura;
+    case "spotify":
+      return spotify;
   }
 }

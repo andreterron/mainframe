@@ -1,24 +1,40 @@
+import { ClientIntegration } from "@mainframe-so/shared";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 import { trpc } from "../lib/trpc_client";
 import { PageHeader } from "./PageHeader";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./ui/tooltip";
+import { AlertCircleIcon } from "lucide-react";
+import { cn } from "../lib/utils";
+import { UnderReviewMessage } from "./UnderReviewMessage";
 
 function IntegrationButton({
-  name,
+  integration,
   type,
   onClick,
 }: {
-  name: string;
+  integration: ClientIntegration;
   type: string;
   onClick: React.MouseEventHandler<HTMLButtonElement>;
 }) {
   const icon = type ? datasetIcon(type) : undefined;
-  return (
+  const btn = (
     <button
       className="border shadow rounded-lg py-2 px-4 flex items-center gap-2"
       onClick={onClick}
     >
       {icon ? (
-        <img className="relative h-4 w-4 m-0.5 object-contain" src={icon} />
+        <img
+          className={cn(
+            "relative h-4 w-4 m-0.5 object-contain shrink-0 grow-0",
+            integration.underReview ? "opacity-75" : "",
+          )}
+          src={icon}
+        />
       ) : (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -38,8 +54,35 @@ function IntegrationButton({
           </g>
         </svg>
       )}
-      <span>{name}</span>
+      <span
+        className={cn(
+          "flex-1 truncate min-w-0 text-start",
+          integration.underReview ? "text-muted-foreground" : "",
+        )}
+      >
+        {integration.name}
+      </span>
+      {integration.underReview && (
+        <TooltipTrigger asChild>
+          <AlertCircleIcon className="w-4 h-4 text-gray-400" />
+        </TooltipTrigger>
+      )}
     </button>
+  );
+
+  return integration.underReview ? (
+    <TooltipProvider>
+      <Tooltip delayDuration={0}>
+        {btn}
+        <TooltipContent className="max-w-xs" side="bottom" sideOffset={12}>
+          <p>
+            <UnderReviewMessage integration={integration} />
+          </p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  ) : (
+    btn
   );
 }
 
@@ -54,10 +97,10 @@ export default function DatasetSetup({
       <PageHeader title="New Dataset" />
       <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
         {(integrations ? Object.entries(integrations) : []).map(
-          ([key, { name }]) => (
+          ([key, integration]) => (
             <IntegrationButton
               key={key}
-              name={name}
+              integration={integration}
               type={key}
               onClick={() => onIntegrationSelected(key)}
             />

@@ -42,6 +42,7 @@ import { env } from "./lib/env.server";
 import { nango } from "./lib/nango";
 import * as Sentry from "@sentry/node";
 import { getTokenFromDataset } from "./lib/integration-token";
+import { spotify } from "./lib/integrations/spotify";
 
 /**
  * Initialization of tRPC backend
@@ -551,6 +552,9 @@ export const appRouter = router({
       zotero: createClientIntegration(zotero),
       notion: createClientIntegration(notion),
       oura: createClientIntegration(oura),
+      ...(env.NANGO_PRIVATE_KEY
+        ? { spotify: createClientIntegration(spotify) }
+        : {}),
     };
   }),
 

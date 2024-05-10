@@ -17,7 +17,8 @@ export interface IntegrationObject {
 // TODO: Merge `objects` and `tables` options
 export interface Integration {
   name: string;
-  authType: AuthType;
+  underReview?: boolean;
+  authType?: AuthType;
   authTypes?: {
     nango?: {
       integrationId: string;
