@@ -1,17 +1,18 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { Card } from "./ui/card";
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import "../codemirror.css";
-import { tomorrow } from "thememirror";
+import { tomorrow, coolGlow } from "thememirror";
 import { Button } from "./ui/button";
-import { PlayIcon, PlusSquareIcon } from "lucide-react";
+import { PlayIcon, Moon, PlusSquareIcon, Sun } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useComponentPreview } from "./useComponentPreview";
 import { trpc } from "../lib/trpc_client";
 import { atom, useAtom } from "jotai";
 import { Prec } from "@codemirror/state";
 import { keymap, ViewUpdate } from "@codemirror/view";
+import { cn } from "../lib/utils";
 
 // HACK: This is used to cache the code changes when switching between dataset tabs
 export const codeAtom = atom("");
@@ -23,6 +24,10 @@ export const WebStandardsPlaygroundTab = memo(function ({
   appTsxCode: string;
   componentId?: string;
 }) {
+  const [playgroundTheme, setPlaygroundTheme] = useState(() => {
+    const savedThemeName = localStorage.getItem("playgroundTheme");
+    return savedThemeName === "coolGlow" ? coolGlow : tomorrow;
+  });
   const navigate = useNavigate();
   const [savedCode, setSavedCode] = useState(appTsxCode);
 
@@ -43,6 +48,16 @@ export const WebStandardsPlaygroundTab = memo(function ({
     [setCode],
   );
 
+  const togglePlaygroundTheme = () => {
+    setPlaygroundTheme(playgroundTheme === tomorrow ? coolGlow : tomorrow);
+  };
+
+  useEffect(() => {
+    const playgroundThemeName =
+      playgroundTheme === coolGlow ? "coolGlow" : "tomorrow";
+    localStorage.setItem("playgroundTheme", playgroundThemeName);
+  }, [playgroundTheme]);
+
   async function handleSaveComponent() {
     const code = codeRef.current;
     if (!componentId) {
@@ -62,44 +77,62 @@ export const WebStandardsPlaygroundTab = memo(function ({
   // TODO: Mobile UI
   return (
     <>
-      <Card className="grid grid-cols-2 grid-rows-1 h-[480px] divide-x">
-        <CodeMirror
-          className="font-mono rounded-l-lg overflow-hidden playground"
-          value={code}
-          height="100%"
-          extensions={[
-            javascript({ jsx: true, typescript: true }),
-            Prec.highest(
-              keymap.of([
-                {
-                  key: "Mod-s",
-                  run: () => {
-                    run()?.then(() =>
-                      componentId ? handleSaveComponent() : null,
-                    );
-                    return true;
+      <Card className="grid grid-cols-2 grid-rows-1 h-[480px] divide-x relative">
+        <div className="relative">
+          <Button
+            className={cn(
+              "absolute bottom-3 z-10 right-3 rounded-full w-6 h-6 opacity-85  hover:opacity-100",
+              playgroundTheme === tomorrow
+                ? "bg-slate-100 hover:bg-slate-200"
+                : "bg-slate-700 hover:bg-slate-600 text-slate-200 hover:text-white",
+            )}
+            variant="ghost"
+            size="icon"
+            onClick={togglePlaygroundTheme}
+          >
+            {playgroundTheme === tomorrow ? (
+              <Sun className="w-4 h-4" />
+            ) : (
+              <Moon className="w-4 h-4" />
+            )}
+          </Button>
+          <CodeMirror
+            className="font-mono rounded-l-lg overflow-hidden h-full playground"
+            value={code}
+            height="100%"
+            extensions={[
+              javascript({ jsx: true, typescript: true }),
+              Prec.highest(
+                keymap.of([
+                  {
+                    key: "Mod-s",
+                    run: () => {
+                      run()?.then(() =>
+                        componentId ? handleSaveComponent() : null,
+                      );
+                      return true;
+                    },
                   },
-                },
-                {
-                  key: "Mod-Enter",
-                  run: () => {
-                    run();
-                    return true;
+                  {
+                    key: "Mod-Enter",
+                    run: () => {
+                      run();
+                      return true;
+                    },
                   },
-                },
-              ]),
-            ),
-          ]}
-          onChange={handleChange}
-          basicSetup={{
-            foldGutter: false,
-            lineNumbers: false,
-            autocompletion: false,
-            highlightActiveLine: false,
-          }}
-          theme={tomorrow}
-        />
-
+                ]),
+              ),
+            ]}
+            onChange={handleChange}
+            basicSetup={{
+              foldGutter: false,
+              lineNumbers: false,
+              autocompletion: false,
+              highlightActiveLine: false,
+            }}
+            theme={playgroundTheme}
+          />
+        </div>
         <div className="flex flex-col">
           <div className="shrink-0 grow-0 border-b p-1 flex items-center text-muted-foreground">
             <Button

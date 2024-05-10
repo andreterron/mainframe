@@ -35,6 +35,11 @@ import {
   codeAtom,
 } from "../components/WebStandardPlayground";
 import { ScopeProvider } from "jotai-scope";
+import {
+  areaTemplate,
+  positiveNegativeTemplate,
+  positiveNegativeComposedTemplate,
+} from "~/components/templates/templates";
 
 export function formatCredentialKey(str: string): string {
   return str
@@ -124,6 +129,19 @@ export default function DatasetCredentials() {
     );
   }
 
+  //   const { dataset, object: objectData } = data;
+
+  // Replace the template variables
+  // const apiUrlString =
+  //   env.VITE_API_URL === "https://api.mainframe.so"
+  //     ? ""
+  //     : `apiUrl: "${env.VITE_API_URL}",\n  `;
+
+  // Replace placeholders in the code string, INPUT TEMPLATE HERE
+  // const appTsxCode = positiveNegativeComposedTemplate
+  //   .replace("DATASET_ID_PLACEHOLDER", dataset.id)
+  //   .replace("API_URL_PLACEHOLDER", apiUrlString);
+
   return (
     <ScopeProvider atoms={[codeAtom]}>
       <div className="relative overflow-y-auto">
@@ -208,6 +226,7 @@ export default function App(): JSX.Element {
   </>);
 }`}
                 />
+                {/* <WebStandardsPlaygroundTab appTsxCode={appTsxCode} /> */}
               </TabsContent>
             </Tabs>
           </div>
