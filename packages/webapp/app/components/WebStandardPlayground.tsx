@@ -12,6 +12,7 @@ import { trpc } from "../lib/trpc_client";
 import { atom, useAtom } from "jotai";
 import { Prec } from "@codemirror/state";
 import { keymap, ViewUpdate } from "@codemirror/view";
+import { cn } from "../lib/utils";
 
 // HACK: This is used to cache the code changes when switching between dataset tabs
 export const codeAtom = atom("");
@@ -77,55 +78,61 @@ export const WebStandardsPlaygroundTab = memo(function ({
   return (
     <>
       <Card className="grid grid-cols-2 grid-rows-1 h-[480px] divide-x relative">
-        <Button
-          className="absolute bottom-3 z-10 left-1/2 rounded-full bg-slate-100 w-6 h-6 px-1 -translate-x-10 opacity-85 hover:opacity-100 hover:bg-slate-200"
-          variant="ghost"
-          size="icon"
-          onClick={togglePlaygroundTheme}
-        >
-          {playgroundTheme === tomorrow ? (
-            <Sun className="w-4 h-4" />
-          ) : (
-            <Moon className="w-4 h-4" />
-          )}
-        </Button>
-        <CodeMirror
-          className="font-mono rounded-l-lg overflow-hidden playground"
-          value={code}
-          height="100%"
-          extensions={[
-            javascript({ jsx: true, typescript: true }),
-            Prec.highest(
-              keymap.of([
-                {
-                  key: "Mod-s",
-                  run: () => {
-                    run()?.then(() =>
-                      componentId ? handleSaveComponent() : null,
-                    );
-                    return true;
+        <div className="relative">
+          <Button
+            className={cn(
+              "absolute bottom-3 z-10 right-3 rounded-full w-6 h-6 opacity-85  hover:opacity-100",
+              playgroundTheme === tomorrow
+                ? "bg-slate-100 hover:bg-slate-200"
+                : "bg-slate-700 hover:bg-slate-600 text-slate-200 hover:text-white",
+            )}
+            variant="ghost"
+            size="icon"
+            onClick={togglePlaygroundTheme}
+          >
+            {playgroundTheme === tomorrow ? (
+              <Sun className="w-4 h-4" />
+            ) : (
+              <Moon className="w-4 h-4" />
+            )}
+          </Button>
+          <CodeMirror
+            className="font-mono rounded-l-lg overflow-hidden h-full playground"
+            value={code}
+            height="100%"
+            extensions={[
+              javascript({ jsx: true, typescript: true }),
+              Prec.highest(
+                keymap.of([
+                  {
+                    key: "Mod-s",
+                    run: () => {
+                      run()?.then(() =>
+                        componentId ? handleSaveComponent() : null,
+                      );
+                      return true;
+                    },
                   },
-                },
-                {
-                  key: "Mod-Enter",
-                  run: () => {
-                    run();
-                    return true;
+                  {
+                    key: "Mod-Enter",
+                    run: () => {
+                      run();
+                      return true;
+                    },
                   },
-                },
-              ]),
-            ),
-          ]}
-          onChange={handleChange}
-          basicSetup={{
-            foldGutter: false,
-            lineNumbers: false,
-            autocompletion: false,
-            highlightActiveLine: false,
-          }}
-          theme={playgroundTheme}
-        />
-
+                ]),
+              ),
+            ]}
+            onChange={handleChange}
+            basicSetup={{
+              foldGutter: false,
+              lineNumbers: false,
+              autocompletion: false,
+              highlightActiveLine: false,
+            }}
+            theme={playgroundTheme}
+          />
+        </div>
         <div className="flex flex-col">
           <div className="shrink-0 grow-0 border-b p-1 flex items-center text-muted-foreground">
             <Button

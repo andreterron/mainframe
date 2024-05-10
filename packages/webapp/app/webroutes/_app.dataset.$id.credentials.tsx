@@ -132,15 +132,15 @@ export default function DatasetCredentials() {
   //   const { dataset, object: objectData } = data;
 
   // Replace the template variables
-  const apiUrlString =
-    env.VITE_API_URL === "https://api.mainframe.so"
-      ? ""
-      : `apiUrl: "${env.VITE_API_URL}",\n  `;
+  // const apiUrlString =
+  //   env.VITE_API_URL === "https://api.mainframe.so"
+  //     ? ""
+  //     : `apiUrl: "${env.VITE_API_URL}",\n  `;
 
   // Replace placeholders in the code string, INPUT TEMPLATE HERE
-  const appTsxCode = positiveNegativeComposedTemplate
-    .replace("DATASET_ID_PLACEHOLDER", dataset.id)
-    .replace("API_URL_PLACEHOLDER", apiUrlString);
+  // const appTsxCode = positiveNegativeComposedTemplate
+  //   .replace("DATASET_ID_PLACEHOLDER", dataset.id)
+  //   .replace("API_URL_PLACEHOLDER", apiUrlString);
 
   return (
     <ScopeProvider atoms={[codeAtom]}>

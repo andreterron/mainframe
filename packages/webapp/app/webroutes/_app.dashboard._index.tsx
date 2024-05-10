@@ -24,8 +24,8 @@ export function ComponentCard({
       <CardHeader className="space-y-0 px-4 py-2 border-b border-slate-200 ">
         <div className="flex items-center justify-between">
           <div className="flex flex-col">
-            <CardTitle className="text-sm">Title</CardTitle>
-            <CardDescription className="text-xs">Description</CardDescription>
+            {/* <CardTitle className="text-sm">Title</CardTitle>
+            <CardDescription className="text-xs">Description</CardDescription> */}
           </div>
           <Link to={`/dashboard/${component.id}`}>
             <Button
