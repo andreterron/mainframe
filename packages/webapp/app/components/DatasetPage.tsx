@@ -16,7 +16,8 @@ export function DatasetPage({
     <div className="flex flex-col gap-8 items-start">
       <DatasetHeader dataset={dataset}>{dataset.name}</DatasetHeader>
       <div className="flex flex-col gap-1 p-4">
-        {getDatasetCredentialsKeys(dataset.credentials).length > 0 ? (
+        {getDatasetCredentialsKeys(dataset.credentials).length > 0 ||
+        dataset.credentials?.nangoIntegrationId ? (
           <Link
             to={`/dataset/${dataset.id}/credentials`}
             className="flex items-center gap-3 cursor-pointer select-none text-gray-900 bg-white focus:outline-none hover:bg-gray-100 active:bg-gray-200 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg px-4 py-2 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"

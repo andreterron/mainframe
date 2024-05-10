@@ -6,6 +6,8 @@ import {
   LockIcon,
   GlobeIcon,
   PlayIcon,
+  UnlockIcon,
+  LoaderIcon,
 } from "lucide-react";
 import { PageHeader } from "../components/PageHeader";
 import { DatasetBreadcrumb } from "../components/DatasetHeader.DatasetBreadcrumb";
@@ -70,16 +72,39 @@ function HiddenReadonlyInput({ id, value }: { id: string; value: string }) {
   );
 }
 
+function AccessTokenInput({ datasetId }: { datasetId: string }) {
+  const getAccessToken = trpc.getAccessToken.useMutation();
+  return (
+    <div className="flex w-full items-center space-x-2">
+      <Input
+        className="flex-1"
+        id="nangoAccessToken"
+        type="text"
+        value={getAccessToken.data ?? ""}
+        readOnly
+      />
+      <Button
+        variant="default"
+        className="shrink-0 grow-0"
+        onClick={() => getAccessToken.mutate({ datasetId })}
+        disabled={getAccessToken.isLoading}
+      >
+        {getAccessToken.isLoading ? (
+          <LoaderIcon className="mr-2 h-4 w-4 animate-spin" />
+        ) : (
+          <UnlockIcon className="w-4 h-4 mr-2" />
+        )}
+        Get token
+      </Button>
+    </div>
+  );
+}
+
 export default function DatasetCredentials() {
   const { id: datasetId } = useParams();
 
-  // return <div>Get your latest token</div>;
-
-  // const { data, error, isLoading } = useObject(datasetId, objectId);
-
   const {
     data: dataset,
-    refetch,
     error: datasetError,
     isLoading: isDatasetLoading,
   } = trpc.datasetsGet.useQuery(
@@ -98,8 +123,6 @@ export default function DatasetCredentials() {
       />
     );
   }
-
-  //   const { dataset, object: objectData } = data;
 
   return (
     <ScopeProvider atoms={[codeAtom]}>
@@ -147,6 +170,12 @@ export default function DatasetCredentials() {
                       />
                     </div>
                   ))}
+                  {dataset.credentials?.nangoIntegrationId ? (
+                    <div className="w-full">
+                      <Label htmlFor={"nangoIntegrationId"}>Access Token</Label>
+                      <AccessTokenInput datasetId={dataset.id} />
+                    </div>
+                  ) : null}
                 </div>
               </TabsContent>
               <TabsContent value="http" className="p-4">

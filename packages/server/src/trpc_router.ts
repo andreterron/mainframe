@@ -40,8 +40,8 @@ import { notion } from "./lib/integrations/notion";
 import { oura } from "./lib/integrations/oura";
 import { env } from "./lib/env.server";
 import { nango } from "./lib/nango";
-import { integrations } from "googleapis/build/src/apis/integrations";
 import * as Sentry from "@sentry/node";
+import { getTokenFromDataset } from "./lib/integration-token";
 
 /**
  * Initialization of tRPC backend
@@ -600,6 +600,23 @@ export const appRouter = router({
           },
         })
         .where(eq(datasetsTable.id, input.datasetId));
+    }),
+
+  getAccessToken: protectedProcedure
+    .input(z.object({ datasetId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      let [dataset] = await ctx.db
+        .select()
+        .from(datasetsTable)
+        .where(eq(datasetsTable.id, input.datasetId))
+        .limit(1);
+
+      if (!dataset) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const token = await getTokenFromDataset(dataset);
+      return token;
     }),
 
   syncDataset: protectedProcedure

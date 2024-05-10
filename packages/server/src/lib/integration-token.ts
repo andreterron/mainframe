@@ -2,7 +2,9 @@ import { Dataset } from "@mainframe-so/shared";
 import { nango } from "./nango";
 import { AuthModes } from "@nangohq/node";
 
-export async function getTokenFromDataset(dataset: Dataset) {
+export async function getTokenFromDataset(
+  dataset: Pick<Dataset, "id" | "credentials">,
+) {
   if (dataset.credentials?.nangoIntegrationId) {
     const connection = await nango?.getConnection(
       dataset.credentials?.nangoIntegrationId,
