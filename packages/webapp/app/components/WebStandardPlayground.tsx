@@ -78,7 +78,7 @@ export const WebStandardsPlaygroundTab = memo(function ({
     <>
       <Card className="grid grid-cols-2 grid-rows-1 h-[480px] divide-x relative">
         <Button
-          className="absolute top-3 z-10 left-1/2 rounded-full bg-slate-100 w-7 h-7 px-1 -translate-x-10 opacity-80"
+          className="absolute bottom-3 z-10 left-1/2 rounded-full bg-slate-100 w-6 h-6 px-1 -translate-x-10 opacity-85 hover:opacity-100 hover:bg-slate-200"
           variant="ghost"
           size="icon"
           onClick={togglePlaygroundTheme}
