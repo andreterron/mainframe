@@ -35,7 +35,11 @@ import {
   codeAtom,
 } from "../components/WebStandardPlayground";
 import { ScopeProvider } from "jotai-scope";
-import { areaTemplate } from "~/components/templates/templates";
+import {
+  areaTemplate,
+  positiveNegativeTemplate,
+  positiveNegativeComposedTemplate,
+} from "~/components/templates/templates";
 
 export function formatCredentialKey(str: string): string {
   return str
@@ -133,8 +137,8 @@ export default function DatasetCredentials() {
       ? ""
       : `apiUrl: "${env.VITE_API_URL}",\n  `;
 
-  // Replace placeholders in the code string
-  const appTsxCode = areaTemplate
+  // Replace placeholders in the code string, INPUT TEMPLATE HERE
+  const appTsxCode = positiveNegativeComposedTemplate
     .replace("DATASET_ID_PLACEHOLDER", dataset.id)
     .replace("API_URL_PLACEHOLDER", apiUrlString);
 
