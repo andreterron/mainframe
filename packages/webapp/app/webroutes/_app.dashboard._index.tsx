@@ -20,28 +20,35 @@ export function ComponentCard({
   const { iframe } = useComponentPreview(component.code);
 
   return (
-    <Card className="h-72 overflow-hidden">
-      <CardHeader className="space-y-0 px-4 py-2 border-b border-slate-200 ">
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col">
-            {/* <CardTitle className="text-sm">Title</CardTitle>
-            <CardDescription className="text-xs">Description</CardDescription> */}
-          </div>
-          <Link to={`/dashboard/${component.id}`}>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="rounded-full h-8 w-8 text-slate-500"
-              aria-label="Edit component"
-            >
-              <SquareCode className="w-4 h-4" />
-            </Button>
-          </Link>
-        </div>
-      </CardHeader>
-      {iframe}
-    </Card>
+    <Link to={`/dashboard/${component.id}`}>
+      <Card className="h-72 pointer-events-none overflow-hidden">{iframe}</Card>
+    </Link>
   );
+
+  // TODO: Add card header
+  // return (
+  //   <Card className="h-72 overflow-hidden">
+  //     <CardHeader className="space-y-0 px-4 py-2 border-b border-slate-200 ">
+  //       <div className="flex items-center justify-between">
+  //         <div className="flex flex-col">
+  //           {/* <CardTitle className="text-sm">Title</CardTitle>
+  //           <CardDescription className="text-xs">Description</CardDescription> */}
+  //         </div>
+  //         <Link to={`/dashboard/${component.id}`}>
+  //           <Button
+  //             variant="ghost"
+  //             size="icon"
+  //             className="rounded-full h-8 w-8 text-slate-500"
+  //             aria-label="Edit component"
+  //           >
+  //             <SquareCode className="w-4 h-4" />
+  //           </Button>
+  //         </Link>
+  //       </div>
+  //     </CardHeader>
+  //     {iframe}
+  //   </Card>
+  // );
 }
 export default function DashboardPage() {
   const { data: components } = trpc.getAllComponents.useQuery();
