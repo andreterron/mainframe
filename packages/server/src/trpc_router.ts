@@ -43,6 +43,8 @@ import { nango } from "./lib/nango";
 import * as Sentry from "@sentry/node";
 import { getTokenFromDataset } from "./lib/integration-token";
 import { spotify } from "./lib/integrations/spotify";
+import { render } from "./lib/integrations/render";
+import { vercel } from "./lib/integrations/vercel";
 
 /**
  * Initialization of tRPC backend
@@ -547,6 +549,8 @@ export const appRouter = router({
       toggl: createClientIntegration(toggl),
       posthog: createClientIntegration(posthog),
       github: createClientIntegration(github),
+      render: createClientIntegration(render),
+      vercel: createClientIntegration(vercel),
       peloton: createClientIntegration(peloton),
       // network: createClientIntegration(network),
       zotero: createClientIntegration(zotero),

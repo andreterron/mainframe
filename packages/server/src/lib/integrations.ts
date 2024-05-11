@@ -14,6 +14,8 @@ import { zotero } from "./integrations/zotero";
 import { notion } from "./integrations/notion";
 import { oura } from "./integrations/oura";
 import { spotify } from "./integrations/spotify";
+import { render } from "./integrations/render";
+import { vercel } from "./integrations/vercel";
 
 export function getIntegrationFromType(
   type: string | undefined,
@@ -47,6 +49,12 @@ export function getIntegrationFromType(
   }
   if (type === "spotify") {
     return spotify;
+  }
+  if (type === "render") {
+    return render;
+  }
+  if (type === "vercel") {
+    return vercel;
   }
   return null;
 }
