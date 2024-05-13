@@ -9,6 +9,7 @@ import oura from "./oura.png";
 import spotify from "./spotify.png";
 import render from "./render.png";
 import vercel from "./vercel.png";
+import bitbucket from "./bitbucket.png";
 
 export function datasetIcon(id: string) {
   switch (id) {
@@ -34,5 +35,7 @@ export function datasetIcon(id: string) {
       return render;
     case "vercel":
       return vercel;
+    case "bitbucket":
+      return bitbucket;
   }
 }

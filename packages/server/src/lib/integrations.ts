@@ -13,6 +13,7 @@ import { google } from "./integrations/google";
 import { zotero } from "./integrations/zotero";
 import { notion } from "./integrations/notion";
 import { oura } from "./integrations/oura";
+import { bitbucket } from "./integrations/bitbucket";
 import { spotify } from "./integrations/spotify";
 import { render } from "./integrations/render";
 import { vercel } from "./integrations/vercel";
@@ -55,6 +56,9 @@ export function getIntegrationFromType(
   }
   if (type === "vercel") {
     return vercel;
+  }
+  if (type === "bitbucket") {
+    return bitbucket;
   }
   return null;
 }

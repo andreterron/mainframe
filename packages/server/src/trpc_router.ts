@@ -45,6 +45,7 @@ import { getTokenFromDataset } from "./lib/integration-token";
 import { spotify } from "./lib/integrations/spotify";
 import { render } from "./lib/integrations/render";
 import { vercel } from "./lib/integrations/vercel";
+import { bitbucket } from "./lib/integrations/bitbucket";
 
 /**
  * Initialization of tRPC backend
@@ -556,6 +557,7 @@ export const appRouter = router({
       zotero: createClientIntegration(zotero),
       notion: createClientIntegration(notion),
       oura: createClientIntegration(oura),
+      bitbucket: createClientIntegration(bitbucket),
       ...(env.NANGO_PRIVATE_KEY
         ? { spotify: createClientIntegration(spotify) }
         : {}),
