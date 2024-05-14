@@ -174,6 +174,11 @@ export function setupServer(hooks: SetupServerHooks = {}) {
   );
   app.use("/oauth", oauthRouter);
 
+  // Redirect the root API path to the app
+  app.get("/", (req, res) => {
+    res.redirect(env.APP_URL);
+  });
+
   app.use(
     (
       err: any,
@@ -195,24 +200,10 @@ export function setupServer(hooks: SetupServerHooks = {}) {
 
   function printSuccess(port: number) {
     console.log(`\n 🎉  Your Mainframe is up!`);
-    const localUrl = `http://localhost:${port}`;
-    let lanUrl: string | null = null;
-    const localIp = ip();
-    // Check if the address is a private ip
-    // https://en.wikipedia.org/wiki/Private_network#Private_IPv4_address_spaces
-    // https://github.com/facebook/create-react-app/blob/d960b9e38c062584ff6cfb1a70e1512509a966e7/packages/react-dev-utils/WebpackDevServerUtils.js#LL48C9-L54C10
-    if (
-      localIp &&
-      /^10[.]|^172[.](1[6-9]|2[0-9]|3[0-1])[.]|^192[.]168[.]/.test(localIp)
-    ) {
-      lanUrl = `http://${localIp}:${port}`;
-    }
 
-    const urls = [`${chalk.bold("Local:")}            ${chalk.cyan(localUrl)}`];
-
-    if (lanUrl) {
-      urls.push(`${chalk.bold("On Your Network:")}  ${chalk.cyan(lanUrl)}`);
-    }
+    const urls = [
+      `${chalk.bold("Local:")}            ${chalk.cyan(env.APP_URL)}`,
+    ];
 
     if (env.TUNNEL_BASE_API_URL) {
       urls.push(
