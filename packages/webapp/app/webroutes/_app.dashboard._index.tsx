@@ -1,15 +1,8 @@
 import { PageHeader } from "../components/PageHeader";
 import { trpc } from "../lib/trpc_client";
-
 import { Link } from "react-router-dom";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../components/ui/card";
+import { Card } from "../components/ui/card";
 import { useComponentPreview } from "../components/useComponentPreview";
-import { SquareCode } from "lucide-react";
 import { Button } from "~/components/ui/button";
 
 export function ComponentCard({
@@ -20,35 +13,20 @@ export function ComponentCard({
   const { iframe } = useComponentPreview(component.code);
 
   return (
-    <Link to={`/dashboard/${component.id}`}>
-      <Card className="h-72 pointer-events-none overflow-hidden">{iframe}</Card>
-    </Link>
+    <div className="group">
+      <div className="flex justify-end w-full opacity-0 group-hover:opacity-75 focus-within:opacity-75 transition-all px-2 mb-1">
+        <Button asChild variant="ghost" size="none" className="py-px px-1.5">
+          <Link
+            to={`/dashboard/${component.id}`}
+            className="text-xs text-muted-foreground hover:bg-active"
+          >
+            Edit
+          </Link>
+        </Button>
+      </div>
+      <Card className="h-72 overflow-hidden relative">{iframe}</Card>
+    </div>
   );
-
-  // TODO: Add card header
-  // return (
-  //   <Card className="h-72 overflow-hidden">
-  //     <CardHeader className="space-y-0 px-4 py-2 border-b border-slate-200 ">
-  //       <div className="flex items-center justify-between">
-  //         <div className="flex flex-col">
-  //           {/* <CardTitle className="text-sm">Title</CardTitle>
-  //           <CardDescription className="text-xs">Description</CardDescription> */}
-  //         </div>
-  //         <Link to={`/dashboard/${component.id}`}>
-  //           <Button
-  //             variant="ghost"
-  //             size="icon"
-  //             className="rounded-full h-8 w-8 text-slate-500"
-  //             aria-label="Edit component"
-  //           >
-  //             <SquareCode className="w-4 h-4" />
-  //           </Button>
-  //         </Link>
-  //       </div>
-  //     </CardHeader>
-  //     {iframe}
-  //   </Card>
-  // );
 }
 export default function DashboardPage() {
   const { data: components } = trpc.getAllComponents.useQuery();
@@ -56,7 +34,7 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col items-start gap-4">
       <PageHeader title="Dashboard" />
-      <div className="w-full grid md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-4 px-4 max-w-[100rem]">
+      <div className="w-full grid md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-x-4 gap-y-3 px-4 max-w-[100rem]">
         {components?.map((component) => (
           <ComponentCard key={component.id} component={component} />
         ))}
