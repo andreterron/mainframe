@@ -38,6 +38,7 @@ import { google } from "./lib/integrations/google";
 import { zotero } from "./lib/integrations/zotero";
 import { notion } from "./lib/integrations/notion";
 import { oura } from "./lib/integrations/oura";
+import { valtown } from "./lib/integrations/valtown";
 import { env } from "./lib/env.server";
 import { nango } from "./lib/nango";
 import * as Sentry from "@sentry/node";
@@ -558,6 +559,7 @@ export const appRouter = router({
       notion: createClientIntegration(notion),
       oura: createClientIntegration(oura),
       bitbucket: createClientIntegration(bitbucket),
+      valtown: createClientIntegration(valtown),
       ...(env.NANGO_PRIVATE_KEY
         ? { spotify: createClientIntegration(spotify) }
         : {}),

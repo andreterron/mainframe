@@ -10,6 +10,7 @@ import spotify from "./spotify.png";
 import render from "./render.png";
 import vercel from "./vercel.png";
 import bitbucket from "./bitbucket.png";
+import valtown from "./valtown.png";
 
 export function datasetIcon(id: string) {
   switch (id) {
@@ -37,5 +38,7 @@ export function datasetIcon(id: string) {
       return vercel;
     case "bitbucket":
       return bitbucket;
+    case "valtown":
+      return valtown;
   }
 }

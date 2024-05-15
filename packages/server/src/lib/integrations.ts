@@ -17,6 +17,7 @@ import { bitbucket } from "./integrations/bitbucket";
 import { spotify } from "./integrations/spotify";
 import { render } from "./integrations/render";
 import { vercel } from "./integrations/vercel";
+import { valtown } from "./integrations/valtown";
 
 export function getIntegrationFromType(
   type: string | undefined,
@@ -59,6 +60,9 @@ export function getIntegrationFromType(
   }
   if (type === "bitbucket") {
     return bitbucket;
+  }
+  if (type === "valtown") {
+    return valtown;
   }
   return null;
 }
