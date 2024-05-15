@@ -1,6 +1,6 @@
 {
   "name": "@mainframe-so/server",
-  "version": "0.4.19",
+  "version": "0.4.20",
   "private": false,
   "description": "",
   "main": "dist/index.mjs",
