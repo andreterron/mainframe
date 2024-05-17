@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Card } from "../components/ui/card";
 import { useComponentPreview } from "../components/useComponentPreview";
 import { Button } from "~/components/ui/button";
+import { SadPath } from "../components/SadPath";
 
 export function ComponentCard({
   component,
@@ -29,15 +30,46 @@ export function ComponentCard({
   );
 }
 export default function DashboardPage() {
-  const { data: components } = trpc.getAllComponents.useQuery();
+  const {
+    data: components,
+    isLoading,
+    error,
+  } = trpc.getAllComponents.useQuery();
+
+  if (!components) {
+    return <SadPath className="p-4" error={error} isLoading={isLoading} />;
+  }
 
   return (
     <div className="flex flex-col items-start gap-4">
       <PageHeader title="Dashboard" />
       <div className="w-full grid md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-x-4 gap-y-3 px-4 max-w-[100rem]">
-        {components?.map((component) => (
-          <ComponentCard key={component.id} component={component} />
-        ))}
+        {components.length === 0 ? (
+          <div>
+            <h3 className="text-lg mb-4 font-medium">No saved components</h3>
+            <p className="prose">
+              To save a component:
+              <ol>
+                <li>
+                  Navigate to a dataset or{" "}
+                  <Link to="/new" className="">
+                    create a new one
+                  </Link>
+                </li>
+                <li>Choose an object or table</li>
+                <li>Open the playground</li>
+                <li>Click "Add to dashboard"</li>
+              </ol>
+            </p>
+            <p className="prose font-light text-sm text-muted-foreground mt-4">
+              *You'll soon be able to create components from this screen
+            </p>
+          </div>
+        ) : (
+          components.map((component) => (
+            <ComponentCard key={component.id} component={component} />
+          ))
+        )}
       </div>
     </div>
   );
