@@ -11,6 +11,7 @@ import {
 import { AlertCircleIcon } from "lucide-react";
 import { cn } from "../lib/utils";
 import { UnderReviewMessage } from "./UnderReviewMessage";
+import { partition } from "lodash";
 
 function IntegrationButton({
   integration,
@@ -92,20 +93,48 @@ export default function DatasetSetup({
   onIntegrationSelected: (type: string) => void;
 }) {
   const { data: integrations } = trpc.integrationsAll.useQuery();
+
+  const [good, bad] = partition(
+    Object.entries(integrations ?? []),
+    ([, integration]) => {
+      return (
+        !integration.underReview && integration.authTypes?.nango?.integrationId
+      );
+    },
+  );
+
   return (
     <div className="flex flex-col items-start gap-4">
       <PageHeader title="New Dataset" />
+      <div className="px-4 mt-4">
+        <h1 className=" text-lg font-medium ">Featured</h1>
+        <p className="text-sm text-muted-foreground">
+          Easier to connect. Uses OAuth
+        </p>
+      </div>
       <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
-        {(integrations ? Object.entries(integrations) : []).map(
-          ([key, integration]) => (
-            <IntegrationButton
-              key={key}
-              integration={integration}
-              type={key}
-              onClick={() => onIntegrationSelected(key)}
-            />
-          ),
-        )}
+        {good.map(([key, integration]) => (
+          <IntegrationButton
+            key={key}
+            integration={integration}
+            type={key}
+            onClick={() => onIntegrationSelected(key)}
+          />
+        ))}
+      </div>
+      <div className="px-4 mt-4">
+        <h1 className="text-lg font-medium">All integrations</h1>
+        <p className="text-sm text-muted-foreground">Use your own keys</p>
+      </div>
+      <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
+        {bad.map(([key, integration]) => (
+          <IntegrationButton
+            key={key}
+            integration={integration}
+            type={key}
+            onClick={() => onIntegrationSelected(key)}
+          />
+        ))}
       </div>
     </div>
   );
