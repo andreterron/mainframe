@@ -30,6 +30,9 @@ export interface SetupServerHooks extends CreateContextHooks, ApiRouterHooks {
   getDB?: (
     req: express.Request,
   ) => Promise<Client | undefined> | Client | undefined;
+  iterateOverDBs?: (
+    callback: (db: LibSQLDatabase, userId: string) => Promise<void>,
+  ) => Promise<void>;
 }
 
 declare global {
@@ -63,16 +66,26 @@ export function setupServer(hooks: SetupServerHooks = {}) {
   const task = cron.schedule(
     "*/10 * * * *",
     async (now) => {
-      // TODO: Iterate over every `db`
-      try {
-        await syncAll(db);
-      } catch (e) {
-        console.error(e);
+      async function syncDB(db: LibSQLDatabase, userId?: string) {
+        try {
+          await syncAll(db);
+        } catch (e) {
+          if (userId) {
+            console.error("Failed to sync User's DB", userId);
+          }
+          console.error(e);
+        }
+      }
+
+      if (hooks.iterateOverDBs) {
+        await hooks.iterateOverDBs(syncDB);
+      } else {
+        await syncDB(db);
       }
     },
     {
-      runOnInit: env.VITE_AUTH_PASS,
-      scheduled: env.VITE_AUTH_PASS,
+      runOnInit: true,
+      scheduled: true,
     },
   );
 
