@@ -137,6 +137,7 @@ export const appRouter = router({
     return {
       hasUsers,
       isLoggedIn,
+      userId,
     };
   }),
   login: procedure

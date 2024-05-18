@@ -15,6 +15,8 @@ import { trpc } from "../lib/trpc_client";
 import { useLogout } from "../lib/use-logout";
 import { Loader2Icon } from "lucide-react";
 import { Sidebar } from "../components/sidebar";
+import { posthog } from "../lib/analytics";
+import { env } from "../lib/env_client";
 
 export function SidebarButton({ dataset }: { dataset: Dataset }) {
   const type = dataset.integrationType;
@@ -82,6 +84,9 @@ export default function AppPages() {
   const { data: authInfo, isFetching } = trpc.authInfo.useQuery();
 
   useEffect(() => {
+    if (authInfo && env.VITE_AUTH_PASS && posthog) {
+      posthog.identify(authInfo.userId);
+    }
     if (!isFetching && authInfo && !authInfo.isLoggedIn) {
       navigate(authInfo.hasUsers ? "/login" : "/setup");
     }
