@@ -1,6 +1,12 @@
 import { inferAsyncReturnType } from "@trpc/server";
 import { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 
+export interface UserInfo {
+  id: string;
+  email?: string;
+  name?: string;
+}
+
 export interface CreateContextHooks {
   trpcGetUserId?: ({
     req,
@@ -8,6 +14,13 @@ export interface CreateContextHooks {
   }: CreateExpressContextOptions) =>
     | Promise<string | undefined>
     | string
+    | undefined;
+  trpcGetUserInfo?: ({
+    req,
+    res,
+  }: CreateExpressContextOptions) =>
+    | Promise<UserInfo | undefined>
+    | UserInfo
     | undefined;
   getApiKey?: (
     userId: string | undefined,
@@ -19,7 +32,7 @@ export function createContext(hooks: CreateContextHooks) {
     return {
       req,
       res,
-      userId: await hooks.trpcGetUserId?.({ req, res }),
+      user: await hooks.trpcGetUserInfo?.({ req, res }),
       db: req.db,
       hooks,
     };

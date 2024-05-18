@@ -11,7 +11,7 @@ import {
   componentsTable,
 } from "@mainframe-so/shared";
 import { z } from "zod";
-import { Context } from "./trpc_context";
+import { Context, UserInfo } from "./trpc_context";
 import { and, eq } from "drizzle-orm";
 import { syncDataset, syncObject, syncTable } from "./sync";
 import {
@@ -65,9 +65,12 @@ const procedure = t.procedure.use(sentryMiddleware);
 
 const router = t.router;
 
-async function getUserIdFromCtx(ctx: Context) {
-  if (ctx.userId) {
-    return { userId: ctx.userId, trpcAccess: true };
+async function getUserInfoFromCtx(ctx: Context): Promise<{
+  user: UserInfo | undefined;
+  trpcAccess: boolean;
+}> {
+  if (ctx.user) {
+    return { user: ctx.user, trpcAccess: true };
   }
 
   if (env.VITE_AUTH_PASS) {
@@ -77,11 +80,14 @@ async function getUserIdFromCtx(ctx: Context) {
       ctx.req.header("cookie"),
     );
     const userId = session.data.userId;
-    return { userId, trpcAccess: session.data.type === "admin" };
+    return {
+      user: userId ? { id: userId } : undefined,
+      trpcAccess: session.data.type === "admin",
+    };
   }
 
   return {
-    userId: undefined,
+    user: undefined,
     trpcAccess: false,
   };
 }
@@ -89,16 +95,16 @@ async function getUserIdFromCtx(ctx: Context) {
 const isAuthed = t.middleware(async (opts) => {
   const { ctx } = opts;
 
-  let { userId, trpcAccess } = await getUserIdFromCtx(ctx);
+  let { user, trpcAccess } = await getUserInfoFromCtx(ctx);
 
-  if (!userId || !trpcAccess) {
+  if (!user?.id || !trpcAccess) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
 
   return opts.next({
     ctx: {
       ...ctx,
-      userId,
+      user,
     },
   });
 });
@@ -130,14 +136,14 @@ export const appRouter = router({
       ? await checkIfUserExists(ctx.db)
       : false;
 
-    const { userId } = await getUserIdFromCtx(ctx);
+    const { user } = await getUserInfoFromCtx(ctx);
 
-    const isLoggedIn = !!userId;
+    const isLoggedIn = !!user?.id;
 
     return {
       hasUsers,
       isLoggedIn,
-      userId,
+      user,
     };
   }),
   login: procedure
@@ -240,7 +246,7 @@ export const appRouter = router({
       }
     }
 
-    if (ctx.userId && env.AUTH_LOGOUT_URL) {
+    if (ctx.user?.id && env.AUTH_LOGOUT_URL) {
       return {
         redirect: env.AUTH_LOGOUT_URL,
       };
@@ -508,8 +514,8 @@ export const appRouter = router({
     }),
 
   getApiKey: protectedProcedure.query(async ({ ctx }) => {
-    if (ctx.userId && ctx.hooks.getApiKey) {
-      return (await ctx.hooks.getApiKey(ctx.userId)) ?? null;
+    if (ctx.user?.id && ctx.hooks.getApiKey) {
+      return (await ctx.hooks.getApiKey(ctx.user?.id)) ?? null;
     }
     if (!env.VITE_AUTH_PASS) {
       return undefined;
@@ -520,7 +526,7 @@ export const appRouter = router({
       .where(
         and(
           eq(sessionsTable.type, "api"),
-          eq(sessionsTable.userId, ctx.userId),
+          eq(sessionsTable.userId, ctx.user.id),
         ),
       );
     if (apiKey) {
@@ -535,7 +541,7 @@ export const appRouter = router({
       .insert(sessionsTable)
       .values({
         id,
-        userId: ctx.userId,
+        userId: ctx.user.id,
         type: "api",
       })
       .returning({

@@ -84,8 +84,13 @@ export default function AppPages() {
   const { data: authInfo, isFetching } = trpc.authInfo.useQuery();
 
   useEffect(() => {
-    if (authInfo && env.VITE_AUTH_PASS && posthog) {
-      posthog.identify(authInfo.userId);
+    if (authInfo && !env.VITE_AUTH_PASS && posthog) {
+      const user = authInfo.user;
+      if (user) {
+        posthog.identify(user.id, { email: user.email, name: user.name });
+      } else {
+        posthog.identify(undefined);
+      }
     }
     if (!isFetching && authInfo && !authInfo.isLoggedIn) {
       navigate(authInfo.hasUsers ? "/login" : "/setup");
