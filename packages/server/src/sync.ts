@@ -157,7 +157,12 @@ export async function syncTable(
 
     // Save the rows on the DB
     if (!Array.isArray(data)) {
-      console.error("Data is not an array");
+      console.error(
+        "Data is not an array. type:",
+        typeof data,
+        "| Dataset id:",
+        dataset.id,
+      );
       return;
     }
 
