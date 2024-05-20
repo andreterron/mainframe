@@ -7,13 +7,13 @@ import {
 
 export function PreviewLabel({ className }: { className?: string }) {
   return (
-    <div className={className}>
+    <span className={className}>
       <TooltipProvider>
         <Tooltip delayDuration={0}>
           <TooltipTrigger asChild>
-            <div className="border rounded opacity-70 hover:opacity-100 border-gray-400 px-1 py-0.5 text-xs text-gray-600 bg-gray-200 data-[state=delayed-open]:opacity-100">
+            <span className="border rounded opacity-70 hover:opacity-100 border-gray-400 px-1 py-0.5 text-xs text-gray-600 bg-gray-200 data-[state=delayed-open]:opacity-100">
               Preview
-            </div>
+            </span>
           </TooltipTrigger>
           <TooltipContent className="max-w-xs" side="bottom" sideOffset={12}>
             <p>
@@ -32,6 +32,6 @@ export function PreviewLabel({ className }: { className?: string }) {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-    </div>
+    </span>
   );
 }

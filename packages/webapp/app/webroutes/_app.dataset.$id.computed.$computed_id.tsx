@@ -17,6 +17,7 @@ import { useComputed } from "../lib/data/computed";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import codeStyleLight from "react-syntax-highlighter/dist/esm/styles/hljs/docco";
 import { Input } from "../components/ui/input";
+import { PreviewLabel } from "../components/PreviewLabel";
 
 export default function DatasetComputed() {
   const [paramValues, setParamValues] = useState<Record<string, string>>();
@@ -49,7 +50,12 @@ export default function DatasetComputed() {
       <div className="relative overflow-y-auto">
         <div className="flex flex-col items-start">
           <PageHeader
-            title={name}
+            title={
+              <span className="inline-flex items-center">
+                <span>{name}</span>
+                <PreviewLabel className="ml-2 mt-0.5 inline-flex" />
+              </span>
+            }
             breadcrumb={
               <DatasetBreadcrumb dataset={dataset}>
                 <BreadcrumbSeparator />
