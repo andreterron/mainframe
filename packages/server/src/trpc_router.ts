@@ -813,14 +813,14 @@ export const appRouter = router({
       }
 
       // TODO: params type
-      const result = params ? await fn.get?.(dataset, params as any) : {};
+      const result = params ? await fn.get?.(dataset, params as any) : null;
 
       return {
         dataset,
         id: fn.id,
         name: fn.name,
         params: fn.params,
-        data: result as {},
+        data: result as {} | null,
       };
     }),
 });

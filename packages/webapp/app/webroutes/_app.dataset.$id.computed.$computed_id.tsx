@@ -35,7 +35,7 @@ export default function DatasetComputed() {
     params = computed?.params,
     data = computed?.data;
 
-  if (!dataset || !data) {
+  if (!dataset || !computed) {
     return (
       <SadPath
         className="p-4"
@@ -99,17 +99,19 @@ export default function DatasetComputed() {
               )}
             </Button>
           </form>
-          <pre className="whitespace-pre-wrap font-mono p-4">
-            <SyntaxHighlighter
-              customStyle={{
-                background: "transparent",
-              }}
-              language="json"
-              style={codeStyleLight}
-            >
-              {JSON.stringify(data, null, 4)}
-            </SyntaxHighlighter>
-          </pre>
+          {data && (
+            <pre className="whitespace-pre-wrap font-mono p-4">
+              <SyntaxHighlighter
+                customStyle={{
+                  background: "transparent",
+                }}
+                language="json"
+                style={codeStyleLight}
+              >
+                {JSON.stringify(data, null, 4)}
+              </SyntaxHighlighter>
+            </pre>
+          )}
         </div>
       </div>
     </ScopeProvider>
