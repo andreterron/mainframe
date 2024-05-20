@@ -21,6 +21,7 @@ import {
 } from "./sessions.server";
 import {
   createClientIntegration,
+  getDatasetFunction,
   getDatasetObject,
   getDatasetTable,
   getIntegrationForDataset,
@@ -149,8 +150,8 @@ export const appRouter = router({
   login: procedure
     .input(
       z.object({
-        username: z.string().nonempty(),
-        password: z.string().nonempty(),
+        username: z.string().min(1),
+        password: z.string().min(1),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -187,8 +188,8 @@ export const appRouter = router({
   signup: procedure
     .input(
       z.object({
-        username: z.string().nonempty(),
-        password: z.string().nonempty(),
+        username: z.string().min(1),
+        password: z.string().min(1),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -452,10 +453,10 @@ export const appRouter = router({
   tablesUpdateView: protectedProcedure
     .input(
       z.object({
-        datasetId: z.string().nonempty(),
-        tableId: z.string().nonempty(),
+        datasetId: z.string().min(1),
+        tableId: z.string().min(1),
         // TODO: Make sure view is what we expect before saving
-        view: z.string().nonempty(),
+        view: z.string().min(1),
       }),
     )
     .mutation(async ({ input, ctx }) => {
@@ -780,6 +781,47 @@ export const appRouter = router({
           code: "NOT_FOUND",
         });
       }
+    }),
+
+  getComputedData: protectedProcedure
+    .input(
+      z.object({
+        datasetId: z.string().min(1).optional(),
+        functionName: z.string().min(1).optional(),
+        params: z.record(z.string()).optional(),
+      }),
+    )
+    .query(async ({ input: { datasetId, functionName, params }, ctx }) => {
+      if (!datasetId || !functionName) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const [dataset] = await ctx.db
+        .select()
+        .from(datasetsTable)
+        .where(eq(datasetsTable.id, datasetId))
+        .limit(1);
+
+      if (!dataset) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const fn = getDatasetFunction(dataset, functionName);
+
+      if (!fn) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      // TODO: params type
+      const result = params ? await fn.get?.(dataset, params as any) : {};
+
+      return {
+        dataset,
+        id: fn.id,
+        name: fn.name,
+        params: fn.params,
+        data: result as {},
+      };
     }),
 });
 

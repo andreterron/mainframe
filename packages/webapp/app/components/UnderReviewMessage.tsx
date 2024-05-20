@@ -9,7 +9,13 @@ export function UnderReviewMessage({
     <>
       This integration is currently awaiting approval from {integration.name}.
       Please send us a{" "}
-      <a className="underline" href="https://discord.gg/HUS4y59Dxw">
+      <a
+        className="underline"
+        href="https://discord.gg/HUS4y59Dxw"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Discord"
+      >
         Discord
       </a>{" "}
       message if you need help.

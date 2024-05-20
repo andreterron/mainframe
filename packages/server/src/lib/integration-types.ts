@@ -1,4 +1,4 @@
-import { Dataset, AuthType } from "@mainframe-so/shared";
+import { Dataset, AuthType, ComputedDataParamsDef } from "@mainframe-so/shared";
 import { LibSQLDatabase } from "drizzle-orm/libsql";
 import { Request, Response } from "express";
 
@@ -12,6 +12,13 @@ export interface IntegrationObject {
   name: string;
   get?: (dataset: Dataset) => Promise<any>;
   objId?: (dataset: Dataset, obj: any) => string;
+}
+
+export interface IntegrationComputed {
+  name: string;
+  params: ComputedDataParamsDef;
+  // TODO: Params type
+  get?: (dataset: Dataset, params: any) => Promise<any>;
 }
 
 // TODO: Merge `objects` and `tables` options
@@ -51,6 +58,9 @@ export interface Integration {
   };
   tables: {
     [key: string]: IntegrationTable;
+  };
+  computed?: {
+    [key: string]: IntegrationComputed;
   };
   actions?: {
     [key: string]: (dataset: Dataset, input: any) => Promise<any>;

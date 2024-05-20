@@ -6,6 +6,14 @@ export interface AuthTypes {
   };
 }
 
+export interface ComputedDataParam {
+  key: string;
+  label?: string;
+  placeholder?: string;
+}
+
+export type ComputedDataParamsDef = ComputedDataParam[];
+
 export interface ClientIntegration {
   name: string;
   underReview: boolean;
@@ -19,5 +27,10 @@ export interface ClientIntegration {
   tables: {
     id: string;
     name: string;
+  }[];
+  computed: {
+    id: string;
+    name: string;
+    params: ComputedDataParamsDef;
   }[];
 }

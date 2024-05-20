@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { Dataset, ClientIntegration } from "@mainframe-so/shared";
 import { DatasetHeader } from "./DatasetHeader";
 import { getDatasetCredentialsKeys } from "../lib/data/credentials";
+import { FunctionSquareIcon } from "lucide-react";
+import { PreviewLabel } from "./PreviewLabel";
 
 export function DatasetPage({
   dataset,
@@ -10,7 +12,7 @@ export function DatasetPage({
   dataset: Dataset;
   integration: ClientIntegration;
 }) {
-  const { tables, objects } = integration;
+  const { tables, objects, computed } = integration;
 
   return (
     <div className="flex flex-col gap-8 items-start">
@@ -91,6 +93,19 @@ export function DatasetPage({
             </svg>
             <span>{table.name}</span>
           </Link>
+        ))}
+        {computed.map((fn) => (
+          <div className="flex items-center gap-1">
+            <Link
+              to={`/dataset/${dataset.id}/computed/${fn.id}`}
+              key={fn.id}
+              className="flex items-center gap-3 cursor-pointer select-none text-gray-900 bg-white focus:outline-none hover:bg-gray-100 active:bg-gray-200 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg px-4 py-2 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-700"
+            >
+              <FunctionSquareIcon className="flex-grow-0 flex-shrink-0 w-5 h-5" />
+              <span>{fn.name}</span>
+            </Link>
+            <PreviewLabel />
+          </div>
         ))}
       </div>
     </div>

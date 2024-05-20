@@ -1,5 +1,6 @@
 import {
   Integration,
+  IntegrationComputed,
   IntegrationObject,
   IntegrationTable,
 } from "./integration-types";
@@ -84,6 +85,11 @@ export function createClientIntegration(
       id: k,
       name: v.name,
     })),
+    computed: Object.entries(integration.computed ?? {}).map(([k, v]) => ({
+      id: k,
+      name: v.name,
+      params: v.params,
+    })),
   };
 }
 
@@ -125,4 +131,13 @@ export function getDatasetTable(
   const integration = getIntegrationForDataset(dataset);
   const table = integration?.tables?.[tableId];
   return table ? { ...table, id: tableId } : null;
+}
+
+export function getDatasetFunction(
+  dataset: Dataset,
+  functionName: string,
+): (IntegrationComputed & { id: string }) | null {
+  const integration = getIntegrationForDataset(dataset);
+  const fn = integration?.computed?.[functionName];
+  return fn ? { ...fn, id: functionName } : null;
 }

@@ -53,4 +53,31 @@ export const github: Integration = {
       },
     },
   },
+  computed: {
+    issues: {
+      name: "Issues",
+      // TODO: Use tRPC-like API to define params
+      params: [
+        { key: "owner", label: "Owner", placeholder: "facebook" },
+        { key: "repo", label: "Repo", placeholder: "react" },
+      ],
+      get: async (
+        dataset: Dataset,
+        params: { owner: string; repo: string },
+      ) => {
+        const token = await getTokenFromDataset(dataset);
+        if (!token) return [];
+        const res = await fetch(
+          `https://api.github.com/repos/${params.owner}/${params.repo}/issues?per_page=100`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "X-GitHub-Api-Version": "2022-11-28",
+            },
+          },
+        );
+        return await res.json();
+      },
+    },
+  },
 };
