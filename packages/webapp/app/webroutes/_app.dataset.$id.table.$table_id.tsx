@@ -27,7 +27,7 @@ import {
 import { Separator } from "@radix-ui/react-dropdown-menu";
 import { Label } from "../components/ui/label";
 import { cn } from "../lib/utils";
-import { trpc } from "../lib/trpc_client";
+import { trpc, trpcProxyClient } from "../lib/trpc_client";
 import { SadPath } from "../components/SadPath";
 import { useTable } from "../lib/data/table";
 import { RowType } from "../lib/types";
@@ -52,6 +52,7 @@ import {
   codeAtom,
 } from "../components/WebStandardPlayground";
 import { ScopeProvider } from "jotai-scope";
+import { useSetAtom } from "jotai";
 
 const colHelper = createColumnHelper<RowType>();
 
@@ -84,7 +85,14 @@ function ColumnMenuItem({ column }: { column: Column<RowType, unknown> }) {
   );
 }
 
-export default function DatasetTableDetails() {
+export default function DatasetTableDetailsPage() {
+  return (
+    <ScopeProvider atoms={[codeAtom]}>
+      <DatasetTableDetails />
+    </ScopeProvider>
+  );
+}
+export function DatasetTableDetails() {
   const params = useParams();
   const datasetId = params.id;
   const tableId = params.table_id;
@@ -189,6 +197,20 @@ export default function DatasetTableDetails() {
     },
   });
 
+  async function generateCode(prompt: string) {
+    if (!datasetId || !tableId || !prompt) {
+      return;
+    }
+
+    const code = await trpcProxyClient.generateComponent.query({
+      datasetId,
+      tableId,
+      prompt,
+    });
+
+    return code;
+  }
+
   if (!dataset || !dbTable || !rows) {
     return (
       <SadPath
@@ -200,50 +222,49 @@ export default function DatasetTableDetails() {
   }
 
   return (
-    <ScopeProvider atoms={[codeAtom]}>
-      <div className="relative overflow-y-auto">
-        <div className="flex flex-col items-start">
-          <PageHeader
-            title={dbTable.name}
-            breadcrumb={
-              <DatasetBreadcrumb dataset={dataset}>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>{dbTable.name}</BreadcrumbPage>
-                </BreadcrumbItem>
-              </DatasetBreadcrumb>
-            }
-          >
-            <Popover>
-              <PopoverTrigger
-                title="More"
-                className={cn(
-                  buttonVariants({
-                    variant: "ghost",
-                    size: "icon",
-                    className: "data-[state=open]:bg-accent",
-                  }),
-                )}
-              >
-                <MoreVerticalIcon className="h-4 w-4" />
-              </PopoverTrigger>
-              <PopoverContent className="w-auto px-0 py-1">
-                <Label className="px-4 py-3 block">Columns</Label>
-                <Separator className="w-full h-px bg-border" />
-                <div className="flex flex-col gap-1 px-4 py-2">
-                  {table.getVisibleLeafColumns().map((column) => (
+    <div className="relative overflow-y-auto">
+      <div className="flex flex-col items-start">
+        <PageHeader
+          title={dbTable.name}
+          breadcrumb={
+            <DatasetBreadcrumb dataset={dataset}>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{dbTable.name}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </DatasetBreadcrumb>
+          }
+        >
+          <Popover>
+            <PopoverTrigger
+              title="More"
+              className={cn(
+                buttonVariants({
+                  variant: "ghost",
+                  size: "icon",
+                  className: "data-[state=open]:bg-accent",
+                }),
+              )}
+            >
+              <MoreVerticalIcon className="h-4 w-4" />
+            </PopoverTrigger>
+            <PopoverContent className="w-auto px-0 py-1">
+              <Label className="px-4 py-3 block">Columns</Label>
+              <Separator className="w-full h-px bg-border" />
+              <div className="flex flex-col gap-1 px-4 py-2">
+                {table.getVisibleLeafColumns().map((column) => (
+                  <ColumnMenuItem key={column.id} column={column} />
+                ))}
+                {table
+                  .getAllFlatColumns()
+                  .filter((c) => !c.getIsVisible())
+                  .map((column) => (
                     <ColumnMenuItem key={column.id} column={column} />
                   ))}
-                  {table
-                    .getAllFlatColumns()
-                    .filter((c) => !c.getIsVisible())
-                    .map((column) => (
-                      <ColumnMenuItem key={column.id} column={column} />
-                    ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-            {/* <DropdownMenu>
+              </div>
+            </PopoverContent>
+          </Popover>
+          {/* <DropdownMenu>
                         <DropdownMenuTrigger className="ml-2 inline-flex justify-center rounded-md text-gray-400 bg-black bg-opacity-0 p-1.5 text-sm font-medium hover:bg-opacity-5 data-[state=open]:bg-opacity-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-opacity-75">
                             <MoreVerticalIcon className="h-4 w-4" />
                         </DropdownMenuTrigger>
@@ -261,85 +282,86 @@ export default function DatasetTableDetails() {
                                 ))}
                         </DropdownMenuContent>
                     </DropdownMenu> */}
-          </PageHeader>
-          <Tabs defaultValue="table" className="flex flex-col w-full">
-            <TabsList className="grid grid-cols-3 m-4 self-start">
-              <TabsTrigger value="table">
-                <SheetIcon className="w-3.5 h-3.5 mr-1" />
-                Table
-              </TabsTrigger>
-              <TabsTrigger value="playground">
-                <PlayIcon className="w-3.5 h-3.5 mr-1" />
-                Playground
-              </TabsTrigger>
-              <TabsTrigger value="http">
-                <GlobeIcon className="w-3.5 h-3.5 mr-1" />
-                HTTP
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="table">
-              <div className="max-w-full overflow-auto">
-                {rows.length === 0 ? (
-                  <span className="text-gray-500 mx-4">(Empty table)</span>
-                ) : (
-                  <table className="text-sm text-left text-gray-500 dark:text-gray-400 border-separate border-spacing-0 border-t">
-                    <thead className="text-sm text-gray-700 font-mono">
-                      {table.getHeaderGroups().map((headerGroup) => (
-                        <tr key={headerGroup.id} className="">
-                          {headerGroup.headers.map((header) => (
-                            <th
-                              key={header.id}
-                              scope="col"
-                              className="group box-border border-b bg-gray-50 dark:bg-gray-700 dark:text-gray-400 px-6 py-3 sticky top-0"
-                            >
-                              <span className="flex items-center">
-                                <span className="flex-grow overflow-hidden text-ellipsis">
-                                  {header.isPlaceholder
-                                    ? null
-                                    : flexRender(
-                                        header.column.columnDef.header,
-                                        header.getContext(),
-                                      )}
-                                </span>
-                                {header.column.id !== "_open" ? (
-                                  <ColumnMenu header={header} />
-                                ) : null}
+        </PageHeader>
+        <Tabs defaultValue="table" className="flex flex-col w-full">
+          <TabsList className="grid grid-cols-3 m-4 self-start">
+            <TabsTrigger value="table">
+              <SheetIcon className="w-3.5 h-3.5 mr-1" />
+              Table
+            </TabsTrigger>
+            <TabsTrigger value="playground">
+              <PlayIcon className="w-3.5 h-3.5 mr-1" />
+              Playground
+            </TabsTrigger>
+            <TabsTrigger value="http">
+              <GlobeIcon className="w-3.5 h-3.5 mr-1" />
+              HTTP
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="table">
+            <div className="max-w-full overflow-auto">
+              {rows.length === 0 ? (
+                <span className="text-gray-500 mx-4">(Empty table)</span>
+              ) : (
+                <table className="text-sm text-left text-gray-500 dark:text-gray-400 border-separate border-spacing-0 border-t">
+                  <thead className="text-sm text-gray-700 font-mono">
+                    {table.getHeaderGroups().map((headerGroup) => (
+                      <tr key={headerGroup.id} className="">
+                        {headerGroup.headers.map((header) => (
+                          <th
+                            key={header.id}
+                            scope="col"
+                            className="group box-border border-b bg-gray-50 dark:bg-gray-700 dark:text-gray-400 px-6 py-3 sticky top-0"
+                          >
+                            <span className="flex items-center">
+                              <span className="flex-grow overflow-hidden text-ellipsis">
+                                {header.isPlaceholder
+                                  ? null
+                                  : flexRender(
+                                      header.column.columnDef.header,
+                                      header.getContext(),
+                                    )}
                               </span>
-                            </th>
-                          ))}
-                        </tr>
-                      ))}
-                    </thead>
-                    <tbody>
-                      {table.getRowModel().rows.map((row) => (
-                        <tr
-                          key={row.id}
-                          className="bg-white dark:bg-gray-800 dark:border-gray-700"
-                        >
-                          {row.getVisibleCells().map((cell) => (
-                            <td
-                              key={cell.id}
-                              className="px-6 py-4 border-b font-mono whitespace-nowrap"
-                            >
-                              {flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext(),
-                              )}
-                            </td>
-                          ))}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            </TabsContent>
-            <TabsContent value="http" className="p-4">
-              <ApiRequestTab apiPath={`table/${dbTable.id}/rows`} />
-            </TabsContent>
-            <TabsContent value="playground" className="p-4">
-              <WebStandardsPlaygroundTab
-                appTsxCode={`import { useMainframeTable } from "@mainframe-so/react";
+                              {header.column.id !== "_open" ? (
+                                <ColumnMenu header={header} />
+                              ) : null}
+                            </span>
+                          </th>
+                        ))}
+                      </tr>
+                    ))}
+                  </thead>
+                  <tbody>
+                    {table.getRowModel().rows.map((row) => (
+                      <tr
+                        key={row.id}
+                        className="bg-white dark:bg-gray-800 dark:border-gray-700"
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <td
+                            key={cell.id}
+                            className="px-6 py-4 border-b font-mono whitespace-nowrap"
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </TabsContent>
+          <TabsContent value="http" className="p-4">
+            <ApiRequestTab apiPath={`table/${dbTable.id}/rows`} />
+          </TabsContent>
+          <TabsContent value="playground" className="p-4">
+            <WebStandardsPlaygroundTab
+              onGenerateCode={generateCode}
+              appTsxCode={`import { useMainframeTable } from "@mainframe-so/react";
 
 // TODO: Get environment variables from your app
 import { env } from "./env.ts";
@@ -359,11 +381,10 @@ export default function App(): JSX.Element {
     <pre>{JSON.stringify(data ?? null, null, 4)}</pre>
   </>);
 }`}
-              />
-            </TabsContent>
-          </Tabs>
-        </div>
+            />
+          </TabsContent>
+        </Tabs>
       </div>
-    </ScopeProvider>
+    </div>
   );
 }

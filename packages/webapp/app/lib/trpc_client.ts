@@ -1,6 +1,7 @@
 import {
   TRPCClientError,
   createTRPCReact,
+  createTRPCProxyClient,
   httpBatchLink,
 } from "@trpc/react-query";
 import type { AppRouter } from "@mainframe-so/server";
@@ -8,6 +9,22 @@ import { useState } from "react";
 import { QueryClient } from "@tanstack/react-query";
 import { isTrpcNotFoundError } from "../utils/errors";
 import { env } from "./env_client";
+
+const links = [
+  httpBatchLink({
+    url: `${env.VITE_API_URL}/trpc`,
+    fetch(url, options) {
+      return fetch(url, {
+        ...options,
+        credentials: "include",
+      });
+    },
+  }),
+];
+
+export const trpcProxyClient = createTRPCProxyClient<AppRouter>({
+  links,
+});
 
 export const trpc = createTRPCReact<AppRouter>();
 
@@ -35,17 +52,7 @@ export const useRootQueryClient = () => {
 export const useRootTRPCClient = () => {
   const [trpcClient] = useState(() =>
     trpc.createClient({
-      links: [
-        httpBatchLink({
-          url: `${env.VITE_API_URL}/trpc`,
-          fetch(url, options) {
-            return fetch(url, {
-              ...options,
-              credentials: "include",
-            });
-          },
-        }),
-      ],
+      links,
     }),
   );
   return trpcClient;

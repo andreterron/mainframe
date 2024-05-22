@@ -48,6 +48,8 @@ import { spotify } from "./lib/integrations/spotify";
 import { render } from "./lib/integrations/render";
 import { vercel } from "./lib/integrations/vercel";
 import { bitbucket } from "./lib/integrations/bitbucket";
+import { getTableData } from "./lib/table-data";
+import { generateComponent } from "./lib/llm/openai";
 
 /**
  * Initialization of tRPC backend
@@ -117,6 +119,12 @@ export const protectedProcedure = procedure.use(isAuthed);
  * that can be used throughout the router
  */
 export const appRouter = router({
+  // ----- Helpers
+
+  isAIEnabled: procedure.query(() => !!env.OPENAI_API_KEY),
+
+  // ----- Auth
+
   authEnabled: procedure.query(async ({}) => {
     return {
       pass: { enabled: env.VITE_AUTH_PASS },
@@ -394,61 +402,12 @@ export const appRouter = router({
     )
     .query(async ({ input, ctx }) => {
       const { datasetId, tableId } = input;
-      if (!datasetId || !tableId) {
+      const result = await getTableData(datasetId, tableId, ctx.db);
+      if (!result) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      const [dataset] = await ctx.db
-        .select()
-        .from(datasetsTable)
-        .where(eq(datasetsTable.id, datasetId))
-        .limit(1);
-
-      if (!dataset) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
-
-      const table = getDatasetTable(dataset, tableId);
-
-      if (!table) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
-
-      // Upsert table
-      const tableRows = await ctx.db
-        .insert(tablesTable)
-        .values({
-          datasetId: dataset.id,
-          name: table.name,
-          key: tableId,
-        })
-        .onConflictDoUpdate({
-          target: [tablesTable.datasetId, tablesTable.key],
-          set: { key: tableId },
-        })
-        .returning({
-          id: tablesTable.id,
-          view: tablesTable.view,
-          name: tablesTable.name,
-        });
-
-      const rows = await ctx.db
-        .select({ id: rowsTable.id, data: rowsTable.data })
-        .from(rowsTable)
-        .innerJoin(tablesTable, eq(tablesTable.id, rowsTable.tableId))
-        .where(
-          and(
-            eq(tablesTable.datasetId, datasetId),
-            eq(tablesTable.key, tableId),
-          ),
-        )
-        .limit(ROW_LIMIT);
-
-      return {
-        dataset,
-        rows: rows.map(deserializeData),
-        table: tableRows.at(0),
-      };
+      return result;
     }),
   tablesUpdateView: protectedProcedure
     .input(
@@ -822,6 +781,30 @@ export const appRouter = router({
         params: fn.params,
         data: result as {} | null,
       };
+    }),
+
+  generateComponent: protectedProcedure
+    .input(
+      z.object({
+        prompt: z.string().min(1),
+        datasetId: z.string().min(1),
+        tableId: z.string().min(1),
+      }),
+    )
+    .query(async function ({ input: { datasetId, tableId, prompt }, ctx }) {
+      // Get data
+      const result = await getTableData(datasetId, tableId, ctx.db);
+      if (!result?.table) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      // Generate prompt and call OpenAI
+      const code = await generateComponent(
+        prompt,
+        result.table.id,
+        result.rows,
+      );
+      return code;
     }),
 });
 

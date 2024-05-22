@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import { config } from "dotenv";
 
+// TODO: Review .env file location
 config({ path: "../../.env" });
 
 // https://vitejs.dev/config/
