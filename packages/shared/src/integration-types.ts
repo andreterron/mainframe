@@ -4,6 +4,15 @@ export interface AuthTypes {
   nango?: {
     integrationId: string;
   };
+  form?: {
+    params: {
+      key: string;
+      label?: string;
+      placeholder?: string;
+      type?: "text" | "password";
+    }[];
+    info?: string;
+  };
 }
 
 export interface ComputedDataParam {

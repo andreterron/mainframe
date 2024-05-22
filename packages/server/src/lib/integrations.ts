@@ -19,6 +19,14 @@ import { spotify } from "./integrations/spotify";
 import { render } from "./integrations/render";
 import { vercel } from "./integrations/vercel";
 import { valtown } from "./integrations/valtown";
+import { pick } from "lodash";
+import { z } from "zod";
+
+export const zTokenCredentials = z.object({ token: z.string().min(1) });
+export const zOAuthCredentials = z.object({
+  clientId: z.string().min(1),
+  clientSecret: z.string().min(1),
+});
 
 export function getIntegrationFromType(
   type: string | undefined,
@@ -74,7 +82,14 @@ export function createClientIntegration(
   return {
     name: integration.name,
     underReview: integration.underReview ?? false,
-    authTypes: integration.authTypes,
+    authTypes: !integration.authTypes
+      ? integration.authTypes
+      : {
+          nango: integration.authTypes.nango,
+          form: !integration.authTypes.form
+            ? integration.authTypes.form
+            : pick(integration.authTypes.form, ["info", "params"]),
+        },
     authType: integration.authType,
     authSetupDocs: integration.authSetupDocs,
     objects: Object.entries(integration.objects ?? {}).map(([k, v]) => ({

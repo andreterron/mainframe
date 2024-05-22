@@ -4,26 +4,26 @@ import { Button } from "./ui/button";
 import Nango from "@nangohq/frontend";
 import { env } from "../lib/env_client";
 import { trpc } from "../lib/trpc_client";
-import { AlertTriangleIcon } from "lucide-react";
+import { AlertTriangleIcon, InfoIcon, LoaderIcon } from "lucide-react";
 import { UnderReviewMessage } from "./UnderReviewMessage";
+import { Fragment } from "react";
+import { formJson } from "../utils/form-json";
 
 export default function DatasetTokenInput({
-  onSubmit,
   dataset,
   integration,
 }: {
-  onSubmit: (creds: {
-    token?: string;
-    accessToken?: string;
-    refreshToken?: string;
-    clientId?: string;
-    clientSecret?: string;
-  }) => void;
   dataset: Dataset;
   integration: ClientIntegration;
 }) {
   const utils = trpc.useContext();
   const checkNangoIntegration = trpc.checkNangoIntegration.useMutation({
+    onSettled() {
+      utils.datasetsGet.invalidate();
+    },
+  });
+
+  const datasetsSetAuth = trpc.datasetsSetAuth.useMutation({
     onSettled() {
       utils.datasetsGet.invalidate();
     },
@@ -98,29 +98,59 @@ export default function DatasetTokenInput({
             autoComplete="off"
             onSubmit={(e) => {
               e.preventDefault();
-              const token = ((e.target as any)?.token as HTMLInputElement)
-                ?.value;
-              const clientId = (
-                (e.target as any)?.client_id as HTMLInputElement
-              )?.value;
-              const clientSecret = (
-                (e.target as any)?.client_secret as HTMLInputElement
-              )?.value;
-              // TODO: Consider using zod
-              if (token || (clientId && clientSecret)) {
-                onSubmit({
-                  token,
-                  clientId,
-                  clientSecret,
-                });
-              } else {
-                console.error("Invalid data");
-                // TODO: Handle Error
-              }
+              datasetsSetAuth.mutate({
+                params: formJson(e.target as HTMLFormElement),
+                datasetId: dataset.id,
+              });
             }}
           >
             <div className="flex flex-col gap-2 items-start">
-              {integration.authType === "token" ? (
+              {integration.authTypes?.form ? (
+                <>
+                  {integration.authTypes.form.params.map((param) => (
+                    <Fragment key={param.key}>
+                      <label>{param.label}</label>
+                      {param.type === "password" ? (
+                        <input
+                          name={param.key}
+                          type="password"
+                          className="px-2 py-1 border rounded-md w-96 max-w-full"
+                          // Hack to get browsers to not save this "password" field
+                          autoComplete="off"
+                          readOnly
+                          onFocus={(e) => e.target.removeAttribute("readonly")}
+                          onBlur={(e) => e.target.setAttribute("readonly", "")}
+                        />
+                      ) : (
+                        <input
+                          name={param.key}
+                          type="text"
+                          className="px-2 py-1 border rounded-md w-96 max-w-full"
+                          autoComplete="off"
+                        />
+                      )}
+                    </Fragment>
+                  ))}
+                  {integration.authTypes.form.info && (
+                    <div className="text-sm text-muted-foreground flex items-center gap-2 opacity-80 my-2">
+                      <InfoIcon className="w-4 h-4" />
+                      <span>{integration.authTypes.form.info}</span>
+                    </div>
+                  )}
+                  <Button
+                    variant="secondary"
+                    disabled={datasetsSetAuth.isLoading}
+                  >
+                    Save
+                    {datasetsSetAuth.isLoading && (
+                      <>
+                        {" "}
+                        <LoaderIcon className="w-4 h-4 animate-spin" />
+                      </>
+                    )}
+                  </Button>
+                </>
+              ) : integration.authType === "token" ? (
                 <>
                   <label>Token:</label>
                   <input

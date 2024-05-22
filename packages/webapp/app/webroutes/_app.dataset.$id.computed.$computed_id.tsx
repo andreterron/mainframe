@@ -18,6 +18,7 @@ import SyntaxHighlighter from "react-syntax-highlighter";
 import codeStyleLight from "react-syntax-highlighter/dist/esm/styles/hljs/docco";
 import { Input } from "../components/ui/input";
 import { PreviewLabel } from "../components/PreviewLabel";
+import { formJson } from "../utils/form-json";
 
 export default function DatasetComputed() {
   const [paramValues, setParamValues] = useState<Record<string, string>>();
@@ -69,13 +70,7 @@ export default function DatasetComputed() {
             className="px-4"
             onSubmit={(e) => {
               e.preventDefault();
-              const values = Object.fromEntries(
-                Array.from(new FormData(e.target as any).entries()).filter(
-                  (entry): entry is [string, string] =>
-                    typeof entry[1] === "string",
-                ),
-              );
-              console.log("VALUES", values);
+              const values = formJson(e.target as HTMLFormElement);
               setParamValues(values);
             }}
           >

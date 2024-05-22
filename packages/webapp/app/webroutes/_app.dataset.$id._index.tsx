@@ -63,14 +63,6 @@ export default function DatasetDetails() {
     });
   }
 
-  function setCredentials(credentials: DatasetCredentials) {
-    if (!dataset || !id) {
-      console.error("No doc to set token");
-      return;
-    }
-    datasetsUpdate.mutate({ id, patch: { credentials } });
-  }
-
   return (
     <div className="flex flex-col">
       {!dataset.integrationType ? (
@@ -83,7 +75,6 @@ export default function DatasetDetails() {
         !dataset.credentials?.accessToken &&
         !dataset.credentials?.nangoIntegrationId ? (
           <DatasetTokenInput
-            onSubmit={(creds) => setCredentials(creds)}
             dataset={dataset}
             integration={integrations[dataset.integrationType]}
           />

@@ -1,24 +1,63 @@
 import { and, eq } from "drizzle-orm";
-import { objectsTable } from "@mainframe-so/shared";
+import { datasetsTable } from "@mainframe-so/shared";
 import { Integration } from "../integration-types";
 import { Dataset } from "@mainframe-so/shared";
-import { deserialize } from "../../utils/serialization";
+import { z } from "zod";
+
+const zPelotonAuthResponseBody = z.object({
+  session_id: z.string().min(1),
+  user_id: z.string().min(1),
+  // "pubsub_session": {},
+});
 
 export const peloton: Integration = {
   name: "Peloton",
   authType: "token",
+  authTypes: {
+    form: {
+      params: [
+        {
+          key: "username",
+          label: "Username or email",
+          placeholder: "Your Peloton username or email",
+        },
+        {
+          key: "password",
+          type: "password",
+          label: "Password",
+          placeholder: "Your Peloton password",
+        },
+      ],
+      info: "We don't store your password.",
+      async onSubmit(dataset: Dataset, params: Record<string, string>, db) {
+        const res = await fetch("https://api.onepeloton.com/auth/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username_or_email: params.username,
+            password: params.password,
+          }),
+        });
+
+        // TODO: this throws!
+        const body = zPelotonAuthResponseBody.parse(await res.json());
+
+        await db
+          .update(datasetsTable)
+          .set({
+            credentials: { ...dataset.credentials, token: body.session_id },
+          })
+          .where(eq(datasetsTable.id, dataset.id));
+      },
+    },
+  },
   objects: {
     currentUser: {
       name: "Current User",
       get: async (dataset: Dataset) => {
-        if (!dataset.credentials?.token) return null;
-        const res = await fetch("https://api.onepeloton.com/api/me", {
-          headers: {
-            "Content-Type": "application/json",
-            Cookie: `peloton_session_id=${dataset.credentials.token}`,
-          },
-        });
-        return res.json();
+        return await getCurrentUser(dataset.credentials?.token);
       },
       objId: (dataset: Dataset, obj) => {
         return `${obj.id}`;
@@ -31,19 +70,9 @@ export const peloton: Integration = {
       async get(dataset, db) {
         if (!dataset.credentials?.token) return [];
         try {
-          const [user] = await db
-            .select()
-            .from(objectsTable)
-            .where(
-              and(
-                eq(objectsTable.datasetId, dataset.id),
-                eq(objectsTable.objectType, "currentUser"),
-              ),
-            )
-            .limit(1);
+          const user = await getCurrentUser(dataset.credentials?.token);
 
-          // const session_id = '';
-          const user_id = deserialize(user.data).id;
+          const user_id = user.id;
           let workouts = await fetch(
             `https://api.onepeloton.com/api/user/${user_id}/workouts?joins=ride,ride.instructor&limit=20&page=0&sort_by=-created`,
             {
@@ -77,3 +106,14 @@ export const peloton: Integration = {
     },
   },
 };
+
+async function getCurrentUser(token: string | undefined | null) {
+  if (!token) return null;
+  const res = await fetch("https://api.onepeloton.com/api/me", {
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: `peloton_session_id=${token}`,
+    },
+  });
+  return res.json();
+}

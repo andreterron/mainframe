@@ -30,6 +30,20 @@ export interface Integration {
     nango?: {
       integrationId: string;
     };
+    form?: {
+      params: {
+        key: string;
+        label?: string;
+        placeholder?: string;
+        type?: "text" | "password";
+      }[];
+      info?: string;
+      onSubmit(
+        dataset: Dataset,
+        params: Record<string, string>,
+        db: LibSQLDatabase<Record<string, never>>,
+      ): Promise<void>;
+    };
   };
   authSetupDocs?: string;
   getOAuthUrl?: (

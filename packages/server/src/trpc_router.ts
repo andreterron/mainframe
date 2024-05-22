@@ -9,6 +9,7 @@ import {
   zDatasetPatch,
   ClientIntegration,
   componentsTable,
+  DatasetCredentials,
 } from "@mainframe-so/shared";
 import { z } from "zod";
 import { Context, UserInfo } from "./trpc_context";
@@ -25,9 +26,10 @@ import {
   getDatasetObject,
   getDatasetTable,
   getIntegrationForDataset,
+  zOAuthCredentials,
+  zTokenCredentials,
 } from "./lib/integrations";
 import { deserializeData } from "./utils/serialization";
-import { ROW_LIMIT } from "./utils/constants";
 import { createUserAccount, validateUserAccount } from "./lib/auth.server";
 import { checkIfUserExists } from "./db/helpers";
 import { github } from "./lib/integrations/github";
@@ -318,6 +320,54 @@ export const appRouter = router({
       void syncDataset(ctx.db, dataset).catch((e) => console.error(e));
 
       return dataset;
+    }),
+  datasetsSetAuth: protectedProcedure
+    .input(z.object({ datasetId: z.string(), params: z.record(z.string()) }))
+    .mutation(async ({ input, ctx }) => {
+      let [dataset] = await ctx.db
+        .select()
+        .from(datasetsTable)
+        .where(eq(datasetsTable.id, input.datasetId))
+        .limit(1);
+
+      if (!dataset) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const integration = getIntegrationForDataset(dataset);
+
+      if (!integration) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      if (integration.authTypes?.form) {
+        await integration.authTypes.form.onSubmit(
+          dataset,
+          input.params,
+          ctx.db,
+        );
+      } else {
+        const credentials: DatasetCredentials | undefined =
+          integration.authType === "token"
+            ? zTokenCredentials.parse(input.params)
+            : integration.authType === "oauth2"
+            ? zOAuthCredentials.parse(input.params)
+            : undefined;
+
+        if (!credentials) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Error matching credentials",
+          });
+        }
+
+        await ctx.db
+          .update(datasetsTable)
+          .set({
+            credentials,
+          })
+          .where(eq(datasetsTable.id, input.datasetId));
+      }
     }),
   datasetsDelete: protectedProcedure
     .input(z.object({ id: z.string() }))
