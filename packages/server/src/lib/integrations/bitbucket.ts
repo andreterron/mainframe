@@ -63,7 +63,7 @@ export const bitbucket: Integration = {
         const reposPipelines = await Promise.all(
           repos.map(async (repo) => {
             const res = await fetch(
-              `https://api.bitbucket.org/2.0/repositories/${repo.workspace.uuid}/${repo.slug}/pipelines`,
+              `https://api.bitbucket.org/2.0/repositories/${repo.workspace.uuid}/${repo.slug}/pipelines?sort=-created_on`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
