@@ -43,7 +43,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex flex-col items-start gap-4">
+    <div className="flex flex-col items-start gap-4 pb-16">
       <PageHeader title="Dashboard" />
       <div className="w-full grid md:grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-x-4 gap-y-3 px-4 max-w-[100rem]">
         {components.length === 0 ? (
