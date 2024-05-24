@@ -11,7 +11,9 @@ export function ComponentCard({
 }: {
   component: { id: string; code: string };
 }) {
-  const { iframe } = useComponentPreview(component.code);
+  const { iframe } = useComponentPreview(component.code, {
+    disableScrolling: true,
+  });
 
   return (
     <div className="group">

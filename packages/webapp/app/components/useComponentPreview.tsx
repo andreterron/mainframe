@@ -30,7 +30,10 @@ function envCode(apiKey: string) {
   return `export const env = ${JSON.stringify({ API_KEY: apiKey })}`;
 }
 
-export function useComponentPreview(initialCode: string) {
+export function useComponentPreview(
+  initialCode: string,
+  options: { disableScrolling?: boolean } = {},
+) {
   const [code, setCode] = useState(initialCode);
   const [codeExecuted, setCodeExecuted] = useState(initialCode);
   const codeRef = useRef(code);
@@ -81,6 +84,9 @@ export function useComponentPreview(initialCode: string) {
         onLoad={() => {
           buildCode(codeRef.current);
         }}
+        {...(options.disableScrolling
+          ? { scrolling: "no", style: { overflow: "hidden" } }
+          : {})}
         // TODO: Customize iframe styles
         className="w-full flex-1 min-h-0 h-full"
         sandbox="allow-scripts"
