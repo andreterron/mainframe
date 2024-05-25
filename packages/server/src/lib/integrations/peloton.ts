@@ -74,7 +74,7 @@ export const peloton: Integration = {
 
           const user_id = user.id;
           let workouts = await fetch(
-            `https://api.onepeloton.com/api/user/${user_id}/workouts?joins=ride,ride.instructor&limit=20&page=0&sort_by=-created`,
+            `https://api.onepeloton.com/api/user/${user_id}/workouts?joins=ride,ride.instructor&limit=100&page=0&sort_by=-created`,
             {
               method: "get",
               headers: {
