@@ -63,7 +63,7 @@ export const bitbucket: Integration = {
         const reposPipelines = await Promise.all(
           repos.map(async (repo) => {
             const res = await fetch(
-              `https://api.bitbucket.org/2.0/repositories/${repo.workspace.uuid}/${repo.slug}/pipelines?sort=-created_on`,
+              `https://api.bitbucket.org/2.0/repositories/${repo.workspace.uuid}/${repo.slug}/pipelines?sort=-created_on&pagelen=100`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -71,7 +71,13 @@ export const bitbucket: Integration = {
                 },
               },
             );
-            return (await res.json()).values as any[];
+            const body = await res.json();
+            // TODO: Pagination. body.next should return the uri to call next,
+            //       but it's always undefined. It's not recommended, but we
+            //       can construct our URLs using &page=2 (starts on 1). Be
+            //       mindful that a new pipeline could be created or deleted
+            //       as we paginate, shifting items around.
+            return body.values as any[];
           }),
         );
         const pipelines = reposPipelines.flat();
