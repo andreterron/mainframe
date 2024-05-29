@@ -211,11 +211,11 @@ export default function App(): JSX.Element {
     datasetId: "${dataset.id}",
     apiKey: env.API_KEY,
     args: [],
-    ${
-      env.VITE_API_URL === "https://api.mainframe.so"
-        ? ""
-        : `apiUrl: "${env.VITE_API_URL}",\n  `
-    }}, async (creds) => {
+  ${
+    env.VITE_API_URL === "https://api.mainframe.so"
+      ? ""
+      : `apiUrl: "${env.VITE_API_URL}",\n  `
+  }}, async (creds) => {
     // Use credentials to do something here
     return null;
   });

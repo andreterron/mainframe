@@ -51,7 +51,11 @@ import { render } from "./lib/integrations/render";
 import { vercel } from "./lib/integrations/vercel";
 import { bitbucket } from "./lib/integrations/bitbucket";
 import { getTableData } from "./lib/table-data";
-import { generateComponent } from "./lib/llm/openai";
+import {
+  generateObjectComponent,
+  generateTableComponent,
+} from "./lib/llm/openai";
+import { getObjectAndDataset } from "./lib/object-data";
 
 /**
  * Initialization of tRPC backend
@@ -387,59 +391,13 @@ export const appRouter = router({
     .query(async ({ input, ctx }) => {
       const { datasetId, objectType } = input;
 
-      if (!datasetId || !objectType) {
-        // TODO: Review
+      const result = await getObjectAndDataset(datasetId, objectType, ctx.db);
+
+      if (!result) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      let [[dataset], [object]] = await Promise.all([
-        ctx.db
-          .select()
-          .from(datasetsTable)
-          .where(eq(datasetsTable.id, datasetId))
-          .limit(1),
-        ctx.db
-          .select()
-          .from(objectsTable)
-          .where(
-            and(
-              eq(objectsTable.objectType, objectType),
-              eq(objectsTable.datasetId, datasetId),
-            ),
-          )
-          .limit(1),
-      ]);
-
-      const objectDefinition = getDatasetObject(dataset, objectType);
-
-      if (!object) {
-        if (objectDefinition)
-          await syncObject(ctx.db, dataset, objectDefinition);
-
-        [object] = await ctx.db
-          .select()
-          .from(objectsTable)
-          .where(
-            and(
-              eq(objectsTable.objectType, objectType),
-              eq(objectsTable.datasetId, datasetId),
-            ),
-          )
-          .limit(1);
-        console.log("after another select for some reason");
-      }
-
-      if (!object) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
-
-      return {
-        object: {
-          ...deserializeData(object),
-          name: objectDefinition?.name || object.objectType,
-        },
-        dataset,
-      };
+      return result;
     }),
 
   // Table
@@ -833,7 +791,7 @@ export const appRouter = router({
       };
     }),
 
-  generateComponent: protectedProcedure
+  generateTableComponent: protectedProcedure
     .input(
       z.object({
         prompt: z.string().min(1),
@@ -849,10 +807,35 @@ export const appRouter = router({
       }
 
       // Generate prompt and call OpenAI
-      const code = await generateComponent(
+      const code = await generateTableComponent(
         prompt,
         result.table.id,
         result.rows,
+      );
+      return code;
+    }),
+
+  generateObjectComponent: protectedProcedure
+    .input(
+      z.object({
+        prompt: z.string().min(1),
+        datasetId: z.string().min(1),
+        objectType: z.string().min(1),
+      }),
+    )
+    .query(async function ({ input: { datasetId, objectType, prompt }, ctx }) {
+      // Get data
+      const result = await getObjectAndDataset(datasetId, objectType, ctx.db);
+      if (!result?.object) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      // Generate prompt and call OpenAI
+      const code = await generateObjectComponent(
+        prompt,
+        datasetId,
+        objectType,
+        result.object,
       );
       return code;
     }),

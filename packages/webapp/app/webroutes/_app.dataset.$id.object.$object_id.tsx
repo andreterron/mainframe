@@ -24,6 +24,7 @@ import {
 } from "../components/WebStandardPlayground";
 import { env } from "../lib/env_client";
 import { ScopeProvider } from "jotai-scope";
+import { trpcProxyClient } from "../lib/trpc_client";
 
 export default function DatasetObjectDetails() {
   const { id: datasetId, object_id: objectId } = useParams();
@@ -41,6 +42,20 @@ export default function DatasetObjectDetails() {
   }
 
   const { dataset, object: objectData } = data;
+
+  async function generateCode(prompt: string) {
+    if (!datasetId || !objectId || !prompt) {
+      return;
+    }
+
+    const code = await trpcProxyClient.generateObjectComponent.query({
+      datasetId,
+      objectType: objectId,
+      prompt,
+    });
+
+    return code;
+  }
 
   return (
     <ScopeProvider atoms={[codeAtom]}>
@@ -93,6 +108,7 @@ export default function DatasetObjectDetails() {
               </TabsContent>
               <TabsContent value="playground" className="p-4">
                 <WebStandardsPlaygroundTab
+                  onGenerateCode={generateCode}
                   appTsxCode={`import { useMainframeObject } from "@mainframe-so/react";
 
 // TODO: Get environment variables from your app
@@ -103,11 +119,11 @@ export default function App(): JSX.Element {
     datasetId: "${data.dataset.id}",
     objectType: "${data.object.objectType}",
     apiKey: env.API_KEY,
-    ${
-      env.VITE_API_URL === "https://api.mainframe.so"
-        ? ""
-        : `apiUrl: "${env.VITE_API_URL}",\n  `
-    }});
+  ${
+    env.VITE_API_URL === "https://api.mainframe.so"
+      ? ""
+      : `apiUrl: "${env.VITE_API_URL}",\n  `
+  }});
 
   return (<>
     <h1>Hello world!</h1>

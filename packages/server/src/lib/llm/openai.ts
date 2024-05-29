@@ -15,7 +15,7 @@ const readSystemPromptTemplate = once(async () => {
   );
 });
 
-export async function generateComponent(
+export function generateTableComponent(
   prompt: string,
   tableId: string,
   data: any,
@@ -23,12 +23,60 @@ export async function generateComponent(
   const dataHooks = `const { data } = useMainframeTable({
     tableId: "${tableId}",
     apiKey: env.API_KEY,
-    ${
-      env.VITE_API_URL === "https://api.mainframe.so"
-        ? ""
-        : `apiUrl: "${env.VITE_API_URL}",\n  `
-    }});`;
+  ${
+    env.VITE_API_URL === "https://api.mainframe.so"
+      ? ""
+      : `apiUrl: "${env.VITE_API_URL}",\n  `
+  }});`;
 
+  return generateComponent(prompt, dataHooks, data);
+}
+
+export function generateObjectComponent(
+  prompt: string,
+  datasetId: string,
+  objectType: string,
+  data: any,
+) {
+  const dataHooks = `  const { data } = useMainframeObject({
+    datasetId: "${datasetId}",
+    objectType: "${objectType}",
+    apiKey: env.API_KEY,
+  ${
+    env.VITE_API_URL === "https://api.mainframe.so"
+      ? ""
+      : `apiUrl: "${env.VITE_API_URL}",\n  `
+  }});`;
+
+  return generateComponent(prompt, dataHooks, data.data);
+}
+
+export function generateCredentialComponent(
+  prompt: string,
+  datasetId: string,
+  data: any,
+) {
+  const dataHooks = `  const { data } = useMainframeCredentials({
+    datasetId: "${datasetId}",
+    apiKey: env.API_KEY,
+    args: [],
+  ${
+    env.VITE_API_URL === "https://api.mainframe.so"
+      ? ""
+      : `apiUrl: "${env.VITE_API_URL}",\n  `
+  }}, async (creds) => {
+    // Use credentials to do something here
+    return null;
+  });`;
+
+  return generateComponent(prompt, dataHooks, data);
+}
+
+export async function generateComponent(
+  prompt: string,
+  dataHooks: string,
+  data: any,
+) {
   const interfaces = jsonToTS(data).join("\n");
 
   const systemPromptTemplate = await readSystemPromptTemplate();

@@ -202,7 +202,7 @@ export function DatasetTableDetails() {
       return;
     }
 
-    const code = await trpcProxyClient.generateComponent.query({
+    const code = await trpcProxyClient.generateTableComponent.query({
       datasetId,
       tableId,
       prompt,
@@ -370,11 +370,11 @@ export default function App(): JSX.Element {
   const { data } = useMainframeTable({
     tableId: "${dbTable.id}",
     apiKey: env.API_KEY,
-    ${
-      env.VITE_API_URL === "https://api.mainframe.so"
-        ? ""
-        : `apiUrl: "${env.VITE_API_URL}",\n  `
-    }});
+  ${
+    env.VITE_API_URL === "https://api.mainframe.so"
+      ? ""
+      : `apiUrl: "${env.VITE_API_URL}",\n  `
+  }});
 
   return (<>
     <h1>Hello world!</h1>
