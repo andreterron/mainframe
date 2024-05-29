@@ -1,5 +1,7 @@
 import cron from "node-cron";
-import closeWithGrace from "close-with-grace";
+import closeWithGrace, {
+  type CloseWithGraceAsyncCallback,
+} from "close-with-grace";
 import { db } from "./db/db.server";
 import { getIntegrationForDataset } from "./lib/integrations";
 import express, { Express } from "express";
@@ -33,6 +35,7 @@ export interface SetupServerHooks extends CreateContextHooks, ApiRouterHooks {
   iterateOverDBs?: (
     callback: (db: LibSQLDatabase, userId: string) => Promise<void>,
   ) => Promise<void>;
+  closeWithGrace?: CloseWithGraceAsyncCallback;
 }
 
 declare global {
@@ -293,15 +296,16 @@ export function setupServer(hooks: SetupServerHooks = {}) {
     process.exit(1);
   });
 
-  closeWithGrace(async ({ signal }) => {
+  closeWithGrace(async (options) => {
     task.stop();
-    cloudflaredProcess?.kill(signal);
-    if (server) {
-      await new Promise<void>((resolve, reject) =>
-        server?.close((e) => {
-          e ? reject(e) : resolve();
-        }),
-      );
-    }
+    cloudflaredProcess?.kill(options.signal);
+    const closeServerPromise = server
+      ? new Promise<void>((resolve, reject) =>
+          server?.close((e) => {
+            e ? reject(e) : resolve();
+          }),
+        )
+      : undefined;
+    await Promise.all([closeServerPromise, hooks.closeWithGrace?.(options)]);
   });
 }
