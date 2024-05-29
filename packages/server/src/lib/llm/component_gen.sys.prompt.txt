@@ -25,5 +25,8 @@ $INTERFACES
 
 Guidelines:
 - DO NOT include these interfaces in the generated code.
+- Only respond with code as plain text without code block syntax around it.
+- You can import any package from npm without installing them.
+- DO NOT add instructions to install npm packages.
 
 Please generate a component based on what the user requests.

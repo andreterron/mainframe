@@ -113,8 +113,26 @@ export default function App(): JSX.Element {
 
   let response = chatCompletion.choices[0].message.content ?? "";
 
-  if (response.includes("```")) {
-    response = response.replace(/^.*```.*\n/, "").replace(/```.*$/, "");
+  const tripleQuotes = Array.from(response.matchAll(/```/g));
+  if (tripleQuotes.length > 0) {
+    console.log("AI responded with triple quotes:");
+    console.log(response);
+    let largestCodeBlock: string | undefined;
+    for (let i = 0; i < Math.floor(tripleQuotes.length / 2) * 2; i++) {
+      const a = tripleQuotes[i].index;
+      const b = tripleQuotes[i + 1].index;
+      const codeblock = response
+        .substring(a, b)
+        .replace(/^.*```.*\n/, "")
+        .replace(/```.*$/, "")
+        .trim();
+      if (codeblock.length > (largestCodeBlock?.length ?? 0)) {
+        largestCodeBlock = codeblock;
+      }
+    }
+    if (largestCodeBlock) {
+      return largestCodeBlock;
+    }
   }
 
   return response;
