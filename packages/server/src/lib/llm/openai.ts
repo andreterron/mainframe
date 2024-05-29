@@ -26,7 +26,7 @@ export function generateTableComponent(
   ${
     env.VITE_API_URL === "https://api.mainframe.so"
       ? ""
-      : `apiUrl: "${env.VITE_API_URL}",\n  `
+      : `  apiUrl: "${env.VITE_API_URL}",\n  `
   }});`;
 
   return generateComponent(prompt, dataHooks, data);
@@ -45,7 +45,7 @@ export function generateObjectComponent(
   ${
     env.VITE_API_URL === "https://api.mainframe.so"
       ? ""
-      : `apiUrl: "${env.VITE_API_URL}",\n  `
+      : `  apiUrl: "${env.VITE_API_URL}",\n  `
   }});`;
 
   return generateComponent(prompt, dataHooks, data.data);
@@ -63,7 +63,7 @@ export function generateCredentialComponent(
   ${
     env.VITE_API_URL === "https://api.mainframe.so"
       ? ""
-      : `apiUrl: "${env.VITE_API_URL}",\n  `
+      : `  apiUrl: "${env.VITE_API_URL}",\n  `
   }}, async (creds) => {
     // Use credentials to do something here
     return null;

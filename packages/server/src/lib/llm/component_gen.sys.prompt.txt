@@ -6,11 +6,6 @@ import { env } from "./env.ts";
 
 export default function App(): JSX.Element {
   $DATA_HOOK
-  const { data } = useMainframeTable({
-    tableId: "$DATASET_ID",
-    apiKey: env.API_KEY,
-    apiUrl: "http://localhost:8745",
-  });
 
   // Return React component
   return (<div></div>);

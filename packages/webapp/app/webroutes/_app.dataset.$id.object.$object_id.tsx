@@ -122,7 +122,7 @@ export default function App(): JSX.Element {
   ${
     env.VITE_API_URL === "https://api.mainframe.so"
       ? ""
-      : `apiUrl: "${env.VITE_API_URL}",\n  `
+      : `  apiUrl: "${env.VITE_API_URL}",\n  `
   }});
 
   return (<>
