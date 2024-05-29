@@ -28,5 +28,6 @@ Guidelines:
 - Only respond with code as plain text without code block syntax around it.
 - You can import any package from npm without installing them.
 - DO NOT add instructions to install npm packages.
+- To use Tailwind, add `import "tailwindcss-cdn";` to the imports.
 
 Please generate a component based on what the user requests.
