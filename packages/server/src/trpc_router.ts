@@ -12,14 +12,14 @@ import {
   DatasetCredentials,
 } from "@mainframe-so/shared";
 import { z } from "zod";
-import { Context, UserInfo } from "./trpc_context";
+import { Context, UserInfo } from "./trpc_context.js";
 import { and, eq } from "drizzle-orm";
-import { syncDataset, syncObject, syncTable } from "./sync";
+import { syncDataset, syncObject, syncTable } from "./sync.js";
 import {
   commitSession,
   destroySession,
   getSessionFromCookies,
-} from "./sessions.server";
+} from "./sessions.server.js";
 import {
   createClientIntegration,
   getDatasetFunction,
@@ -28,34 +28,34 @@ import {
   getIntegrationForDataset,
   zOAuthCredentials,
   zTokenCredentials,
-} from "./lib/integrations";
-import { deserializeData } from "./utils/serialization";
-import { createUserAccount, validateUserAccount } from "./lib/auth.server";
-import { checkIfUserExists } from "./db/helpers";
-import { github } from "./lib/integrations/github";
-import { network } from "./lib/integrations/network";
-import { peloton } from "./lib/integrations/peloton";
-import { posthog } from "./lib/integrations/posthog";
-import { toggl } from "./lib/integrations/toggl";
-import { google } from "./lib/integrations/google";
-import { zotero } from "./lib/integrations/zotero";
-import { notion } from "./lib/integrations/notion";
-import { oura } from "./lib/integrations/oura";
-import { valtown } from "./lib/integrations/valtown";
-import { env } from "./lib/env.server";
-import { nango } from "./lib/nango";
+} from "./lib/integrations.js";
+import { deserializeData } from "./utils/serialization.js";
+import { createUserAccount, validateUserAccount } from "./lib/auth.server.js";
+import { checkIfUserExists } from "./db/helpers.js";
+import { github } from "./lib/integrations/github.js";
+import { network } from "./lib/integrations/network.js";
+import { peloton } from "./lib/integrations/peloton.js";
+import { posthog } from "./lib/integrations/posthog.js";
+import { toggl } from "./lib/integrations/toggl.js";
+import { google } from "./lib/integrations/google.js";
+import { zotero } from "./lib/integrations/zotero.js";
+import { notion } from "./lib/integrations/notion.js";
+import { oura } from "./lib/integrations/oura.js";
+import { valtown } from "./lib/integrations/valtown.js";
+import { env } from "./lib/env.server.js";
+import { nango } from "./lib/nango.js";
 import * as Sentry from "@sentry/node";
-import { getTokenFromDataset } from "./lib/integration-token";
-import { spotify } from "./lib/integrations/spotify";
-import { render } from "./lib/integrations/render";
-import { vercel } from "./lib/integrations/vercel";
-import { bitbucket } from "./lib/integrations/bitbucket";
-import { getTableData } from "./lib/table-data";
+import { getTokenFromDataset } from "./lib/integration-token.js";
+import { spotify } from "./lib/integrations/spotify.js";
+import { render } from "./lib/integrations/render.js";
+import { vercel } from "./lib/integrations/vercel.js";
+import { bitbucket } from "./lib/integrations/bitbucket.js";
+import { getTableData } from "./lib/table-data.js";
 import {
   generateObjectComponent,
   generateTableComponent,
-} from "./lib/llm/openai";
-import { getObjectAndDataset } from "./lib/object-data";
+} from "./lib/llm/openai.js";
+import { getObjectAndDataset } from "./lib/object-data.js";
 
 /**
  * Initialization of tRPC backend

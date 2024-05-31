@@ -1,10 +1,12 @@
-import { env } from "../env.server";
-import jsonToTS from "json-to-ts";
-import { once } from "lodash";
+import { env } from "../env.server.js";
+import jsonToTSMod from "json-to-ts";
+import { once } from "lodash-es";
 import { readFile } from "fs/promises";
 import OpenAI from "openai";
-import { __dirnameFromImportMetaUrl } from "../../utils/dirname";
+import { __dirnameFromImportMetaUrl } from "../../utils/dirname.js";
 import { resolve } from "path";
+
+const jsonToTS = jsonToTSMod.default;
 
 const __dirname = __dirnameFromImportMetaUrl(import.meta.url);
 

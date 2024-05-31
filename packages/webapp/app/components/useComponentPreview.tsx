@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as esbuild from "esbuild-wasm";
-import { once } from "lodash";
+import { once } from "lodash-es";
 import wasmURL from "esbuild-wasm/esbuild.wasm?url";
 import { trpc } from "../lib/trpc_client";
 import indexHtml from "../playground/index.html?raw";

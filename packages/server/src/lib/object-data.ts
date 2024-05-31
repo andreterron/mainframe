@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
-import { deserializeData } from "../utils/serialization";
-import { getDatasetObject } from "./integrations";
+import { deserializeData } from "../utils/serialization.js";
+import { getDatasetObject } from "./integrations.js";
 import { datasetsTable, objectsTable } from "@mainframe-so/shared";
 import { LibSQLDatabase } from "drizzle-orm/libsql";
 

@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { datasetsTable } from "@mainframe-so/shared";
-import { Integration } from "../integration-types";
+import { Integration } from "../integration-types.js";
 import { Dataset } from "@mainframe-so/shared";
 import { z } from "zod";
 

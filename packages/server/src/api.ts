@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { operations } from "./lib/operations";
+import { operations } from "./lib/operations.js";
 import {
   getSessionFromId,
   getSessionIdFromCookieHeader,
-} from "./sessions.server";
+} from "./sessions.server.js";
 import {
   Operation,
   datasetsTable,
@@ -11,12 +11,12 @@ import {
   rowsTable,
 } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
-import { deserializeData } from "./utils/serialization";
-import { getIntegrationFromType } from "./lib/integrations";
+import { deserializeData } from "./utils/serialization.js";
+import { getIntegrationFromType } from "./lib/integrations.js";
 import bodyParser from "body-parser";
-import { env } from "./lib/env.server";
+import { env } from "./lib/env.server.js";
 import express from "express";
-import { getTokenFromDataset } from "./lib/integration-token";
+import { getTokenFromDataset } from "./lib/integration-token.js";
 
 export interface ApiRouterHooks {
   getUserIdFromBearerToken?(

@@ -1,9 +1,9 @@
 import { datasetsTable, rowsTable, tablesTable } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
 import { LibSQLDatabase } from "drizzle-orm/libsql";
-import { getDatasetTable } from "./integrations";
-import { ROW_LIMIT } from "../utils/constants";
-import { deserializeData } from "../utils/serialization";
+import { getDatasetTable } from "./integrations.js";
+import { ROW_LIMIT } from "../utils/constants.js";
+import { deserializeData } from "../utils/serialization.js";
 
 export async function getTableData(
   datasetId: string | undefined,

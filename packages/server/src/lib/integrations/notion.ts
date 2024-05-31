@@ -1,5 +1,5 @@
-import { getTokenFromDataset } from "../integration-token";
-import { Integration } from "../integration-types";
+import { getTokenFromDataset } from "../integration-token.js";
+import { Integration } from "../integration-types.js";
 
 export const notion: Integration = {
   name: "Notion",

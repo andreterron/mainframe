@@ -1,6 +1,6 @@
 import { sessionsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
-import { env } from "./lib/env.server";
+import { env } from "./lib/env.server.js";
 import { CookieSerializeOptions, parse, serialize } from "cookie";
 import cookieSignature from "cookie-signature";
 import { LibSQLDatabase } from "drizzle-orm/libsql";

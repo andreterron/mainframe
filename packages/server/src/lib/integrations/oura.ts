@@ -1,4 +1,4 @@
-import { Integration, IntegrationTable } from "../integration-types";
+import { Integration, IntegrationTable } from "../integration-types.js";
 
 const API_DOMAIN = `https://api.ouraring.com`;
 

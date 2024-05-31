@@ -2,30 +2,32 @@ import cron from "node-cron";
 import closeWithGrace, {
   type CloseWithGraceAsyncCallback,
 } from "close-with-grace";
-import { db } from "./db/db.server";
-import { getIntegrationForDataset } from "./lib/integrations";
+import { db } from "./db/db.server.js";
+import { getIntegrationForDataset } from "./lib/integrations.js";
 import express, { Express } from "express";
-import { json, text } from "body-parser";
-import { env } from "./lib/env.server";
+import bodyParser from "body-parser";
+import { env } from "./lib/env.server.js";
 import { ZodError } from "zod";
 import type { Server } from "http";
-import { syncAll } from "./sync";
+import { syncAll } from "./sync.js";
 import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
-import { startCloudflared } from "./cloudflared";
+import { startCloudflared } from "./cloudflared.js";
 import type { ChildProcess } from "node:child_process";
 import { initTRPC } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
-import { Context, CreateContextHooks, createContext } from "./trpc_context";
-import { appRouter } from "./trpc_router";
-export type { AppRouter } from "./trpc_router";
+import { Context, CreateContextHooks, createContext } from "./trpc_context.js";
+import { appRouter } from "./trpc_router.js";
+export type { AppRouter } from "./trpc_router.js";
 import cors from "cors";
-import { buildApiRouter, ApiRouterHooks } from "./api";
-import { oauthRouter } from "./oauth_router";
+import { buildApiRouter, ApiRouterHooks } from "./api.js";
+import { oauthRouter } from "./oauth_router.js";
 import { ip } from "address";
 import chalk from "chalk";
 import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
 import { Client } from "@libsql/client";
+
+const { json, text } = bodyParser;
 
 export interface SetupServerHooks extends CreateContextHooks, ApiRouterHooks {
   express?: (app: Express) => void;

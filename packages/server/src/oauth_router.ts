@@ -1,5 +1,5 @@
 import { Request, Router } from "express";
-import { getIntegrationForDataset } from "./lib/integrations";
+import { getIntegrationForDataset } from "./lib/integrations.js";
 import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
 
