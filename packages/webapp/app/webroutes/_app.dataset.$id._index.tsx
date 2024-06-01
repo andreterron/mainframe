@@ -63,26 +63,24 @@ export default function DatasetDetails() {
     });
   }
 
+  const integration = dataset.integrationType
+    ? integrations?.[dataset.integrationType]
+    : undefined;
+
   return (
     <div className="flex flex-col">
       {!dataset.integrationType ? (
         <DatasetSetup
           onIntegrationSelected={(type) => setIntegrationType(type)}
         />
-      ) : integrations?.[dataset.integrationType] ? (
-        integrations?.[dataset.integrationType].authType !== "none" &&
+      ) : integration ? (
+        integration?.authType !== "none" &&
         !dataset.credentials?.token &&
         !dataset.credentials?.accessToken &&
         !dataset.credentials?.nangoIntegrationId ? (
-          <DatasetTokenInput
-            dataset={dataset}
-            integration={integrations[dataset.integrationType]}
-          />
+          <DatasetTokenInput dataset={dataset} integration={integration} />
         ) : (
-          <DatasetPage
-            dataset={dataset}
-            integration={integrations[dataset.integrationType]}
-          />
+          <DatasetPage dataset={dataset} integration={integration} />
         )
       ) : (
         <span className="p-4">Error: Integration not found</span>

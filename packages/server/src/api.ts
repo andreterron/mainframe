@@ -85,6 +85,11 @@ export function buildApiRouter(hooks: ApiRouterHooks) {
       .where(eq(datasetsTable.id, req.params.dataset_id))
       .limit(1);
 
+    if (!dataset) {
+      res.sendStatus(404);
+      return;
+    }
+
     const token = await getTokenFromDataset(dataset);
 
     res.contentType("application/json");
@@ -102,6 +107,11 @@ export function buildApiRouter(hooks: ApiRouterHooks) {
         ),
       )
       .limit(1);
+
+    if (!object) {
+      res.sendStatus(404);
+      return;
+    }
 
     res.contentType("application/json");
     res.send(JSON.stringify(deserializeData(object)));
@@ -131,7 +141,7 @@ export function buildApiRouter(hooks: ApiRouterHooks) {
 
       // Call the action
       const action = integration?.actions?.[req.params.action_name];
-      if (!action) {
+      if (!dataset || !action) {
         res.sendStatus(404);
         return;
       }

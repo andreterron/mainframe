@@ -15,6 +15,7 @@
     "noUnusedParameters": false,
     "preserveWatchOutput": true,
     "skipLibCheck": true,
+    "noUncheckedIndexedAccess": true,
     "strict": true,
     "target": "es2016",
     "module": "ESNext",

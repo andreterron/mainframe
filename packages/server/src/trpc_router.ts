@@ -229,6 +229,13 @@ export const appRouter = router({
       // TODO: This can fail if the username already exists
       const account = await createUserAccount(ctx.db, username, password);
 
+      if (!account) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create user account",
+        });
+      }
+
       // Don't pass the cookie header here, because we always want a fresh session
       const session = await getSessionFromCookies(ctx.db);
 

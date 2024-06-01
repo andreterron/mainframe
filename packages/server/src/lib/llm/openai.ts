@@ -111,7 +111,7 @@ export default function App(): JSX.Element {
     model: "gpt-4o",
   });
 
-  let response = chatCompletion.choices[0].message.content ?? "";
+  let response = chatCompletion.choices[0]?.message.content ?? "";
 
   const tripleQuotes = Array.from(response.matchAll(/```/g));
   if (tripleQuotes.length > 0) {
@@ -119,8 +119,11 @@ export default function App(): JSX.Element {
     console.log(response);
     let largestCodeBlock: string | undefined;
     for (let i = 0; i < Math.floor(tripleQuotes.length / 2) * 2; i++) {
-      const a = tripleQuotes[i].index;
-      const b = tripleQuotes[i + 1].index;
+      const a = tripleQuotes[i]?.index;
+      const b = tripleQuotes[i + 1]?.index;
+      if (a === undefined || b === undefined) {
+        break;
+      }
       const codeblock = response
         .substring(a, b)
         .replace(/^.*```.*\n/, "")

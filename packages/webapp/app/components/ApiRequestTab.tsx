@@ -72,7 +72,7 @@ export function ApiRequestTab({ apiPath }: { apiPath: string }) {
     refetchOnMount: false,
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
-    queryKey: [apiUrl],
+    queryKey: [apiUrl] as const,
     queryFn: async (ctx) => {
       const res = await fetch(ctx.queryKey[0], {
         credentials: "include",

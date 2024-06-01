@@ -31,6 +31,10 @@ export async function getObjectAndDataset(
       .limit(1),
   ]);
 
+  if (!dataset) {
+    return undefined;
+  }
+
   const objectDefinition = getDatasetObject(dataset, objectType);
 
   if (!object) {

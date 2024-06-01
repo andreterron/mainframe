@@ -135,6 +135,10 @@ export function setupServer(hooks: SetupServerHooks = {}) {
         console.log(
           `Received webhook request for dataset ${req.params.dataset_id}`,
         );
+        if (!req.params.dataset_id) {
+          res.sendStatus(400);
+          return;
+        }
         // TODO: This req.db might not exist
         const [dataset] = await req.db
           .select()
