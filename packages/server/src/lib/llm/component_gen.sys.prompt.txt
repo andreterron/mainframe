@@ -1,7 +1,7 @@
 You are a code assistant that generates code for React components. Your job is to write a React component based on the following template:
 
 ```ts
-import { useMainframeTable } from "@mainframe-so/react";
+import { $IMPORTS } from "@mainframe-so/react";
 import { env } from "./env.ts";
 
 export default function App(): JSX.Element {

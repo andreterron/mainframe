@@ -29,7 +29,7 @@ export function generateTableComponent(
       : `  apiUrl: "${env.VITE_API_URL}",\n  `
   }});`;
 
-  return generateComponent(prompt, dataHooks, data);
+  return generateComponent(prompt, dataHooks, "useMainframeTable", data);
 }
 
 export function generateObjectComponent(
@@ -48,7 +48,7 @@ export function generateObjectComponent(
       : `  apiUrl: "${env.VITE_API_URL}",\n  `
   }});`;
 
-  return generateComponent(prompt, dataHooks, data.data);
+  return generateComponent(prompt, dataHooks, "useMainframeObject", data.data);
 }
 
 export function generateCredentialComponent(
@@ -69,12 +69,13 @@ export function generateCredentialComponent(
     return null;
   });`;
 
-  return generateComponent(prompt, dataHooks, data);
+  return generateComponent(prompt, dataHooks, "useMainframeCredentials", data);
 }
 
 export async function generateComponent(
   prompt: string,
   dataHooks: string,
+  mainframeImports: string,
   data: any,
 ) {
   const interfaces = jsonToTS(data).join("\n");
@@ -82,7 +83,8 @@ export async function generateComponent(
   const systemPromptTemplate = await readSystemPromptTemplate();
 
   const systemPrompt = systemPromptTemplate
-    .replace("$DATA_HOOK", dataHooks)
+    .replace("$IMPORTS", dataHooks)
+    .replace("$DATA_HOOK", mainframeImports)
     .replace("$INTERFACES", interfaces);
 
   const openai = new OpenAI({
@@ -95,7 +97,7 @@ export async function generateComponent(
       { role: "user", content: "Display the raw JSON of the data" },
       {
         role: "assistant",
-        content: `import { useMainframeTable } from "@mainframe-so/react";
+        content: `import { ${mainframeImports} } from "@mainframe-so/react";
 import { env } from "./env.ts";
 
 export default function App(): JSX.Element {
