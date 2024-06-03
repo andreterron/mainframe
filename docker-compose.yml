@@ -1,0 +1,13 @@
+version: '2'
+services:
+  mainframe:
+    container_name: mainframe
+    build: ./
+    command: npm run dev
+    volumes:
+      - .:/usr/app/
+      - /usr/app/node_modules
+    ports:
+      - "8744:8744"
+      - "8745:8745"
+    restart: always
