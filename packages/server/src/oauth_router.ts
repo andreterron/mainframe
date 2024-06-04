@@ -18,88 +18,101 @@ function getBaseUrl(req: Request) {
   return `${protocol}://${host}/oauth/callback`;
 }
 
-oauthRouter.get("/start/:dataset_id", async (req, res) => {
-  const datasetId = req.params.dataset_id;
-
-  if (!datasetId) {
-    res.status(404).send("Invalid dataset id");
-    return;
-  }
-
-  const [dataset] = await req.db
-    .select()
-    .from(datasetsTable)
-    .where(eq(datasetsTable.id, datasetId))
-    .limit(1);
-  if (!dataset) {
-    res.status(404).send("Dataset not found");
-    return;
-  }
-
-  const integration = getIntegrationForDataset(dataset);
-  if (!integration) {
-    res.status(404).send("Integration not found");
-    return;
-  }
-
-  if (!integration.getOAuthUrl) {
-    res.status(400).send("Integration doesn't support oauth");
-    return;
-  }
-
-  const baseUrl = getBaseUrl(req);
-
+oauthRouter.get("/start/:dataset_id", async (req, res, next) => {
   try {
-    const url = await integration.getOAuthUrl(baseUrl, dataset);
+    const datasetId = req.params.dataset_id;
 
-    if (!url) {
+    if (!datasetId) {
+      res.status(404).send("Invalid dataset id");
+      return;
+    }
+
+    const [dataset] = await req.db
+      .select()
+      .from(datasetsTable)
+      .where(eq(datasetsTable.id, datasetId))
+      .limit(1);
+    if (!dataset) {
+      res.status(404).send("Dataset not found");
+      return;
+    }
+
+    const integration = getIntegrationForDataset(dataset);
+    if (!integration) {
+      res.status(404).send("Integration not found");
+      return;
+    }
+
+    if (!integration.getOAuthUrl) {
       res.status(400).send("Integration doesn't support oauth");
       return;
     }
 
-    res.redirect(url);
+    const baseUrl = getBaseUrl(req);
+
+    try {
+      const url = await integration.getOAuthUrl(baseUrl, dataset);
+
+      if (!url) {
+        res.status(400).send("Integration doesn't support oauth");
+        return;
+      }
+
+      res.redirect(url);
+    } catch (e) {
+      console.error(e);
+      res.sendStatus(500);
+    }
   } catch (e) {
-    console.error(e);
-    res.sendStatus(500);
+    next(e);
   }
 });
 
-oauthRouter.get("/callback/:dataset_id", async (req, res) => {
-  const datasetId = req.params.dataset_id;
-
-  if (!datasetId) {
-    res.status(404).send("Invalid dataset id");
-    return;
-  }
-
-  const [dataset] = await req.db
-    .select()
-    .from(datasetsTable)
-    .where(eq(datasetsTable.id, datasetId))
-    .limit(1);
-  if (!dataset) {
-    res.status(404).send("Dataset not found");
-    return;
-  }
-
-  const integration = getIntegrationForDataset(dataset);
-  if (!integration) {
-    res.status(404).send("Integration not found");
-    return;
-  }
-
-  if (!integration.oauthCallback) {
-    res.status(400).send("Integration doesn't support oauth");
-    return;
-  }
-
-  const baseUrl = getBaseUrl(req);
-
+oauthRouter.get("/callback/:dataset_id", async (req, res, next) => {
   try {
-    await integration.oauthCallback(baseUrl, dataset, req.query as any, req.db);
-    res.redirect(`/dataset/${dataset.id}`);
+    const datasetId = req.params.dataset_id;
+
+    if (!datasetId) {
+      res.status(404).send("Invalid dataset id");
+      return;
+    }
+
+    const [dataset] = await req.db
+      .select()
+      .from(datasetsTable)
+      .where(eq(datasetsTable.id, datasetId))
+      .limit(1);
+    if (!dataset) {
+      res.status(404).send("Dataset not found");
+      return;
+    }
+
+    const integration = getIntegrationForDataset(dataset);
+    if (!integration) {
+      res.status(404).send("Integration not found");
+      return;
+    }
+
+    if (!integration.oauthCallback) {
+      res.status(400).send("Integration doesn't support oauth");
+      return;
+    }
+
+    const baseUrl = getBaseUrl(req);
+
+    try {
+      await integration.oauthCallback(
+        baseUrl,
+        dataset,
+        req.query as any,
+        req.db,
+      );
+      res.redirect(`/dataset/${dataset.id}`);
+    } catch (e) {
+      console.error(e);
+      res.sendStatus(500);
+    }
   } catch (e) {
-    console.error(e);
-    res.sendStatus(500);
+    next(e);
   }
 });
