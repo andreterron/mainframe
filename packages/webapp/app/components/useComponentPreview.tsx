@@ -9,11 +9,11 @@ import { env } from "../lib/env_client";
 
 const initOnce = once(async () => {
   // @ts-ignore
-  if (esbuild["__initialized__"]) {
+  if (window["__esbuild__initialized__"]) {
     return;
   }
   // @ts-ignore
-  esbuild["__initialized__"] = true;
+  window["__esbuild__initialized__"] = true;
   await esbuild.initialize({
     wasmURL,
   });
