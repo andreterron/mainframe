@@ -2,8 +2,12 @@ import { Link } from "react-router-dom";
 import { Dataset, ClientIntegration } from "@mainframe-so/shared";
 import { DatasetHeader } from "./DatasetHeader";
 import { getDatasetCredentialsKeys } from "../lib/data/credentials";
-import { FunctionSquareIcon } from "lucide-react";
+import { CheckIcon, FunctionSquareIcon, PencilIcon } from "lucide-react";
 import { PreviewLabel } from "./PreviewLabel";
+import { trpc } from "../lib/trpc_client";
+import { useState } from "react";
+import { Button } from "./ui/button";
+import { z } from "zod";
 
 export function DatasetPage({
   dataset,
@@ -13,10 +17,72 @@ export function DatasetPage({
   integration: ClientIntegration;
 }) {
   const { tables, objects, computed } = integration;
+  const utils = trpc.useContext();
+  const datasetsUpdate = trpc.datasetsUpdate.useMutation({
+    onSuccess() {
+      utils.datasetsGet.invalidate();
+      utils.datasetsAll.invalidate();
+    },
+  });
+
+  const [editingTitle, setEditingTitle] = useState(false);
 
   return (
     <div className="flex flex-col gap-8 items-start">
-      <DatasetHeader dataset={dataset}>{dataset.name}</DatasetHeader>
+      <DatasetHeader dataset={dataset}>
+        {editingTitle ? (
+          <form
+            className="flex items-center"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const name = z
+                .string()
+                .optional()
+                .catch(undefined)
+                .parse(
+                  new FormData(e.target as HTMLFormElement).get("datasetTitle"),
+                )
+                ?.trim();
+              if (!name) {
+                setEditingTitle(false);
+                return;
+              }
+              utils.datasetsGet.setData(
+                { id: dataset.id },
+                { ...dataset, name },
+              );
+              datasetsUpdate.mutate({ id: dataset.id, patch: { name } });
+              setEditingTitle(false);
+            }}
+          >
+            <input
+              id="dataset-title"
+              name="datasetTitle"
+              className="p-1 border-0 margin-0 ring-2 ring-primary ring-inset bg-muted rounded-md"
+              placeholder="Cancel rename"
+              autoFocus
+              defaultValue={dataset.name}
+            ></input>
+            <Button variant="default" size="icon" className="ml-2">
+              <CheckIcon className="w-4 h-4 inline" />
+            </Button>
+          </form>
+        ) : (
+          <span className="inline-block group pr-8 h-10">
+            <span className="p-1 inline-block">{dataset.name}</span>
+            <Button
+              variant="ghost"
+              className="ml-2 opacity-0 transition-opacity duration-75 group-hover:opacity-100 w-8 h-8"
+              size="none"
+              onClick={() => {
+                setEditingTitle((v) => !v);
+              }}
+            >
+              <PencilIcon className="w-4 h-4 inline text-muted-foreground" />
+            </Button>
+          </span>
+        )}
+      </DatasetHeader>
       <div className="flex flex-col gap-1 p-4">
         {getDatasetCredentialsKeys(dataset.credentials).length > 0 ||
         dataset.credentials?.nangoIntegrationId ? (
