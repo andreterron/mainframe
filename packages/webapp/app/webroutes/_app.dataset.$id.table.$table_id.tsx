@@ -314,7 +314,7 @@ export function DatasetTableDetails() {
                             className="group box-border border-b bg-gray-50 dark:bg-gray-700 dark:text-gray-400 px-6 py-3 sticky top-0"
                           >
                             <span className="flex items-center">
-                              <span className="flex-grow overflow-hidden text-ellipsis">
+                              <span className="flex-grow max-w-md truncate">
                                 {header.isPlaceholder
                                   ? null
                                   : flexRender(
@@ -340,7 +340,7 @@ export function DatasetTableDetails() {
                         {row.getVisibleCells().map((cell) => (
                           <td
                             key={cell.id}
-                            className="px-6 py-4 border-b font-mono whitespace-nowrap"
+                            className="px-6 py-4 border-b font-mono whitespace-nowrap max-w-md truncate"
                           >
                             {flexRender(
                               cell.column.columnDef.cell,
