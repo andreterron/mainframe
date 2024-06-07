@@ -26,6 +26,7 @@ import { ip } from "address";
 import chalk from "chalk";
 import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
 import { Client } from "@libsql/client";
+import { honoRequestListener } from "./hono";
 
 export interface SetupServerHooks extends CreateContextHooks, ApiRouterHooks {
   express?: (app: Express) => void;
@@ -114,10 +115,6 @@ export function setupServer(hooks: SetupServerHooks = {}) {
     next();
   });
 
-  app.get("/healthcheck", (req, res) => {
-    res.json({ success: true });
-  });
-
   process
     .on("unhandledRejection", (reason, p) => {
       console.error(reason, "Unhandled Rejection at Promise", p);
@@ -197,6 +194,14 @@ export function setupServer(hooks: SetupServerHooks = {}) {
   // Redirect the root API path to the app
   app.get("/", (req, res) => {
     res.redirect(env.APP_URL);
+  });
+
+  app.use(async (req, res, next) => {
+    try {
+      await honoRequestListener(req, res);
+    } catch (e) {
+      next(e);
+    }
   });
 
   app.use(
