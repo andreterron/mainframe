@@ -53,6 +53,17 @@ export const github: Integration = {
       },
     },
   },
+  async proxyFetch(dataset, path: string, init) {
+    const headers = new Headers(init?.headers);
+    const token = await getTokenFromDataset(dataset);
+    if (!token) return new Response("Unauthorized", { status: 407 });
+
+    headers.set("Authorization", `Bearer ${token}`);
+    headers.set("X-GitHub-Api-Version", "2022-11-28");
+
+    // TODO: Check if the response needs to be cleaned
+    return fetch(`https://api.github.com/${path}`, { ...init, headers });
+  },
   computed: {
     issues: {
       name: "Issues",

@@ -1,6 +1,6 @@
 import { Dataset, AuthType, ComputedDataParamsDef } from "@mainframe-so/shared";
 import { LibSQLDatabase } from "drizzle-orm/libsql";
-import { Request, Response } from "express";
+import type express from "express";
 
 export interface IntegrationTable {
   name: string;
@@ -45,6 +45,11 @@ export interface Integration {
       ): Promise<void>;
     };
   };
+  proxyFetch?: (
+    dataset: Dataset,
+    path: string,
+    init?: RequestInit,
+  ) => Promise<Response>;
   authSetupDocs?: string;
   getOAuthUrl?: (
     baseUrl: string,
@@ -64,8 +69,8 @@ export interface Integration {
   webhook?: (
     dataset: Dataset,
     // TODO: Migrate away from express
-    req: Request,
-    res: Response,
+    req: express.Request,
+    res: express.Response,
   ) => Promise<any>;
   objects?: {
     [key: string]: IntegrationObject;
