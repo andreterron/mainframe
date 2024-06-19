@@ -12,7 +12,6 @@
   "scripts": {
     "dev": "npm run build -- --watch src",
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
-    "prepublishOnly": "npm run build",
     "publish-package": "npm publish"
   },
   "exports": {
