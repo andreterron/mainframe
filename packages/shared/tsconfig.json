@@ -1,6 +1,8 @@
 {
   "display": "Shared",
-  "include": ["src/**/*.ts"],
+  "include": [
+    "src/**/*.ts"
+  ],
   "compilerOptions": {
     "composite": false,
     "declaration": true,
@@ -20,6 +22,7 @@
     "module": "ESNext",
     "outDir": "dist"
   },
-
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }
