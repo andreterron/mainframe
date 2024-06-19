@@ -1,5 +1,5 @@
 import { getRequestListener, type HttpBindings } from "@hono/node-server";
-import { type ServerResponse } from "http";
+import { type ServerResponse } from "node:http";
 import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";
 import { env } from "./lib/env.server";
