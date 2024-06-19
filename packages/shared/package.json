@@ -6,6 +6,9 @@
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "npm run build -- --watch src",
     "build": "tsup src/index.ts --format cjs,esm --dts --clean",
