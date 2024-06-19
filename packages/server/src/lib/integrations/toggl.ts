@@ -3,7 +3,7 @@ import { Integration } from "../integration-types";
 import { Dataset, Row } from "@mainframe-so/shared";
 import { syncTable, updateObject, updateRowFromTableType } from "../../sync";
 import { getDatasetObject, getDatasetTable } from "../integrations";
-import crypto from "crypto";
+import crypto from "node:crypto";
 import { objectsTable, rowsTable, tablesTable } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
 import { deserialize } from "../../utils/serialization";

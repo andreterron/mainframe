@@ -8,7 +8,7 @@ import express, { Express } from "express";
 import { json, text } from "body-parser";
 import { env } from "./lib/env.server";
 import { ZodError } from "zod";
-import type { Server } from "http";
+import type { Server } from "node:http";
 import { syncAll } from "./sync";
 import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";

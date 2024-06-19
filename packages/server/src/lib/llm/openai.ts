@@ -1,10 +1,10 @@
 import { env } from "../env.server";
 import jsonToTS from "json-to-ts";
 import { once } from "lodash";
-import { readFile } from "fs/promises";
+import { readFile } from "node:fs/promises";
 import OpenAI from "openai";
 import { __dirnameFromImportMetaUrl } from "../../utils/dirname";
-import { resolve } from "path";
+import { resolve } from "node:path";
 
 const __dirname = __dirnameFromImportMetaUrl(import.meta.url);
 
