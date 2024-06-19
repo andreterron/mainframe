@@ -7,8 +7,8 @@
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "tsup src/index.ts --format cjs,esm --watch",
-    "build": "tsup src/index.ts --format cjs,esm && tsc --declaration --emitDeclarationOnly",
+    "dev": "npm run build -- --watch src",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "publish-package": "npm publish"
   },
   "exports": {
