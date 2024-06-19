@@ -38,6 +38,7 @@
     "@trpc/server": "^10.38.1",
     "address": "^2.0.1",
     "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
     "chalk": "^5.3.0",
     "close-with-grace": "^1.2.0",
     "cloudflared": "^0.5.0",

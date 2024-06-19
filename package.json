@@ -17,20 +17,10 @@
     "db:drop": "drizzle-kit drop"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.13",
     "concurrently": "^8.2.0",
     "drizzle-kit": "^0.20.18",
     "nanoid": "^4.0.2",
     "turbo": "^2.0.4"
-  },
-  "dependencies": {
-    "@codemirror/lang-javascript": "^6.2.2",
-    "@uiw/react-codemirror": "^4.22.0",
-    "body-parser": "^1.20.2",
-    "esbuild-wasm": "^0.20.2",
-    "jotai": "^2.8.0",
-    "jotai-scope": "^0.6.0",
-    "thememirror": "^2.0.1"
   },
   "packageManager": "npm@10.2.4"
 }
