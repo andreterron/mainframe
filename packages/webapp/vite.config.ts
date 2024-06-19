@@ -3,9 +3,9 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import { config } from "dotenv";
+import process from "node:process";
 
-// TODO: Review .env file location
-config({ path: "../../.env" });
+config({ path: process.env.DOTENV_CONFIG_PATH || "../../.env" });
 
 // https://vitejs.dev/config/
 export default defineConfig({
