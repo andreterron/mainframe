@@ -1,6 +1,6 @@
 {
   "name": "@mainframe-so/shared",
-  "version": "0.4.21",
+  "version": "0.4.22",
   "private": false,
   "description": "",
   "main": "./dist/index.js",
