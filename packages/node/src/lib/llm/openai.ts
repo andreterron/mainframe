@@ -6,6 +6,7 @@ import OpenAI from "openai";
 import { __dirnameFromImportMetaUrl } from "../../utils/dirname";
 import { resolve } from "node:path";
 
+// TODO: import.meta is empty on cjs bundle
 const __dirname = __dirnameFromImportMetaUrl(import.meta.url);
 
 const readSystemPromptTemplate = once(async () => {

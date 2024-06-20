@@ -3,13 +3,13 @@ import closeWithGrace, {
   type CloseWithGraceAsyncCallback,
 } from "close-with-grace";
 import { db } from "./db/db.server";
-import { getIntegrationForDataset } from "./lib/integrations";
+import { getIntegrationForDataset } from "@mainframe-so/server";
 import express, { Express } from "express";
 import { json, text } from "body-parser";
 import { env } from "./lib/env.server";
 import { ZodError } from "zod";
 import type { Server } from "node:http";
-import { syncAll } from "./sync";
+import { syncAll } from "@mainframe-so/server";
 import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
 import { startCloudflared } from "./cloudflared";
@@ -122,45 +122,6 @@ export function setupServer(hooks: SetupServerHooks = {}) {
     .on("uncaughtException", (err) => {
       console.error(err, "Uncaught Exception thrown");
     });
-
-  app.all(
-    ["/webhooks/:dataset_id", "/webhooks/:dataset_id/*"],
-    // Text is used here so integrations can validate the webhook signature
-    text({ type: () => true }),
-    async (req, res, next) => {
-      try {
-        console.log(
-          `Received webhook request for dataset ${req.params.dataset_id}`,
-        );
-        if (!req.params.dataset_id) {
-          res.sendStatus(400);
-          return;
-        }
-        // TODO: This req.db might not exist
-        const [dataset] = await req.db
-          .select()
-          .from(datasetsTable)
-          .where(eq(datasetsTable.id, req.params.dataset_id))
-          .limit(1);
-        if (!dataset) {
-          res.sendStatus(404);
-          return;
-        }
-        if (!dataset) {
-          return res.sendStatus(404);
-        }
-        const integration = getIntegrationForDataset(dataset);
-
-        if (!integration?.webhook) {
-          return res.sendStatus(404);
-        }
-
-        integration.webhook(dataset, req, res);
-      } catch (e) {
-        next(e);
-      }
-    },
-  );
 
   app.use(
     "/trpc",

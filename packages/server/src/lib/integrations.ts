@@ -4,12 +4,12 @@ import {
   IntegrationObject,
   IntegrationTable,
 } from "./integration-types";
+import { Dataset, ClientIntegration } from "@mainframe-so/shared";
 import { github } from "./integrations/github";
 import { network } from "./integrations/network";
 import { peloton } from "./integrations/peloton";
 import { posthog } from "./integrations/posthog";
 import { toggl } from "./integrations/toggl";
-import { Dataset, ClientIntegration } from "@mainframe-so/shared";
 import { google } from "./integrations/google";
 import { zotero } from "./integrations/zotero";
 import { notion } from "./integrations/notion";

@@ -14,7 +14,7 @@ import {
 import { z } from "zod";
 import { Context, UserInfo } from "./trpc_context";
 import { and, eq } from "drizzle-orm";
-import { syncDataset, syncObject, syncTable } from "./sync";
+import { syncDataset, syncObject, syncTable } from "@mainframe-so/server";
 import {
   commitSession,
   destroySession,
@@ -28,28 +28,28 @@ import {
   getIntegrationForDataset,
   zOAuthCredentials,
   zTokenCredentials,
-} from "./lib/integrations";
+} from "@mainframe-so/server";
 import { deserializeData } from "./utils/serialization";
 import { createUserAccount, validateUserAccount } from "./lib/auth.server";
 import { checkIfUserExists } from "./db/helpers";
-import { github } from "./lib/integrations/github";
-import { network } from "./lib/integrations/network";
-import { peloton } from "./lib/integrations/peloton";
-import { posthog } from "./lib/integrations/posthog";
-import { toggl } from "./lib/integrations/toggl";
-import { google } from "./lib/integrations/google";
-import { zotero } from "./lib/integrations/zotero";
-import { notion } from "./lib/integrations/notion";
-import { oura } from "./lib/integrations/oura";
-import { valtown } from "./lib/integrations/valtown";
+import { github } from "@mainframe-so/server";
+import { network } from "@mainframe-so/server";
+import { peloton } from "@mainframe-so/server";
+import { posthog } from "@mainframe-so/server";
+import { toggl } from "@mainframe-so/server";
+import { google } from "@mainframe-so/server";
+import { zotero } from "@mainframe-so/server";
+import { notion } from "@mainframe-so/server";
+import { oura } from "@mainframe-so/server";
+import { valtown } from "@mainframe-so/server";
 import { env } from "./lib/env.server";
-import { nango } from "./lib/nango";
+import { nango } from "@mainframe-so/server";
 import * as Sentry from "@sentry/node";
-import { getTokenFromDataset } from "./lib/integration-token";
-import { spotify } from "./lib/integrations/spotify";
-import { render } from "./lib/integrations/render";
-import { vercel } from "./lib/integrations/vercel";
-import { bitbucket } from "./lib/integrations/bitbucket";
+import { getTokenFromDataset } from "@mainframe-so/server";
+import { spotify } from "@mainframe-so/server";
+import { render } from "@mainframe-so/server";
+import { vercel } from "@mainframe-so/server";
+import { bitbucket } from "@mainframe-so/server";
 import { getTableData } from "./lib/table-data";
 import {
   generateObjectComponent,

@@ -1,8 +1,6 @@
 {
   "display": "Shared",
-  "include": [
-    "src/**/*.ts"
-  ],
+  "include": ["src/**/*.ts"],
   "compilerOptions": {
     "composite": false,
     "declaration": true,
@@ -18,11 +16,9 @@
     "skipLibCheck": true,
     "noUncheckedIndexedAccess": true,
     "strict": true,
-    "target": "es2016",
+    "target": "ES2021",
     "module": "ESNext",
     "outDir": "dist"
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

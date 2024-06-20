@@ -12,6 +12,7 @@
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.2",
     "@codesandbox/sandpack-react": "^2.13.7",
+    "@mainframe-so/node": "*",
     "@mainframe-so/react": "*",
     "@mainframe-so/shared": "*",
     "@nangohq/frontend": "^0.39.13",

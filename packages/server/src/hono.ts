@@ -1,24 +1,19 @@
-import { getRequestListener, type HttpBindings } from "@hono/node-server";
-import { type ServerResponse } from "node:http";
 import { Hono } from "hono";
-import { createMiddleware } from "hono/factory";
-import { env } from "./lib/env.server";
-import { Env } from "./hono/hono-types";
-import { apiRouter } from "./routes/api";
+import { Env } from "./types.js";
+import { apiRouter } from "./routers/api-router.js";
+import { webhookRouter } from "./routers/webhook-router.js";
 
-const dbMiddleware = createMiddleware<Env>(async (c, next) => {
-  c.set("db", c.env.incoming.db);
-  await next();
-});
+export function createHono<E extends Env = Env>(init?: {
+  initApp: (app: Hono<E>) => void;
+}) {
+  const app = new Hono<E>();
 
-export const hono = new Hono<Env>()
-  // Healthcheck
-  .use(dbMiddleware)
-  .route("/api", apiRouter)
-  .get("/healthcheck", async (c) => {
-    return c.json({ success: true });
-  });
+  init?.initApp?.(app);
 
-export const honoRequestListener = getRequestListener(hono.fetch, {
-  hostname: new URL(env.VITE_API_URL).hostname,
-});
+  return app
+    .route("/api", apiRouter)
+    .route("/webhooks", webhookRouter)
+    .get("/healthcheck", async (c) => {
+      return c.json({ success: true });
+    });
+}

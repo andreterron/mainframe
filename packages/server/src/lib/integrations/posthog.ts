@@ -1,5 +1,5 @@
-import { deserialize } from "../../utils/serialization";
-import { Integration } from "../integration-types";
+import { deserialize } from "../../utils/serialization.js";
+import { Integration } from "../integration-types.js";
 import { Dataset } from "@mainframe-so/shared";
 import { rowsTable, tablesTable } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
