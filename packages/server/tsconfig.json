@@ -1,12 +1,16 @@
 {
   "display": "Server",
-  "include": ["src/**/*.ts"],
+  "include": [
+    "src/**/*.ts"
+  ],
   "compilerOptions": {
     "composite": false,
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
     "inlineSources": false,
     "isolatedModules": true,
     "moduleResolution": "node",
@@ -20,5 +24,7 @@
     "module": "ESNext",
     "outDir": "dist"
   },
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }
