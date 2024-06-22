@@ -3,14 +3,12 @@
   "version": "0.4.23",
   "private": false,
   "description": "",
-  "sideEffects": false,
-  "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "npm run build -- --watch src",
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean --tsconfig tsconfig.json",
+    "dev": "tsx watch --clear-screen=false src/app.ts",
+    "build": "tsc",
     "publish-package": "npm publish"
   },
   "exports": {
