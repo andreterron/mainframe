@@ -1,9 +1,9 @@
 import { Hono } from "hono";
-import { Env } from "../types.js";
+import { Env } from "../types.ts";
 import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
-import { getIntegrationForDataset } from "../lib/integrations.js";
-import { ensureDB } from "../utils/ensure-db.js";
+import { getIntegrationForDataset } from "../lib/integrations.ts";
+import { ensureDB } from "../utils/ensure-db.ts";
 import { HTTPException } from "hono/http-exception";
 
 export const webhookRouter = new Hono<Env>().all(

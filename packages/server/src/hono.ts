@@ -1,7 +1,7 @@
 import { Hono } from "hono";
-import { Env } from "./types.js";
-import { apiRouter } from "./routers/api-router.js";
-import { webhookRouter } from "./routers/webhook-router.js";
+import { Env } from "./types.ts";
+import { apiRouter } from "./routers/api-router.ts";
+import { webhookRouter } from "./routers/webhook-router.ts";
 
 export function createHono<E extends Env = Env>(init?: {
   initApp: (app: Hono<E>) => void;

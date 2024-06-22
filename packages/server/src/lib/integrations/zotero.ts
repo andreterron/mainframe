@@ -1,4 +1,4 @@
-import { Integration } from "../integration-types";
+import { Integration } from "../integration-types.ts";
 import { Dataset } from "@mainframe-so/shared";
 
 function zoteroHeaders(token: string) {

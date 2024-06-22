@@ -1,4 +1,4 @@
-import { Integration } from "../integration-types";
+import { Integration } from "../integration-types.ts";
 import { Dataset } from "@mainframe-so/shared";
 import { google as api, calendar_v3 } from "googleapis";
 import { datasetsTable } from "@mainframe-so/shared";
