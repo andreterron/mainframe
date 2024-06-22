@@ -1,26 +1,7 @@
 {
-  "display": "Shared",
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../tsconfig.json",
   "include": ["src/**/*.ts", "tsup.config.ts"],
-  "compilerOptions": {
-    "composite": false,
-    "declaration": true,
-    "declarationMap": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "allowImportingTsExtensions": true,
-    "inlineSources": false,
-    "isolatedModules": true,
-    "moduleResolution": "node",
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "preserveWatchOutput": true,
-    "skipLibCheck": true,
-    "noUncheckedIndexedAccess": true,
-    "strict": true,
-    "target": "ES2021",
-    "module": "ESNext",
-    "outDir": "dist"
-  },
-  "exclude": ["node_modules"]
+
+  "compilerOptions": {}
 }

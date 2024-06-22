@@ -13,7 +13,7 @@
   ],
   "scripts": {
     "dev": "tsup --watch src",
-    "build": "tsup",
+    "build": "tsup --tsconfig tsconfig.build.json",
     "publish-package": "npm publish"
   },
   "exports": {
