@@ -11,7 +11,7 @@ import {
 import { AlertCircleIcon } from "lucide-react";
 import { cn } from "../lib/utils";
 import { UnderReviewMessage } from "./UnderReviewMessage";
-import { partition } from "lodash";
+import { partition } from "lodash-es";
 
 function IntegrationButton({
   integration,
