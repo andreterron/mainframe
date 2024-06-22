@@ -5,7 +5,7 @@ import closeWithGrace, {
 import { db } from "./db/db.server";
 import { getIntegrationForDataset } from "@mainframe-so/server";
 import express, { Express } from "express";
-import { json, text } from "body-parser";
+import bodyParser from "body-parser";
 import { env } from "./lib/env.server";
 import { ZodError } from "zod";
 import type { Server } from "node:http";
@@ -126,7 +126,7 @@ export function setupServer(hooks: SetupServerHooks = {}) {
   app.use(
     "/trpc",
     cors({ credentials: true, origin: env.APP_URL }),
-    json(),
+    bodyParser.json(),
     trpcExpress.createExpressMiddleware({
       router: appRouter,
       createContext: createContext(hooks),

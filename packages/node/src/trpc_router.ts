@@ -56,6 +56,7 @@ import {
   generateTableComponent,
 } from "./lib/llm/openai";
 import { getObjectAndDataset } from "./lib/object-data";
+import { nanoid } from "nanoid";
 
 /**
  * Initialization of tRPC backend
@@ -509,7 +510,6 @@ export const appRouter = router({
     }
 
     // TODO: Remove dynamic import
-    const { nanoid } = await import("nanoid");
     const id = nanoid(32);
 
     const [newApiKey] = await ctx.db

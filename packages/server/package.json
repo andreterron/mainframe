@@ -12,7 +12,7 @@
     "dist"
   ],
   "scripts": {
-    "dev": "tsup --watch src",
+    "dev": "tsup --format esm --watch src",
     "build": "tsup --tsconfig tsconfig.build.json",
     "publish-package": "npm publish"
   },
