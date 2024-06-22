@@ -3,8 +3,10 @@
   "version": "0.4.23",
   "private": false,
   "description": "",
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"
@@ -16,8 +18,8 @@
   },
   "exports": {
     ".": {
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
     }
   },
@@ -25,7 +27,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "^4.9.3"
+    "typescript": "^5.0.4"
   },
   "dependencies": {
     "@mainframe-so/shared": "0.4.23",
