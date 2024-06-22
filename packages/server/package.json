@@ -40,6 +40,7 @@
     "hono": "^4.4.3",
     "local-devices": "^3.0.0",
     "lodash-es": "^4.17.21",
+    "typed-emitter": "^2.1.0",
     "zod": "^3.21.4"
   }
 }

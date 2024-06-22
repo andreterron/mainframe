@@ -33,7 +33,6 @@
     "@types/node": "^18.15.1",
     "@types/node-cron": "^3.0.8",
     "tsx": "^3.12.7",
-    "typed-emitter": "^2.1.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {
