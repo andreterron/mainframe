@@ -19,9 +19,7 @@ export default defineConfig({
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: "mainframe",
       project: "mainframe-client",
-      disable:
-        process.env.NODE_ENV !== "production" ||
-        !!process.env.SENTRY_AUTH_TOKEN,
+      disable: !!process.env.SENTRY_AUTH_TOKEN,
     }),
   ],
 
