@@ -12,8 +12,8 @@
     "dist"
   ],
   "scripts": {
-    "dev": "npm run build -- --watch src",
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean --tsconfig tsconfig.json",
+    "dev": "tsup --watch src",
+    "build": "tsup",
     "publish-package": "npm publish"
   },
   "exports": {
