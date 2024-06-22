@@ -17,7 +17,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "typescript": "^4.9.3"
+    "typescript": "^5.0.4"
   },
   "dependencies": {
     "swr": "^2.2.5"

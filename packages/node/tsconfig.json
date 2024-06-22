@@ -1,6 +1,6 @@
 {
   "display": "Node",
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "tsup.config.ts"],
   "compilerOptions": {
     "composite": false,
     "declaration": true,
@@ -8,6 +8,8 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
     "inlineSources": false,
     "isolatedModules": true,
     "moduleResolution": "node",

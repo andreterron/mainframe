@@ -4,9 +4,6 @@ import { mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { __dirnameFromImportMetaUrl } from "../utils/dirname";
 
-// TODO: import.meta is empty on cjs bundle
-const __dirname = __dirnameFromImportMetaUrl(import.meta.url);
-
 const dbDirname = resolve(__dirname, "..", "..", "..", "..", "database");
 
 const dbPath = join(dbDirname, "mainframe.db");
