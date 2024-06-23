@@ -20,7 +20,6 @@ import { appRouter } from "./trpc_router";
 export type { AppRouter } from "./trpc_router";
 import cors from "cors";
 import { buildApiRouter, ApiRouterHooks } from "./api";
-import { oauthRouter } from "./oauth_router";
 import chalk from "chalk";
 import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
 import { Client } from "@libsql/client";
@@ -148,7 +147,6 @@ export function setupServer(hooks: SetupServerHooks = {}) {
     },
     buildApiRouter(hooks),
   );
-  app.use("/oauth", oauthRouter);
 
   // Redirect the root API path to the app
   app.get("/", (req, res) => {

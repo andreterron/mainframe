@@ -47,6 +47,7 @@ export default function DatasetTokenInput({
   };
   const nangoIntegration = integration.authTypes?.nango;
   const hasManualIntegration = integration.authType;
+  console.log(dataset);
   return (
     <div className="flex flex-col gap-8 items-start">
       <DatasetHeader dataset={dataset}>{dataset.name}</DatasetHeader>
@@ -173,7 +174,7 @@ export default function DatasetTokenInput({
                   <>
                     <label>Client ID:</label>
                     <input
-                      name="client_id"
+                      name="clientId"
                       type="password"
                       className="px-2 py-1 border rounded-md w-96 max-w-full"
                       // Hack to get browsers to not save this "password" field
@@ -184,7 +185,7 @@ export default function DatasetTokenInput({
                     />
                     <label>Client Secret:</label>
                     <input
-                      name="client_secret"
+                      name="clientSecret"
                       type="password"
                       className="px-2 py-1 border rounded-md w-96 max-w-full"
                       // Hack to get browsers to not save this "password" field
@@ -196,7 +197,7 @@ export default function DatasetTokenInput({
                     <p>
                       Callback URL:{" "}
                       <code className="p-1 rounded bg-gray-200">
-                        {`${location.origin}/oauth/callback/${dataset.id}`}
+                        {`${env.VITE_API_URL}/oauth/callback/${dataset.id}`}
                       </code>
                     </p>
                     <button className="bg-gray-200 hover:bg-gray-300 active:bg-gray-400 px-2 py-1 rounded-md">
@@ -208,11 +209,11 @@ export default function DatasetTokenInput({
                     <p>
                       Callback URL:{" "}
                       <code className="p-1 rounded bg-gray-200">
-                        {`${location.origin}/oauth/callback/${dataset.id}`}
+                        {`${env.VITE_API_URL}/oauth/callback/${dataset.id}`}
                       </code>
                     </p>
                     <a
-                      href={`/oauth/start/${dataset.id}`}
+                      href={`${env.VITE_API_URL}/oauth/start/${dataset.id}`}
                       className="bg-gray-200 hover:bg-gray-300 active:bg-gray-400 px-2 py-1 rounded-md"
                     >
                       Authorize

@@ -3,6 +3,7 @@ import { Env } from "./types.ts";
 import { apiRouter } from "./routers/api-router.ts";
 import { webhookRouter } from "./routers/webhook-router.ts";
 import { LibSQLDatabase } from "drizzle-orm/libsql/driver";
+import { oauthRouter } from "./routers/oauth-router.ts";
 
 export function createMainframeAPI<E extends Env = Env>(init: {
   /**
@@ -33,6 +34,7 @@ export function createMainframeAPI<E extends Env = Env>(init: {
 
   return app
     .route("/api", apiRouter)
+    .route("/oauth", oauthRouter)
     .route("/webhooks", webhookRouter)
     .get("/healthcheck", async (c) => {
       return c.json({ success: true });

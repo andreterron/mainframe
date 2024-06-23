@@ -11,6 +11,9 @@ config({ path: process.env.DOTENV_CONFIG_PATH || "../../.env" });
 export default defineConfig({
   server: {
     port: 8744,
+    proxy: {
+      "/oauth": "http://localhost:8745/oauth",
+    },
   },
 
   plugins: [
