@@ -3,7 +3,6 @@ import { resolve, dirname } from "path";
 import { homedir, userInfo } from "os";
 import { fileURLToPath } from 'url';
 
-// TODO: import.meta is empty on cjs bundle
 const __dirname = fileURLToPath(dirname(import.meta.url));
 
 const repoFolder = resolve(__dirname, '..')
