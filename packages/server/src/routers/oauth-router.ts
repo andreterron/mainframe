@@ -1,4 +1,4 @@
-import { getIntegrationForDataset } from "@mainframe-so/server";
+import { getIntegrationForDataset } from "../lib/integrations.ts";
 import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
