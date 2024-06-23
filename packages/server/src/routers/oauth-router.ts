@@ -17,8 +17,6 @@ function getBaseUrl(req: Request) {
   )
     ? "http"
     : "https";
-  // TODO: DO NOT COMMIT THIS CHANGE
-  console.log(host);
   return `${protocol}://${host}/oauth/callback`;
 }
 
