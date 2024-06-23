@@ -7,7 +7,7 @@ export function ensureDB(
   if (!db) {
     throw new HTTPException(500, {
       message:
-        "Missing Hono variable `db`. Please ensure you have a database middleware.",
+        "Missing Hono variable `db`. Please ensure you return a Drizzle LibSQLite database on the `getRequestDB` setting of `createMainframeAPI({})`.",
     });
   }
 }
