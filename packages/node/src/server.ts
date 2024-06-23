@@ -51,7 +51,7 @@ export function setupServer(hooks: SetupServerHooks = {}) {
 
   const port = env.PORT || 8745;
 
-  async function setupWebhooks(baseApiUrl: string) {
+  async function setupWebhooks(baseApiUrl: string, db: LibSQLDatabase) {
     // Get all datasets
     const datasets = await db.select().from(datasetsTable);
 
@@ -247,7 +247,18 @@ export function setupServer(hooks: SetupServerHooks = {}) {
       // Wait for the API to be ready
       await serverPromise;
 
-      await setupWebhooks(baseApiUrl);
+      if (hooks.iterateOverDBs) {
+        await hooks.iterateOverDBs(async (db, userId) => {
+          try {
+            await setupWebhooks(baseApiUrl, db);
+          } catch (e) {
+            console.error(`Failed to setup webhook for user ${userId}`);
+            console.error(e);
+          }
+        });
+      } else {
+        await setupWebhooks(baseApiUrl, db);
+      }
     })
     .catch((e) => console.error(e));
 
