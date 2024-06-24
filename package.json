@@ -17,6 +17,7 @@
     "db:drop": "drizzle-kit drop"
   },
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.47.0",
     "concurrently": "^8.2.0",
     "drizzle-kit": "^0.20.18",
     "nanoid": "^4.0.2",
