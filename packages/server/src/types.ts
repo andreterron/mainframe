@@ -1,4 +1,4 @@
-import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { type LibSQLDatabase } from "drizzle-orm/libsql";
 
 export type Env = {
   Variables: {

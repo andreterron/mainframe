@@ -3,7 +3,7 @@ import { Integration } from "../integration-types.ts";
 import { Dataset } from "@mainframe-so/shared";
 import { rowsTable, tablesTable } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
-import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { type LibSQLDatabase } from "drizzle-orm/libsql";
 
 async function getProjectChildren(
   db: LibSQLDatabase,

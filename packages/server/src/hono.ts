@@ -2,7 +2,7 @@ import { Context, Hono } from "hono";
 import { Env } from "./types.ts";
 import { apiRouter } from "./routers/api-router.ts";
 import { webhookRouter } from "./routers/webhook-router.ts";
-import { LibSQLDatabase } from "drizzle-orm/libsql/driver";
+import { type LibSQLDatabase } from "drizzle-orm/libsql";
 import { oauthRouter } from "./routers/oauth-router.ts";
 
 export function createMainframeAPI<E extends Env = Env>(init: {

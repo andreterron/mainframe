@@ -18,7 +18,7 @@ import {
 import { and, eq } from "drizzle-orm";
 import { deserialize, serialize } from "./utils/serialization.ts";
 import { writeOperation } from "./lib/operations.ts";
-import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { type LibSQLDatabase } from "drizzle-orm/libsql";
 
 export async function updateRowFromTableType(
   db: LibSQLDatabase,

@@ -34,7 +34,7 @@
     "@mainframe-so/shared": "0.4.23",
     "@nangohq/node": "^0.39.13",
     "dotenv": "^16.3.1",
-    "drizzle-orm": "~0.29.5",
+    "drizzle-orm": "^0.29.5",
     "envsafe": "^2.0.3",
     "googleapis": "^128.0.0",
     "hono": "^4.4.3",

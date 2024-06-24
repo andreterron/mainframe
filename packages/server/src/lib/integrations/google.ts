@@ -3,7 +3,7 @@ import { Dataset } from "@mainframe-so/shared";
 import { google as api, calendar_v3 } from "googleapis";
 import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
-import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { type LibSQLDatabase } from "drizzle-orm/libsql";
 
 async function getAuth(dataset: Dataset, db: LibSQLDatabase) {
   if (
