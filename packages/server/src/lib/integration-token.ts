@@ -1,5 +1,5 @@
 import { Dataset } from "@mainframe-so/shared";
-import { nango } from "./nango";
+import { nango } from "./nango.ts";
 import { AuthModes } from "@nangohq/node";
 
 export async function getTokenFromDataset(

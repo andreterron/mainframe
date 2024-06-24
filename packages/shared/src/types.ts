@@ -1,10 +1,10 @@
-import { InferSelectModel } from "drizzle-orm";
+import type { InferSelectModel } from "drizzle-orm";
 import type {
   datasetsTable,
   objectsTable,
   rowsTable,
   tablesTable,
-} from "./db/schema.js";
+} from "./db/schema.ts";
 import { z } from "zod";
 
 export type Dataset = InferSelectModel<typeof datasetsTable>;

@@ -16,9 +16,20 @@
       "dependsOn": ["build", "test", "lint"]
     },
     "lint": {},
-    "dev": {
+    "dev-prep": {
+      "dependsOn": ["^dev-prep"],
+      "outputs": ["dist/**"]
+    },
+    "@mainframe-so/node#serve": {
+      "dependsOn": ["dev-prep"],
       "cache": false,
       "persistent": true
+    },
+    "dev": {
+      "dependsOn": ["dev-prep"],
+      "cache": false,
+      "persistent": true,
+      "outputs": ["dist/**"]
     }
   }
 }

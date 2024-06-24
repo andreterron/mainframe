@@ -4,7 +4,7 @@ import {
   createTRPCProxyClient,
   httpBatchLink,
 } from "@trpc/react-query";
-import type { AppRouter } from "@mainframe-so/server";
+import type { AppRouter } from "@mainframe-so/node";
 import { useState } from "react";
 import { QueryClient } from "@tanstack/react-query";
 import { isTrpcNotFoundError } from "../utils/errors";

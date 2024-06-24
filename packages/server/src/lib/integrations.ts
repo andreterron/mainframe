@@ -3,23 +3,23 @@ import {
   IntegrationComputed,
   IntegrationObject,
   IntegrationTable,
-} from "./integration-types";
-import { github } from "./integrations/github";
-import { network } from "./integrations/network";
-import { peloton } from "./integrations/peloton";
-import { posthog } from "./integrations/posthog";
-import { toggl } from "./integrations/toggl";
+} from "./integration-types.ts";
 import { Dataset, ClientIntegration } from "@mainframe-so/shared";
-import { google } from "./integrations/google";
-import { zotero } from "./integrations/zotero";
-import { notion } from "./integrations/notion";
-import { oura } from "./integrations/oura";
-import { bitbucket } from "./integrations/bitbucket";
-import { spotify } from "./integrations/spotify";
-import { render } from "./integrations/render";
-import { vercel } from "./integrations/vercel";
-import { valtown } from "./integrations/valtown";
-import { pick } from "lodash";
+import { github } from "./integrations/github.ts";
+import { network } from "./integrations/network.ts";
+import { peloton } from "./integrations/peloton.ts";
+import { posthog } from "./integrations/posthog.ts";
+import { toggl } from "./integrations/toggl.ts";
+import { google } from "./integrations/google.ts";
+import { zotero } from "./integrations/zotero.ts";
+import { notion } from "./integrations/notion.ts";
+import { oura } from "./integrations/oura.ts";
+import { bitbucket } from "./integrations/bitbucket.ts";
+import { spotify } from "./integrations/spotify.ts";
+import { render } from "./integrations/render.ts";
+import { vercel } from "./integrations/vercel.ts";
+import { valtown } from "./integrations/valtown.ts";
+import { pick } from "lodash-es";
 import { z } from "zod";
 
 export const zTokenCredentials = z.object({ token: z.string().min(1) });

@@ -13,6 +13,7 @@ import {
 } from "./ui/breadcrumb";
 import { HomeIcon } from "./icons/HomeIcon";
 import { DatasetBreadcrumb } from "./DatasetHeader.DatasetBreadcrumb";
+import { env } from "../lib/env_client";
 
 export function DatasetHeader({
   children,
@@ -47,7 +48,10 @@ export function DatasetHeader({
     >
       {dataset.integrationType === "google" && (
         <Button variant="ghost" asChild>
-          <a title="Reload OAuth" href={`/oauth/start/${dataset.id}`}>
+          <a
+            title="Reload OAuth"
+            href={`${env.VITE_API_URL}/oauth/start/${dataset.id}`}
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

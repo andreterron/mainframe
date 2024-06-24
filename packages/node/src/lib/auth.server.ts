@@ -1,8 +1,10 @@
-import { hash } from "bcryptjs";
+import bcryptjs from "bcryptjs";
 import { usersTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
 import { LibSQLDatabase } from "drizzle-orm/libsql";
-import { env } from "./env.server";
+import { env } from "./env.server.ts";
+
+const { hash } = bcryptjs;
 
 export async function createUserAccount(
   db: LibSQLDatabase,

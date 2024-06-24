@@ -2,7 +2,7 @@ import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
 import { mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { __dirnameFromImportMetaUrl } from "../utils/dirname";
+import { __dirnameFromImportMetaUrl } from "../utils/dirname.ts";
 
 const __dirname = __dirnameFromImportMetaUrl(import.meta.url);
 

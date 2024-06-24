@@ -1,6 +1,6 @@
 import { LibSQLDatabase } from "drizzle-orm/libsql";
 import { usersTable } from "@mainframe-so/shared";
-import { env } from "../lib/env.server";
+import { env } from "../lib/env.server.ts";
 
 export async function checkIfUserExists(db: LibSQLDatabase) {
   if (!env.VITE_AUTH_PASS) {

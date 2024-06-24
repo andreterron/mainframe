@@ -1,9 +1,10 @@
 import { sessionsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
-import { env } from "./lib/env.server";
+import { env } from "./lib/env.server.ts";
 import { CookieSerializeOptions, parse, serialize } from "cookie";
 import cookieSignature from "cookie-signature";
 import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { nanoid } from "nanoid";
 
 export interface MainframeSession {
   id: string;
@@ -96,7 +97,6 @@ async function deleteData(db: LibSQLDatabase, id: string) {
 
 async function createSession(db: LibSQLDatabase): Promise<MainframeSession> {
   // TODO: Remove dynamic import
-  const { nanoid } = await import("nanoid");
   const id = nanoid(32);
   await db.insert(sessionsTable).values({
     id,

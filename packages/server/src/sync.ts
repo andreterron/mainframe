@@ -2,9 +2,12 @@ import {
   getDatasetTable,
   getObjectsForDataset,
   getTablesForDataset,
-} from "./lib/integrations";
-import { isEqual } from "lodash";
-import { IntegrationObject, IntegrationTable } from "./lib/integration-types";
+} from "./lib/integrations.ts";
+import { isEqual } from "lodash-es";
+import {
+  IntegrationObject,
+  IntegrationTable,
+} from "./lib/integration-types.ts";
 import {
   datasetsTable,
   objectsTable,
@@ -13,9 +16,9 @@ import {
   Dataset,
 } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
-import { deserialize, serialize } from "./utils/serialization";
-import { writeOperation } from "./lib/operations";
-import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { deserialize, serialize } from "./utils/serialization.ts";
+import { writeOperation } from "./lib/operations.ts";
+import { type LibSQLDatabase } from "drizzle-orm/libsql";
 
 export async function updateRowFromTableType(
   db: LibSQLDatabase,

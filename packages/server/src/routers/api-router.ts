@@ -1,17 +1,19 @@
 import { Hono } from "hono";
-import { Env } from "../hono/hono-types";
+import { Env } from "../types.ts";
 import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
-import { getIntegrationFromType } from "../lib/integrations";
+import { getIntegrationFromType } from "../lib/integrations.ts";
+import { ensureDB } from "../utils/ensure-db.ts";
+import { syncAll } from "../sync.ts";
 
 // TODO: Accept Proxy-Authorization to get the db. This is currently done on
 //       the express middleware.
-export const apiRouter = new Hono<Env>().all(
-  "/proxy/:datasetId/*",
-  async (c) => {
+export const apiRouter = new Hono<Env>()
+  .all("/proxy/:datasetId/*", async (c) => {
     // Read from Hono context
     const req = c.req.raw;
-    const db = c.get("db");
+    const db = c.var.db;
+    ensureDB(db);
     const datasetId = c.req.param("datasetId");
 
     // Get integration for that dataset
@@ -61,5 +63,12 @@ export const apiRouter = new Hono<Env>().all(
     res.headers.delete("Content-Length");
 
     return res;
-  },
-);
+  })
+  .post("/sync/all", async (c) => {
+    const db = c.var.db;
+    ensureDB(db);
+    await syncAll(db);
+    // TODO: Return 202 when we start a background job
+    c.status(204);
+    return c.body(null);
+  });

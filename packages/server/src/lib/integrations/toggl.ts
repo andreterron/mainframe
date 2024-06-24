@@ -1,12 +1,13 @@
-import { Request, Response } from "express";
-import { Integration } from "../integration-types";
+import { Integration } from "../integration-types.ts";
 import { Dataset, Row } from "@mainframe-so/shared";
-import { syncTable, updateObject, updateRowFromTableType } from "../../sync";
-import { getDatasetObject, getDatasetTable } from "../integrations";
+import { syncTable, updateObject, updateRowFromTableType } from "../../sync.ts";
+import { getDatasetObject, getDatasetTable } from "../integrations.ts";
 import crypto from "node:crypto";
 import { objectsTable, rowsTable, tablesTable } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
-import { deserialize } from "../../utils/serialization";
+import { deserialize } from "../../utils/serialization.ts";
+import { HTTPException } from "hono/http-exception";
+import { Buffer } from "node:buffer";
 
 function togglHeaders(dataset: Dataset) {
   return {
@@ -202,20 +203,20 @@ export const toggl: Integration = {
       }
     }
   },
-  webhook: async (dataset, req: Request, res: Response) => {
+  webhook: async (db, dataset, req) => {
     if (
-      req.header("Content-Type") !== "application/json" ||
+      req.headers.get("Content-Type") !== "application/json" ||
       req.method !== "POST"
     ) {
       // Toggl only sends POST events with Content-Type: application/json
       // https://developers.track.toggl.com/docs/webhooks_start/validating_received_events#other-considerations
       console.log("Invalid Toggl webhook received");
-      return res.sendStatus(400);
+      throw new HTTPException(400);
     }
 
     if (typeof req.body !== "string") {
       console.log("Webhook body wasn't a string");
-      return res.sendStatus(400);
+      throw new HTTPException(400);
     }
 
     const json = JSON.parse(req.body) as TogglWebhook;
@@ -224,7 +225,7 @@ export const toggl: Integration = {
     // The reason is that we'll get a "ping" event before saving the subscription to the DB
     let webhook: Row | undefined;
     try {
-      [webhook] = await req.db
+      [webhook] = await db
         .select({
           id: rowsTable.id,
           sourceId: rowsTable.sourceId,
@@ -243,15 +244,15 @@ export const toggl: Integration = {
         .limit(1);
     } catch (e) {
       console.log("Error getting webhook", e);
-      return res.sendStatus(200);
+      return new Response("Ok", { status: 200 });
     }
     if (!webhook) {
       console.log("Webhook not found");
-      return res.sendStatus(200);
+      return new Response("Ok", { status: 200 });
     }
 
     const message = req.body;
-    const signature = req.header("x-webhook-signature-256");
+    const signature = req.headers.get("x-webhook-signature-256");
     const secret = deserialize(webhook.data).secret;
 
     const hmac = crypto.createHmac("sha256", secret).setEncoding("hex");
@@ -259,37 +260,42 @@ export const toggl: Integration = {
 
     if (!signature) {
       console.error("Missing Signature");
-      return res.sendStatus(400);
+
+      throw new HTTPException(400);
     }
 
     if (signature.replace(/^.*=/, "") !== hmac.digest("hex")) {
       console.log("Invalid HMAC");
-      return res.sendStatus(400);
+      throw new HTTPException(400);
     }
 
     // Valid HMAC
 
     if (isPingWebhookEvent(json)) {
       console.log("Toggl Webhook Ping event");
-      return res.send({ validation_code: json.validation_code });
+      // @ts-ignore This should work. tsup or rollu-dts-plugin are failing
+      return Response.json(
+        { validation_code: json.validation_code },
+        { status: 400 },
+      );
     }
 
     if (json.metadata.model === "time_entry") {
       const table = getDatasetTable(dataset, "timeEntries");
       if (table?.rowId) {
         await updateRowFromTableType(
-          req.db,
+          db,
           json.payload,
           table.rowId(dataset, json.payload),
           json.payload,
         );
       } else {
         console.error("Failed to find timeEntries definition");
-        return res.sendStatus(204);
+        return new Response(null, { status: 204 });
       }
 
       // Update currentTimeEntry if needed
-      let [currentEntryRow] = await req.db
+      let [currentEntryRow] = await db
         .select({
           id: objectsTable.id,
           sourceId: objectsTable.sourceId,
@@ -314,7 +320,7 @@ export const toggl: Integration = {
           deserialize(currentEntryRow?.data ?? null)?.id === json.payload.id)
       ) {
         await updateObject(
-          req.db,
+          db,
           dataset,
           json.metadata.action === "deleted" || json.payload.stop
             ? null
@@ -327,7 +333,7 @@ export const toggl: Integration = {
       }
     }
 
-    return res.sendStatus(204);
+    return new Response(null, { status: 204 });
   },
   objects: {
     currentEntry: {
