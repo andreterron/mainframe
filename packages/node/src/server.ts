@@ -2,28 +2,28 @@ import cron from "node-cron";
 import closeWithGrace, {
   type CloseWithGraceAsyncCallback,
 } from "close-with-grace";
-import { db } from "./db/db.server";
+import { db } from "./db/db.server.ts";
 import { getIntegrationForDataset } from "@mainframe-so/server";
 import express, { Express } from "express";
 import bodyParser from "body-parser";
-import { env } from "./lib/env.server";
+import { env } from "./lib/env.server.ts";
 import { ZodError } from "zod";
 import type { Server } from "node:http";
 import { syncAll } from "@mainframe-so/server";
 import { datasetsTable } from "@mainframe-so/shared";
-import { startCloudflared } from "./cloudflared";
+import { startCloudflared } from "./cloudflared.ts";
 import type { ChildProcess } from "node:child_process";
 import { initTRPC } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
-import { Context, CreateContextHooks, createContext } from "./trpc_context";
-import { appRouter } from "./trpc_router";
-export type { AppRouter } from "./trpc_router";
+import { Context, CreateContextHooks, createContext } from "./trpc_context.ts";
+import { appRouter } from "./trpc_router.ts";
+export type { AppRouter } from "./trpc_router.ts";
 import cors from "cors";
-import { buildApiRouter, ApiRouterHooks } from "./api";
+import { buildApiRouter, ApiRouterHooks } from "./api.ts";
 import chalk from "chalk";
 import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
 import { Client } from "@libsql/client";
-import { honoRequestListener } from "./hono";
+import { honoRequestListener } from "./hono.ts";
 
 export interface SetupServerHooks extends CreateContextHooks, ApiRouterHooks {
   express?: (app: Express) => void;

@@ -1,5 +1,5 @@
-export type { AppRouter } from "./trpc_router";
-export { setupServer } from "./server";
-export type { SetupServerHooks } from "./server";
-export type { CreateContextHooks } from "./trpc_context";
-export * from "./db/migrate";
+export type { AppRouter } from "./trpc_router.js";
+export { setupServer } from "./server.js";
+export type { SetupServerHooks } from "./server.js";
+export type { CreateContextHooks } from "./trpc_context.js";
+export * from "./db/migrate.js";

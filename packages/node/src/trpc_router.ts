@@ -12,14 +12,14 @@ import {
   DatasetCredentials,
 } from "@mainframe-so/shared";
 import { z } from "zod";
-import { Context, UserInfo } from "./trpc_context";
+import { Context, UserInfo } from "./trpc_context.ts";
 import { and, eq } from "drizzle-orm";
 import { syncDataset, syncObject, syncTable } from "@mainframe-so/server";
 import {
   commitSession,
   destroySession,
   getSessionFromCookies,
-} from "./sessions.server";
+} from "./sessions.server.ts";
 import {
   createClientIntegration,
   getDatasetFunction,
@@ -29,9 +29,9 @@ import {
   zOAuthCredentials,
   zTokenCredentials,
 } from "@mainframe-so/server";
-import { deserializeData } from "./utils/serialization";
-import { createUserAccount, validateUserAccount } from "./lib/auth.server";
-import { checkIfUserExists } from "./db/helpers";
+import { deserializeData } from "./utils/serialization.ts";
+import { createUserAccount, validateUserAccount } from "./lib/auth.server.ts";
+import { checkIfUserExists } from "./db/helpers.ts";
 import { github } from "@mainframe-so/server";
 import { network } from "@mainframe-so/server";
 import { peloton } from "@mainframe-so/server";
@@ -42,7 +42,7 @@ import { zotero } from "@mainframe-so/server";
 import { notion } from "@mainframe-so/server";
 import { oura } from "@mainframe-so/server";
 import { valtown } from "@mainframe-so/server";
-import { env } from "./lib/env.server";
+import { env } from "./lib/env.server.ts";
 import { nango } from "@mainframe-so/server";
 import * as Sentry from "@sentry/node";
 import { getTokenFromDataset } from "@mainframe-so/server";
@@ -50,12 +50,12 @@ import { spotify } from "@mainframe-so/server";
 import { render } from "@mainframe-so/server";
 import { vercel } from "@mainframe-so/server";
 import { bitbucket } from "@mainframe-so/server";
-import { getTableData } from "./lib/table-data";
+import { getTableData } from "./lib/table-data.ts";
 import {
   generateObjectComponent,
   generateTableComponent,
-} from "./lib/llm/openai";
-import { getObjectAndDataset } from "./lib/object-data";
+} from "./lib/llm/openai.ts";
+import { getObjectAndDataset } from "./lib/object-data.ts";
 import { nanoid } from "nanoid";
 
 /**

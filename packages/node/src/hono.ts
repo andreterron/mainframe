@@ -1,5 +1,5 @@
 import { getRequestListener } from "@hono/node-server";
-import { env } from "./lib/env.server";
+import { env } from "./lib/env.server.ts";
 import { Env as ApiEnv } from "@mainframe-so/server";
 import express from "express";
 import { createMainframeAPI } from "@mainframe-so/server";

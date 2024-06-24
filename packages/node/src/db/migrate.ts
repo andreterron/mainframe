@@ -2,7 +2,7 @@ import { migrate } from "drizzle-orm/libsql/migrator";
 import { LibSQLDatabase, drizzle } from "drizzle-orm/libsql";
 import { Client } from "@libsql/client";
 import { resolve } from "node:path";
-import { __dirnameFromImportMetaUrl } from "../utils/dirname";
+import { __dirnameFromImportMetaUrl } from "../utils/dirname.ts";
 import journal from "./migrations/meta/_journal.json";
 
 const __dirname = __dirnameFromImportMetaUrl(import.meta.url);

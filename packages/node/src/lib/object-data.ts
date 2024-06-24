@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { deserializeData } from "../utils/serialization";
+import { deserializeData } from "../utils/serialization.ts";
 import { getDatasetObject } from "@mainframe-so/server";
 import { datasetsTable, objectsTable } from "@mainframe-so/shared";
 import { LibSQLDatabase } from "drizzle-orm/libsql";

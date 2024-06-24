@@ -3,7 +3,7 @@ import { operations } from "@mainframe-so/server";
 import {
   getSessionFromId,
   getSessionIdFromCookieHeader,
-} from "./sessions.server";
+} from "./sessions.server.ts";
 import {
   Operation,
   datasetsTable,
@@ -11,10 +11,10 @@ import {
   rowsTable,
 } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
-import { deserializeData } from "./utils/serialization";
+import { deserializeData } from "./utils/serialization.ts";
 import { getIntegrationFromType } from "@mainframe-so/server";
 import bodyParser from "body-parser";
-import { env } from "./lib/env.server";
+import { env } from "./lib/env.server.ts";
 import express from "express";
 import { getTokenFromDataset } from "@mainframe-so/server";
 

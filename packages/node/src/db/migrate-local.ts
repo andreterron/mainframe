@@ -1,4 +1,4 @@
-import { db } from "./db.server";
-import { migrateDB } from "./migrate";
+import { db } from "./db.server.ts";
+import { migrateDB } from "./migrate.ts";
 
 migrateDB(db);
