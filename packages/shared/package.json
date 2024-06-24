@@ -13,7 +13,8 @@
   ],
   "scripts": {
     "dev": "tsup --format esm --watch src",
-    "build": "tsup --tsconfig tsconfig.build.json",
+    "dev-prep": "tsup --format esm",
+    "build": "tsup --clean",
     "publish-package": "npm publish"
   },
   "exports": {

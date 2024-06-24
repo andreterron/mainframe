@@ -16,9 +16,15 @@
       "dependsOn": ["build", "test", "lint"]
     },
     "lint": {},
+    "dev-prep": {
+      "dependsOn": ["^dev-prep"],
+      "outputs": ["dist/**"]
+    },
     "dev": {
+      "dependsOn": ["dev-prep"],
       "cache": false,
-      "persistent": true
+      "persistent": true,
+      "outputs": ["dist/**"]
     }
   }
 }

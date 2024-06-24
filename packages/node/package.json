@@ -10,7 +10,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "dev": "tsx watch --clear-screen=false src/app.ts",
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc",
     "publish-package": "npm publish"
   },
   "exports": {
