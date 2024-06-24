@@ -28,7 +28,6 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@microsoft/api-extractor": "^7.47.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {
