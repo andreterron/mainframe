@@ -45,6 +45,7 @@
     "zod": "^3.21.4"
   },
   "optionalDependencies": {
+    "@esbuild/linux-x64": "^0.21.5",
     "@rollup/rollup-linux-x64-gnu": "^4.18.0"
   }
 }
