@@ -43,6 +43,8 @@ export const WebStandardsPlaygroundTab = memo(function ({
     refetchOnReconnect: false,
     refetchOnWindowFocus: false,
   });
+  const { data: components } = trpc.getAllComponents.useQuery();
+  const hideDashboard = !components?.length;
 
   const [playgroundTheme, setPlaygroundTheme] = useState(() => {
     const savedThemeName = localStorage.getItem("playgroundTheme");
@@ -214,25 +216,27 @@ export const WebStandardsPlaygroundTab = memo(function ({
               Run
             </Button>
             <div className="flex-1" />
-            <Button
-              variant={
-                componentId && !dirty && code !== savedCode
-                  ? "default"
-                  : "ghost"
-              }
-              size="xs"
-              className="text-xs"
-              onClick={handleSaveComponent}
-            >
-              {!componentId ? (
-                <>
-                  <PlusSquareIcon className="w-3 h-3 mr-1" />
-                  Add to dashboard
-                </>
-              ) : (
-                <>Save</>
-              )}
-            </Button>
+            {!hideDashboard ? (
+              <Button
+                variant={
+                  componentId && !dirty && code !== savedCode
+                    ? "default"
+                    : "ghost"
+                }
+                size="xs"
+                className="text-xs"
+                onClick={handleSaveComponent}
+              >
+                {!componentId ? (
+                  <>
+                    <PlusSquareIcon className="w-3 h-3 mr-1" />
+                    Add to dashboard
+                  </>
+                ) : (
+                  <>Save</>
+                )}
+              </Button>
+            ) : null}
           </div>
           {iframe}
         </div>

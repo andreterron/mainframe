@@ -103,6 +103,8 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
   const isIndexPath = useMatch("/");
   const logout = useLogout();
   const { data: datasets } = trpc.datasetsAll.useQuery();
+  const { data: components } = trpc.getAllComponents.useQuery();
+  const hideDashboard = !components?.length;
 
   return (
     <aside
@@ -132,11 +134,13 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
           </svg>
         </Link>
         <section className="pt-8">
-          <SidebarButton
-            href="/dashboard"
-            name={() => "Dashboard"}
-            icon={<LayoutGridIcon className="relative w-5 h-5" />}
-          />
+          {!hideDashboard && (
+            <SidebarButton
+              href="/dashboard"
+              name={() => "Dashboard"}
+              icon={<LayoutGridIcon className="relative w-5 h-5" />}
+            />
+          )}
           <SidebarButton
             href="/new"
             isActive={(isActive) => isActive || !!isIndexPath}
