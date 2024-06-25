@@ -1,10 +1,11 @@
 import { PageHeader } from "../components/PageHeader";
 import { trpc } from "../lib/trpc_client";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card } from "../components/ui/card";
 import { useComponentPreview } from "../components/useComponentPreview";
 import { Button } from "~/components/ui/button";
 import { SadPath } from "../components/SadPath";
+import { useEffect } from "react";
 
 export function ComponentCard({
   component,
@@ -37,6 +38,13 @@ export default function DashboardPage() {
     isLoading,
     error,
   } = trpc.getAllComponents.useQuery();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (components?.length === 0) {
+      navigate("/");
+    }
+  }, [components?.length]);
 
   if (!components) {
     return <SadPath className="p-4" error={error} isLoading={isLoading} />;
