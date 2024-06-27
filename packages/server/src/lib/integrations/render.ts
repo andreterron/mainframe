@@ -2,6 +2,8 @@ import { getTokenFromDataset } from "../integration-token.ts";
 import { Integration } from "../integration-types.ts";
 import { Dataset } from "@mainframe-so/shared";
 
+// Their OpenAPI schema can be found here: https://api-docs.render.com/openapi
+
 export const render: Integration = {
   name: "Render",
   authType: "token",
