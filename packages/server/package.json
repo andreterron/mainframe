@@ -1,6 +1,6 @@
 {
   "name": "@mainframe-so/server",
-  "version": "0.4.23",
+  "version": "0.5.0",
   "private": false,
   "description": "",
   "sideEffects": false,
@@ -32,7 +32,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@mainframe-so/shared": "0.4.23",
+    "@mainframe-so/shared": "0.5.0",
     "@nangohq/node": "^0.39.13",
     "dotenv": "^16.3.1",
     "drizzle-orm": "^0.29.5",

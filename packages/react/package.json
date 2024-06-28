@@ -1,6 +1,6 @@
 {
   "name": "@mainframe-so/react",
-  "version": "0.4.23",
+  "version": "0.5.0",
   "private": false,
   "description": "",
   "types": "dist/index.d.ts",
