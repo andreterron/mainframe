@@ -15,7 +15,8 @@
     "dev": "tsup --format esm --watch src",
     "dev-prep": "tsup --format esm",
     "build": "tsup --clean",
-    "publish-package": "npm publish"
+    "publish-package": "npm publish",
+    "publish-jsr": "jsr publish --allow-slow-types"
   },
   "exports": {
     ".": {
@@ -29,6 +30,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
+    "jsr": "^0.12.4",
     "typescript": "^5.0.4"
   },
   "dependencies": {

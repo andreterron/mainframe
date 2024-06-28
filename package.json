@@ -11,6 +11,7 @@
     "dev": "turbo run \"@mainframe-so/node#serve\" dev --env-mode=loose --filter=!@mainframe-so/node",
     "build": "turbo run build --env-mode=loose",
     "publish-package": "turbo run publish-package",
+    "publish-jsr": "turbo run publish-jsr",
     "start": "node scripts/generate-env.mjs && npm run db:migrate && npm run dev",
     "db:migrate": "tsx packages/server/src/db/migrate-local.ts",
     "db:generate": "drizzle-kit generate:sqlite",

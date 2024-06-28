@@ -15,6 +15,9 @@
     "publish-package": {
       "dependsOn": ["build", "test", "lint"]
     },
+    "publish-jsr": {
+      "dependsOn": ["build", "test", "lint"]
+    },
     "lint": {},
     "dev-prep": {
       "dependsOn": ["^dev-prep"],
