@@ -5,6 +5,7 @@ import { webhookRouter } from "./routers/webhook-router.ts";
 import { type LibSQLDatabase } from "drizzle-orm/libsql";
 import { oauthRouter } from "./routers/oauth-router.ts";
 import { isApiRequestAuthorizedForPasswordAuth } from "./lib/password-based-auth/password-auth-api-check.ts";
+import { env } from "./lib/env.server.ts";
 
 export function createMainframeAPI<E extends Env = Env>(
   init: {

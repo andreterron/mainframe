@@ -1,10 +1,10 @@
 import { sessionsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
+import { env } from "./env.server.ts";
 import { CookieSerializeOptions, parse, serialize } from "cookie";
 import cookieSignature from "cookie-signature";
 import { LibSQLDatabase } from "drizzle-orm/libsql";
 import { nanoid } from "nanoid";
-import { env } from "./env.server";
 
 export interface MainframeSession {
   id: string;

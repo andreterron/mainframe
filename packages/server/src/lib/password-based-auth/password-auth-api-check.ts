@@ -1,7 +1,7 @@
 import { Context } from "hono";
-import { Env } from "../../types";
-import { getSessionFromId, getSessionIdFromCookieHeader } from "../sessions";
-import { ensureDB } from "../../utils/ensure-db";
+import { Env } from "../../types.ts";
+import { getSessionFromId, getSessionIdFromCookieHeader } from "../sessions.ts";
+import { ensureDB } from "../../utils/ensure-db.ts";
 
 function parseBearerHeader(header: string | undefined) {
   if (!header) {
