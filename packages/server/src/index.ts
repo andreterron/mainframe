@@ -17,6 +17,7 @@ export * from "./lib/integration-types.ts";
 export * from "./lib/integrations.ts";
 export * from "./lib/nango.ts";
 export * from "./lib/operations.ts";
+export * from "./lib/sessions.ts";
 export * from "./routers/api-router.ts";
 export * from "./routers/webhook-router.ts";
 export * from "./utils/serialization.ts";

@@ -50,8 +50,6 @@
     "chalk": "^5.3.0",
     "close-with-grace": "^1.2.0",
     "cloudflared": "^0.5.0",
-    "cookie": "^0.5.0",
-    "cookie-signature": "^1.2.1",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "drizzle-orm": "^0.29.5",

@@ -9,7 +9,7 @@ import bodyParser from "body-parser";
 import { env } from "./lib/env.server.ts";
 import { ZodError } from "zod";
 import type { Server } from "node:http";
-import { syncAll } from "@mainframe-so/server";
+import { syncAll, ApiRouterHooks } from "@mainframe-so/server";
 import { datasetsTable } from "@mainframe-so/shared";
 import { startCloudflared } from "./cloudflared.ts";
 import type { ChildProcess } from "node:child_process";
@@ -19,13 +19,14 @@ import { Context, CreateContextHooks, createContext } from "./trpc_context.ts";
 import { appRouter } from "./trpc_router.ts";
 export type { AppRouter } from "./trpc_router.ts";
 import cors from "cors";
-import { buildApiRouter, ApiRouterHooks } from "./api.ts";
 import chalk from "chalk";
 import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
 import { Client } from "@libsql/client";
-import { honoRequestListener } from "./hono.ts";
+import { createHonoRequestListener } from "./hono.ts";
 
-export interface SetupServerHooks extends CreateContextHooks, ApiRouterHooks {
+export interface SetupServerHooks
+  extends CreateContextHooks,
+    Partial<ApiRouterHooks> {
   express?: (app: Express) => void;
   getDB?: (
     req: express.Request,
@@ -46,7 +47,7 @@ declare global {
 }
 
 export function setupServer(hooks: SetupServerHooks = {}) {
-  const t = initTRPC.context<Context>().create();
+  const honoRequestListener = createHonoRequestListener(hooks);
 
   const port = env.PORT || 8745;
 
@@ -131,21 +132,6 @@ export function setupServer(hooks: SetupServerHooks = {}) {
         console.error(path, error);
       },
     }),
-  );
-
-  app.use(
-    "/api",
-    (req, res, next) => {
-      cors(
-        req.header("Origin") === env.APP_URL
-          ? {
-              credentials: req.header("Origin") === env.APP_URL,
-              origin: env.APP_URL,
-            }
-          : {},
-      )(req, res, next);
-    },
-    buildApiRouter(hooks),
   );
 
   // Redirect the root API path to the app

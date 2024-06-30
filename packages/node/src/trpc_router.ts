@@ -19,7 +19,7 @@ import {
   commitSession,
   destroySession,
   getSessionFromCookies,
-} from "./sessions.server.ts";
+} from "@mainframe-so/server";
 import {
   createClientIntegration,
   getDatasetFunction,

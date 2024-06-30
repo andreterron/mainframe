@@ -9,4 +9,5 @@ if (typeof window === "undefined") {
 export const env = envsafe({
   APP_URL: url({ default: "http://localhost:8744" }),
   NANGO_PRIVATE_KEY: str({ default: "", allowEmpty: true }),
+  COOKIE_SECRET: str({ default: "", allowEmpty: true }),
 });
