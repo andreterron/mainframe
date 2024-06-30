@@ -1,0 +1,89 @@
+import { Link, useParams } from "react-router-dom";
+import { Dataset, ClientIntegration } from "@mainframe-so/shared";
+import { DatasetHeader } from "../DatasetHeader";
+import { getDatasetCredentialsKeys } from "../../lib/data/credentials";
+import { CheckIcon, FunctionSquareIcon, PencilIcon } from "lucide-react";
+import { PreviewLabel } from "../PreviewLabel";
+import { trpc } from "../../lib/trpc_client";
+import { useMemo, useState } from "react";
+import { Button } from "../ui/button";
+import { z } from "zod";
+import { env } from "../../lib/env_client";
+import Nango from "@nangohq/frontend";
+import { datasetIcon } from "../../lib/integrations/icons/datasetIcon";
+import { uniqueId } from "lodash-es";
+
+export function ConnectPage() {
+  const params = useParams();
+  const provider = params.provider;
+  const utils = trpc.useUtils();
+  const checkNangoIntegration = trpc.checkNangoIntegration.useMutation({
+    onSettled() {
+      utils.datasetsGet.invalidate();
+    },
+  });
+  const { data: integrations, isLoading: isLoadingIntegrations } =
+    trpc.integrationsAll.useQuery();
+  const integration = provider ? integrations?.[provider] : undefined;
+
+  const handleNangoConnection = async (integrationId: string) => {
+    if (!env.VITE_NANGO_PUBLIC_KEY) {
+      return;
+    }
+    const nango = new Nango({
+      publicKey: env.VITE_NANGO_PUBLIC_KEY,
+    });
+    try {
+      // TODO: Create new dataset? Create unauth user?
+      const id = uniqueId();
+      await nango.auth(integrationId, id);
+      // Inform the backend that this is connected
+      // await checkNangoIntegration.mutateAsync({ datasetId: dataset.id });
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  const nangoIntegration = integration?.authTypes?.nango;
+
+  if (!nangoIntegration || !provider) {
+    return <div>Integration not found</div>;
+  }
+  const icon = datasetIcon(provider);
+
+  return (
+    <div className="flex flex-col pt-32 gap-8 items-center max-w-2xl mx-auto">
+      <div className="flex w-full items-center max-w-60">
+        <div className="bg-blue-400 border-blue-600 border size-12 rounded-lg text-white flex items-center justify-center">
+          App
+        </div>
+        <div className="flex-grow h-px border-dashed border-t border-black"></div>
+        <div className="bg-amber-400 border-amber-600 border size-12 rounded-lg">
+          {/* TODO: Mainframe logo */}
+        </div>
+        <div className="flex-grow h-px border-dashed border-t border-black"></div>
+        <div className="bg-white border-gray-400 border size-12 p-1.5 rounded-lg">
+          <img className="relative object-contain" src={icon} />
+        </div>
+      </div>
+      <div className="text-center font-light text-lg">
+        This application uses{" "}
+        <strong className="font-semibold">Mainframe</strong>
+        <br />
+        to connect to {integration.name}.
+      </div>
+      <div className="flex flex-col gap-8 items-start px-4">
+        {nangoIntegration && env.VITE_NANGO_PUBLIC_KEY ? (
+          <>
+            <Button
+              onClick={() =>
+                handleNangoConnection(nangoIntegration.integrationId)
+              }
+            >
+              Continue
+            </Button>
+          </>
+        ) : null}
+      </div>
+    </div>
+  );
+}

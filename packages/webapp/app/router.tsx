@@ -14,6 +14,7 @@ import DatasetCredentials from "./webroutes/_app.dataset.$id.credentials";
 import DashboardComponentPage from "./webroutes/_app.dashboard.$id";
 import DashboardPage from "./webroutes/_app.dashboard._index";
 import DatasetComputed from "./webroutes/_app.dataset.$id.computed.$computed_id";
+import { ConnectPage } from "./components/pages/ConnectPage";
 
 export const router = createBrowserRouter([
   {
@@ -33,6 +34,12 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  // Mainframe Connect flow
+  {
+    path: "/connect/:provider",
+    element: <ConnectPage />,
+  },
+  // Dashboard
   {
     element: <AppPages />,
     children: [
