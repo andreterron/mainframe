@@ -1,6 +1,6 @@
 import { getRequestListener } from "@hono/node-server";
 import { env } from "./lib/env.server.ts";
-import { Env as ApiEnv } from "@mainframe-so/server";
+import { Env as ApiEnv, ApiRouterHooks } from "@mainframe-so/server";
 import express from "express";
 import { createMainframeAPI } from "@mainframe-so/server";
 
@@ -12,12 +12,15 @@ type Env = ApiEnv & {
   };
 };
 
-export const hono = createMainframeAPI<Env>({
-  getRequestDB(c) {
-    return c.env.incoming.db;
-  },
-});
+export const createHonoRequestListener = (config: Partial<ApiRouterHooks>) => {
+  const hono = createMainframeAPI<Env>({
+    getRequestDB(c) {
+      return c.env.incoming.db;
+    },
+    ...config,
+  });
 
-export const honoRequestListener = getRequestListener(hono.fetch, {
-  hostname: new URL(env.VITE_API_URL).hostname,
-});
+  return getRequestListener(hono.fetch, {
+    hostname: new URL(env.VITE_API_URL).hostname,
+  });
+};

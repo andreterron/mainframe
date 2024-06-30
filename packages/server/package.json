@@ -36,6 +36,8 @@
   "dependencies": {
     "@mainframe-so/shared": "0.5.0",
     "@nangohq/node": "^0.39.13",
+    "cookie": "^0.6.0",
+    "cookie-signature": "^1.2.1",
     "dotenv": "^16.3.1",
     "drizzle-orm": "^0.29.5",
     "envsafe": "^2.0.3",
@@ -43,6 +45,7 @@
     "hono": "^4.4.3",
     "local-devices": "^3.0.0",
     "lodash-es": "^4.17.21",
+    "nanoid": "^5.0.7",
     "typed-emitter": "^2.1.0",
     "zod": "^3.21.4"
   },

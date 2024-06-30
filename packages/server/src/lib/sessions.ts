@@ -1,10 +1,10 @@
 import { sessionsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
-import { env } from "./lib/env.server.ts";
 import { CookieSerializeOptions, parse, serialize } from "cookie";
 import cookieSignature from "cookie-signature";
 import { LibSQLDatabase } from "drizzle-orm/libsql";
 import { nanoid } from "nanoid";
+import { env } from "./env.server";
 
 export interface MainframeSession {
   id: string;
@@ -16,7 +16,6 @@ export interface MainframeSession {
 }
 
 const cookieNames: [string, ...string[]] = ["__session_mainframe", "__session"];
-const cookieSecrets = env.COOKIE_SECRET ? [env.COOKIE_SECRET] : [];
 const cookieSettings: CookieSerializeOptions = {
   // path: "/",
   httpOnly: true,
@@ -34,6 +33,7 @@ const cookieSettings: CookieSerializeOptions = {
 //       if the request has no session. Useful for API requests.
 export function getSessionIdFromCookieHeader(
   cookieHeader: string | null | undefined,
+  cookieSecrets: string[] = env.COOKIE_SECRET ? [env.COOKIE_SECRET] : [],
 ) {
   if (!cookieHeader) {
     return null;
@@ -60,6 +60,7 @@ export function getSessionIdFromCookieHeader(
 
 function serializeSessionCookie(
   value: string,
+  cookieSecrets: string[] = env.COOKIE_SECRET ? [env.COOKIE_SECRET] : [],
   options?: CookieSerializeOptions,
 ) {
   return serialize(cookieNames[0], value, {
@@ -145,9 +146,10 @@ export async function getSessionFromIdOrCreate(
 export async function getSessionFromCookies(
   db: LibSQLDatabase,
   cookieHeader?: string | null | undefined,
+  cookieSecrets: string[] = env.COOKIE_SECRET ? [env.COOKIE_SECRET] : [],
   options?: any,
 ): Promise<MainframeSession> {
-  const sessionId = getSessionIdFromCookieHeader(cookieHeader);
+  const sessionId = getSessionIdFromCookieHeader(cookieHeader, cookieSecrets);
 
   if (!sessionId) {
     return createSession(db);
@@ -159,6 +161,7 @@ export async function getSessionFromCookies(
 export async function commitSession(
   session: MainframeSession,
   db: LibSQLDatabase,
+  cookieSecrets: string[] = env.COOKIE_SECRET ? [env.COOKIE_SECRET] : [],
   options?: CookieSerializeOptions,
 ) {
   // Update row
@@ -173,7 +176,11 @@ export async function commitSession(
 
   await updateData(db, id, data, expires);
 
-  let serializedCookie = serializeSessionCookie(session.id, options);
+  let serializedCookie = serializeSessionCookie(
+    session.id,
+    cookieSecrets,
+    options,
+  );
   if (serializedCookie.length > 4096) {
     throw new Error(
       "Cookie length will exceed browser maximum. Length: " +
@@ -186,11 +193,12 @@ export async function commitSession(
 export async function destroySession(
   session: MainframeSession,
   db: LibSQLDatabase,
+  cookieSecrets: string[] = env.COOKIE_SECRET ? [env.COOKIE_SECRET] : [],
   options?: CookieSerializeOptions,
 ) {
   // Delete row
   await deleteData(db, session.id);
-  return serializeSessionCookie("", {
+  return serializeSessionCookie("", cookieSecrets, {
     ...options,
     maxAge: undefined,
     expires: new Date(0),
