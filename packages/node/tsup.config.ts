@@ -36,7 +36,7 @@ export default defineConfig({
             };
           }
           if (args.kind !== "entry-point") {
-            return { path: args.path, external: true };
+            return { path: args.path, external: !args.path.match(/\.json$/) };
           }
         });
       },
