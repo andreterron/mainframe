@@ -35,6 +35,7 @@ export function createContext(hooks: CreateContextHooks) {
       res,
       user: await hooks.trpcGetUserInfo?.({ req, res }),
       db: drizzle(req.db),
+      operations: req.operations,
       hooks,
     };
   };
