@@ -100,7 +100,7 @@ export const toggl: Integration = {
   authType: "token",
   authSetupDocs:
     "https://github.com/andreterron/mainframe/blob/main/packages/docs/integrations/toggl.md",
-  setupWebhooks: async (db, dataset: Dataset, baseApiUrl: string) => {
+  setupWebhooks: async (ctx, dataset: Dataset, baseApiUrl: string) => {
     // Remove trailing slashes
     const normalizedBaseApiUrl = baseApiUrl.replace(/\/+$/, "");
     if (!normalizedBaseApiUrl) {
@@ -176,7 +176,7 @@ export const toggl: Integration = {
           continue;
         }
 
-        await syncTable(db, dataset, table);
+        await syncTable(ctx, dataset, table);
       }
 
       if (webhookToThis) {
@@ -203,7 +203,7 @@ export const toggl: Integration = {
       }
     }
   },
-  webhook: async (db, dataset, req) => {
+  webhook: async (ctx, dataset, req) => {
     if (
       req.headers.get("Content-Type") !== "application/json" ||
       req.method !== "POST"
@@ -225,7 +225,7 @@ export const toggl: Integration = {
     // The reason is that we'll get a "ping" event before saving the subscription to the DB
     let webhook: Row | undefined;
     try {
-      [webhook] = await db
+      [webhook] = await ctx.db
         .select({
           id: rowsTable.id,
           sourceId: rowsTable.sourceId,
@@ -284,7 +284,7 @@ export const toggl: Integration = {
       const table = getDatasetTable(dataset, "timeEntries");
       if (table?.rowId) {
         await updateRowFromTableType(
-          db,
+          ctx,
           json.payload,
           table.rowId(dataset, json.payload),
           json.payload,
@@ -295,7 +295,7 @@ export const toggl: Integration = {
       }
 
       // Update currentTimeEntry if needed
-      let [currentEntryRow] = await db
+      let [currentEntryRow] = await ctx.db
         .select({
           id: objectsTable.id,
           sourceId: objectsTable.sourceId,
@@ -320,7 +320,7 @@ export const toggl: Integration = {
           deserialize(currentEntryRow?.data ?? null)?.id === json.payload.id)
       ) {
         await updateObject(
-          db,
+          ctx,
           dataset,
           json.metadata.action === "deleted" || json.payload.stop
             ? null

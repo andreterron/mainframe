@@ -2,8 +2,13 @@ import cron from "node-cron";
 import closeWithGrace, {
   type CloseWithGraceAsyncCallback,
 } from "close-with-grace";
-import { db } from "./db/db.server.ts";
-import { getIntegrationForDataset } from "@mainframe-so/server";
+import { dbClient } from "./db/db.server.ts";
+import {
+  MainframeContext,
+  getIntegrationForDataset,
+  GLOBAL_operations,
+  OperationsEmitter,
+} from "@mainframe-so/server";
 import express, { Express } from "express";
 import bodyParser from "body-parser";
 import { env } from "./lib/env.server.ts";
@@ -28,11 +33,14 @@ export interface SetupServerHooks
   extends CreateContextHooks,
     Partial<ApiRouterHooks> {
   express?: (app: Express) => void;
-  getDB?: (
+  getCtx?: (
     req: express.Request,
-  ) => Promise<Client | undefined> | Client | undefined;
+  ) =>
+    | Promise<{ db: Client; operations?: OperationsEmitter } | undefined>
+    | { db: Client; operations?: OperationsEmitter }
+    | undefined;
   iterateOverDBs?: (
-    callback: (db: LibSQLDatabase, userId: string) => Promise<void>,
+    callback: (ctx: MainframeContext, userId: string) => Promise<void>,
   ) => Promise<void>;
   closeWithGrace?: CloseWithGraceAsyncCallback;
 }
@@ -41,25 +49,29 @@ declare global {
   namespace Express {
     interface Request {
       // TODO: This is optional
-      db: LibSQLDatabase;
+      db: Client;
+      operations?: OperationsEmitter;
     }
   }
 }
 
 export function setupServer(hooks: SetupServerHooks = {}) {
+  // TODO: Try to remove this
+  const localDb = drizzle(dbClient);
+
   const honoRequestListener = createHonoRequestListener(hooks);
 
   const port = env.PORT || 8745;
 
-  async function setupWebhooks(baseApiUrl: string, db: LibSQLDatabase) {
+  async function setupWebhooks(baseApiUrl: string, ctx: MainframeContext) {
     // Get all datasets
-    const datasets = await db.select().from(datasetsTable);
+    const datasets = await ctx.db.select().from(datasetsTable);
 
     // For each integration
     for (let dataset of datasets) {
       const integration = getIntegrationForDataset(dataset);
       if (integration?.setupWebhooks) {
-        await integration.setupWebhooks(db, dataset, baseApiUrl);
+        await integration.setupWebhooks(ctx, dataset, baseApiUrl);
       }
     }
   }
@@ -68,9 +80,9 @@ export function setupServer(hooks: SetupServerHooks = {}) {
   const task = cron.schedule(
     "*/10 * * * *",
     async (now) => {
-      async function syncDB(db: LibSQLDatabase, userId?: string) {
+      async function syncDB(ctx: MainframeContext, userId?: string) {
         try {
-          await syncAll(db);
+          await syncAll(ctx);
         } catch (e) {
           if (userId) {
             console.error("Failed to sync User's DB", userId);
@@ -82,7 +94,7 @@ export function setupServer(hooks: SetupServerHooks = {}) {
       if (hooks.iterateOverDBs) {
         await hooks.iterateOverDBs(syncDB);
       } else {
-        await syncDB(db);
+        await syncDB({ db: localDb, operations: GLOBAL_operations });
       }
     },
     {
@@ -96,19 +108,20 @@ export function setupServer(hooks: SetupServerHooks = {}) {
   hooks.express?.(app);
 
   app.use(async (req, _res, next) => {
-    if (hooks.getDB) {
+    if (hooks.getCtx) {
       try {
-        const hookDB = await hooks.getDB(req);
-        if (hookDB) {
-          const client = hookDB;
-          req.db = drizzle(client);
+        const hookCtx = await hooks.getCtx(req);
+        if (hookCtx) {
+          req.db = hookCtx.db;
+          req.operations = hookCtx.operations;
         }
       } catch (e) {
         console.log("Failed to use hook to create DB");
         console.error(e);
       }
     } else {
-      req.db = db;
+      req.db = dbClient;
+      req.operations = GLOBAL_operations;
     }
     next();
   });
@@ -232,16 +245,19 @@ export function setupServer(hooks: SetupServerHooks = {}) {
       await serverPromise;
 
       if (hooks.iterateOverDBs) {
-        await hooks.iterateOverDBs(async (db, userId) => {
+        await hooks.iterateOverDBs(async (ctx, userId) => {
           try {
-            await setupWebhooks(baseApiUrl, db);
+            await setupWebhooks(baseApiUrl, ctx);
           } catch (e) {
             console.error(`Failed to setup webhook for user ${userId}`);
             console.error(e);
           }
         });
       } else {
-        await setupWebhooks(baseApiUrl, db);
+        await setupWebhooks(baseApiUrl, {
+          db: localDb,
+          operations: GLOBAL_operations,
+        });
       }
     })
     .catch((e) => console.error(e));

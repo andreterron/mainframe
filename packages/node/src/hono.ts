@@ -14,8 +14,11 @@ type Env = ApiEnv & {
 
 export const createHonoRequestListener = (config: Partial<ApiRouterHooks>) => {
   const hono = createMainframeAPI<Env>({
-    getRequestDB(c) {
-      return c.env.incoming.db;
+    getRequestCtx(c) {
+      return {
+        db: c.env.incoming.db,
+        operations: c.env.incoming.operations,
+      };
     },
     ...config,
   });

@@ -29,6 +29,10 @@ export const webhookRouter = new Hono<Env>().all(
       throw new HTTPException(404);
     }
 
-    return integration.webhook(c.var.db, dataset, c.req.raw);
+    return integration.webhook(
+      { db: c.var.db, operations: c.var.operations },
+      dataset,
+      c.req.raw,
+    );
   },
 );

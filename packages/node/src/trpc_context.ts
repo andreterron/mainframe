@@ -1,5 +1,6 @@
 import { inferAsyncReturnType } from "@trpc/server";
 import { CreateExpressContextOptions } from "@trpc/server/adapters/express";
+import { drizzle } from "drizzle-orm/libsql";
 
 export interface UserInfo {
   id: string;
@@ -33,7 +34,7 @@ export function createContext(hooks: CreateContextHooks) {
       req,
       res,
       user: await hooks.trpcGetUserInfo?.({ req, res }),
-      db: req.db,
+      db: drizzle(req.db),
       hooks,
     };
   };

@@ -1,5 +1,6 @@
 import { Dataset, AuthType, ComputedDataParamsDef } from "@mainframe-so/shared";
 import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { MainframeContext } from "./context";
 
 export interface IntegrationTable {
   name: string;
@@ -61,12 +62,12 @@ export interface Integration {
     db: LibSQLDatabase,
   ) => Promise<void>;
   setupWebhooks?: (
-    db: LibSQLDatabase,
+    ctx: MainframeContext,
     dataset: Dataset,
     baseApiUrl: string,
   ) => Promise<any>;
   webhook?: (
-    db: LibSQLDatabase,
+    ctx: MainframeContext,
     dataset: Dataset,
     req: Request,
   ) => Promise<Response>;

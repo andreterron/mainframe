@@ -22,6 +22,4 @@ try {
   }
 }
 
-const sqlite = createClient({ url: `file://${dbPath}` });
-
-export const db: LibSQLDatabase = drizzle(sqlite);
+export const dbClient = createClient({ url: `file://${dbPath}` });

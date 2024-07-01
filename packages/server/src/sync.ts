@@ -19,9 +19,10 @@ import { and, eq } from "drizzle-orm";
 import { deserialize, serialize } from "./utils/serialization.ts";
 import { writeOperation } from "./lib/operations.ts";
 import { type LibSQLDatabase } from "drizzle-orm/libsql";
+import { MainframeContext } from "./lib/context.ts";
 
 export async function updateRowFromTableType(
-  db: LibSQLDatabase,
+  ctx: MainframeContext,
   dataset: Dataset,
   tableKey: string,
   data: any,
@@ -32,7 +33,7 @@ export async function updateRowFromTableType(
   }
 
   // Upsert table
-  const [dbTable] = await db
+  const [dbTable] = await ctx.db
     .insert(tablesTable)
     .values({ datasetId: dataset.id, name: table.name, key: table.id })
     .onConflictDoUpdate({
@@ -48,16 +49,16 @@ export async function updateRowFromTableType(
 
   const id = table.rowId(dataset, data);
 
-  await updateRow(db, data, id, dbTable.id);
+  await updateRow(ctx, data, id, dbTable.id);
 }
 
 export async function updateRow(
-  db: LibSQLDatabase,
+  ctx: MainframeContext,
   data: any,
   id: string,
   tableId: string,
 ) {
-  const [existing] = await db
+  const [existing] = await ctx.db
     .select()
     .from(rowsTable)
     .where(and(eq(rowsTable.tableId, tableId), eq(rowsTable.sourceId, id)))
@@ -65,7 +66,7 @@ export async function updateRow(
   if (existing && isEqual(deserialize(existing.data), data)) {
     return false;
   }
-  const [upserted] = await db
+  const [upserted] = await ctx.db
     .insert(rowsTable)
     .values({ tableId, sourceId: id, data: serialize(data) })
     .onConflictDoUpdate({
@@ -74,19 +75,19 @@ export async function updateRow(
     })
     .returning();
   if (upserted) {
-    writeOperation({ type: "row", tableId, data: data });
+    writeOperation(ctx.operations, { type: "row", tableId, data: data });
   }
   return !!upserted;
 }
 
 export async function updateObject(
-  db: LibSQLDatabase,
+  ctx: MainframeContext,
   dataset: Dataset,
   data: any,
   id: string | null,
   objectType: string,
 ) {
-  const [existing] = await db
+  const [existing] = await ctx.db
     .select()
     .from(objectsTable)
     .where(
@@ -99,7 +100,7 @@ export async function updateObject(
   if (existing && isEqual(deserialize(existing.data), data)) {
     return false;
   }
-  const [upserted] = await db
+  const [upserted] = await ctx.db
     .insert(objectsTable)
     .values({
       objectType: objectType,
@@ -114,7 +115,7 @@ export async function updateObject(
     })
     .returning();
   if (upserted) {
-    writeOperation({
+    writeOperation(ctx.operations, {
       type: "object",
       datasetId: dataset.id,
       objectType,
@@ -125,7 +126,7 @@ export async function updateObject(
 }
 
 export async function syncObject(
-  db: LibSQLDatabase,
+  ctx: MainframeContext,
   dataset: Dataset,
   objectDefinition: IntegrationObject & { id: string },
 ) {
@@ -137,7 +138,7 @@ export async function syncObject(
   const data = await objectDefinition.get(dataset);
 
   await updateObject(
-    db,
+    ctx,
     dataset,
     data,
     data ? objectDefinition.objId(dataset, data) : null,
@@ -146,7 +147,7 @@ export async function syncObject(
 }
 
 export async function syncTable(
-  db: LibSQLDatabase,
+  ctx: MainframeContext,
   dataset: Dataset,
   table: IntegrationTable & { id: string },
 ) {
@@ -156,7 +157,7 @@ export async function syncTable(
     }
 
     // Call fetch on each table
-    const data = await table.get(dataset, db);
+    const data = await table.get(dataset, ctx.db);
 
     // Save the rows on the DB
     if (!Array.isArray(data)) {
@@ -170,7 +171,7 @@ export async function syncTable(
     }
 
     // Upsert table
-    let [dbTable] = await db
+    let [dbTable] = await ctx.db
       .insert(tablesTable)
       .values({ datasetId: dataset.id, name: table.name, key: table.id })
       .onConflictDoUpdate({
@@ -189,13 +190,13 @@ export async function syncTable(
     for (let rowData of data) {
       const id = table.rowId(dataset, rowData);
 
-      const result = await updateRow(db, rowData, id, dbTable.id);
+      const result = await updateRow(ctx, rowData, id, dbTable.id);
       if (result) {
         updated++;
       }
     }
 
-    await writeOperation({
+    await writeOperation(ctx.operations, {
       type: "table",
       datasetId: dataset.id,
       tableId: table.id,
@@ -205,7 +206,7 @@ export async function syncTable(
   }
 }
 
-export async function syncDataset(db: LibSQLDatabase, dataset: Dataset) {
+export async function syncDataset(ctx: MainframeContext, dataset: Dataset) {
   if (
     !dataset.integrationType ||
     (!dataset.credentials?.token && !dataset.credentials?.accessToken)
@@ -217,22 +218,22 @@ export async function syncDataset(db: LibSQLDatabase, dataset: Dataset) {
   const objects = getObjectsForDataset(dataset);
 
   for (let object of objects) {
-    await syncObject(db, dataset, object);
+    await syncObject(ctx, dataset, object);
   }
 
   // Load all tables
   const tables = getTablesForDataset(dataset);
 
   for (let table of tables) {
-    await syncTable(db, dataset, table);
+    await syncTable(ctx, dataset, table);
   }
 }
 
-export async function syncAll(db: LibSQLDatabase) {
+export async function syncAll(ctx: MainframeContext) {
   // Load all datasets
-  const datasets = await db.select().from(datasetsTable);
+  const datasets = await ctx.db.select().from(datasetsTable);
 
   for (let dataset of datasets) {
-    await syncDataset(db, dataset);
+    await syncDataset(ctx, dataset);
   }
 }

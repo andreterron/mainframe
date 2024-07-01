@@ -34,6 +34,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "@libsql/client": "^0.7.0",
     "@mainframe-so/shared": "0.5.0",
     "@nangohq/node": "^0.39.13",
     "cookie": "^0.6.0",

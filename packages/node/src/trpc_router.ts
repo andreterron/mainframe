@@ -312,7 +312,7 @@ export const appRouter = router({
         throw new TRPCError({ code: "CONFLICT" });
       }
 
-      void syncDataset(ctx.db, dataset).catch((e) => console.error(e));
+      void syncDataset(ctx, dataset).catch((e) => console.error(e));
 
       return dataset;
     }),
@@ -329,7 +329,7 @@ export const appRouter = router({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      void syncDataset(ctx.db, dataset).catch((e) => console.error(e));
+      void syncDataset(ctx, dataset).catch((e) => console.error(e));
 
       return dataset;
     }),
@@ -626,7 +626,7 @@ export const appRouter = router({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      await syncDataset(ctx.db, dataset);
+      await syncDataset(ctx, dataset);
     }),
 
   syncTable: protectedProcedure
@@ -648,7 +648,7 @@ export const appRouter = router({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      await syncTable(ctx.db, dataset, table);
+      await syncTable(ctx, dataset, table);
     }),
 
   syncObject: protectedProcedure
@@ -674,7 +674,7 @@ export const appRouter = router({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      await syncObject(ctx.db, dataset, objectDefinition);
+      await syncObject(ctx, dataset, objectDefinition);
     }),
 
   getAllComponents: protectedProcedure.query(async ({ ctx }) => {

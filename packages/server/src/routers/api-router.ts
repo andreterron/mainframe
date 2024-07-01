@@ -13,7 +13,6 @@ import { syncAll } from "../sync.ts";
 import { HTTPException } from "hono/http-exception";
 import { deserializeData } from "../utils/serialization.ts";
 import { getTokenFromDataset } from "../lib/integration-token.ts";
-import { operations } from "../lib/operations.ts";
 import { accepts } from "hono/accepts";
 import { cors } from "hono/cors";
 import { env } from "../lib/env.server.ts";
@@ -200,7 +199,7 @@ export function createApiRouter<E extends Env = Env>(hooks: ApiRouterHooks<E>) {
         }
       })
 
-      .get("/operations", (c) => {
+      .get("/operations", (c: Context<E>) => {
         // TODO: Consider sending a JSON array back
         // TODO: Add a ?since= query parameter
 
@@ -215,6 +214,12 @@ export function createApiRouter<E extends Env = Env>(hooks: ApiRouterHooks<E>) {
 
           // res.flushHeaders();
           const stream = new TransformStream<string, string>();
+
+          if (!c.var.operations) {
+            throw new HTTPException(401);
+          }
+
+          const operations = c.var.operations;
 
           async function setupOperationsPipe() {
             const writer = stream.writable.getWriter();
