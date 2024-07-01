@@ -12,6 +12,7 @@ import { env } from "../../lib/env_client";
 import Nango from "@nangohq/frontend";
 import { datasetIcon } from "../../lib/integrations/icons/datasetIcon";
 import { uniqueId } from "lodash-es";
+import mainframeLogo from "../../images/icon-192x192.png";
 
 export function ConnectPage() {
   const params = useParams();
@@ -57,9 +58,10 @@ export function ConnectPage() {
           App
         </div>
         <div className="flex-grow h-px border-dashed border-t border-black"></div>
-        <div className="bg-amber-400 border-amber-600 border size-12 rounded-lg">
-          {/* TODO: Mainframe logo */}
-        </div>
+        <img
+          className="border-amber-300 border size-12 rounded-lg overflow-hidden"
+          src={mainframeLogo}
+        />
         <div className="flex-grow h-px border-dashed border-t border-black"></div>
         <div className="bg-white border-gray-400 border size-12 p-1.5 rounded-lg">
           <img className="relative object-contain" src={icon} />
