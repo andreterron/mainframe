@@ -35,7 +35,8 @@
     "@types/node": "^18.15.1",
     "@types/node-cron": "^3.0.8",
     "tsx": "^3.12.7",
-    "typescript": "^5.0.4"
+    "typescript": "^5.0.4",
+    "vitest": "^1.6.0"
   },
   "dependencies": {
     "@hono/node-server": "^1.11.2",

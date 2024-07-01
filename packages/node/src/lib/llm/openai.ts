@@ -3,10 +3,10 @@ import jsonToTS from "json-to-ts";
 import { once } from "lodash-es";
 import { readFile } from "node:fs/promises";
 import OpenAI from "openai";
-import { __dirnameFromImportMetaUrl } from "../../utils/dirname.ts";
+import { src__dirnameFromImportMetaUrl } from "../../utils/dirname.ts";
 import { resolve } from "node:path";
 
-const __dirname = __dirnameFromImportMetaUrl(import.meta.url);
+const __dirname = src__dirnameFromImportMetaUrl(import.meta.url);
 
 const readSystemPromptTemplate = once(async () => {
   return await readFile(
