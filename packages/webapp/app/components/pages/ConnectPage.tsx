@@ -37,9 +37,12 @@ export function ConnectPage() {
     try {
       // TODO: Create new dataset? Create unauth user?
       const id = uniqueId();
+      // TODO: Mainframe is in a new tab, and nango.auth opens yet another tab.
+      //       can we limit to just one new tab?
       await nango.auth(integrationId, id);
       // Inform the backend that this is connected
       // await checkNangoIntegration.mutateAsync({ datasetId: dataset.id });
+      window.close();
     } catch (e) {
       console.error(e);
     }
