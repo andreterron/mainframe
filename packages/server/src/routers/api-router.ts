@@ -30,14 +30,6 @@ export interface ApiRouterHooks<E extends Env = Env> {
 export function createApiRouter<E extends Env = Env>(hooks: ApiRouterHooks<E>) {
   const hono = new Hono<E>();
 
-  // Auth
-  hono.use(async (c: Context<E>, next) => {
-    if (await hooks.isApiRequestAuthorized(c)) {
-      return next();
-    }
-    throw new HTTPException(401);
-  });
-
   // Cors
   hono.use(async (c, next) => {
     const origin = c.req.header("origin");
@@ -47,6 +39,14 @@ export function createApiRouter<E extends Env = Env>(hooks: ApiRouterHooks<E>) {
     } else {
       return cors()(c, next);
     }
+  });
+
+  // Auth
+  hono.use(async (c: Context<E>, next) => {
+    if (await hooks.isApiRequestAuthorized(c)) {
+      return next();
+    }
+    throw new HTTPException(401);
   });
 
   return (
