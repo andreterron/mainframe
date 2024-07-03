@@ -53,6 +53,7 @@ export function ConnectPage() {
           body: JSON.stringify({
             nangoConnectionId: nangoResult.connectionId,
           }),
+          credentials: "include",
         },
       );
 

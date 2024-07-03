@@ -14,6 +14,15 @@ import { nanoid } from "nanoid";
 const COOKIE_NAME = "mfm_conn_session_id";
 const COOKIE_MAX_AGE = 366 * 24 * 60 * 60;
 
+export function getSessionFromCookie(c: Context) {
+  if (!connectDB) {
+    console.error("Missing connectDB");
+    throw new HTTPException(500);
+  }
+
+  return getCookie(c, COOKIE_NAME);
+}
+
 export async function ensureSessionCookie(c: Context, appId: string) {
   if (!connectDB) {
     console.error("Missing connectDB");

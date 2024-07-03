@@ -11,7 +11,10 @@ import {
   connectionsTable,
   sessionsTable,
 } from "../db/connect-db/connect-schema.ts";
-import { ensureSessionCookie } from "../lib/connect-cookies.ts";
+import {
+  ensureSessionCookie,
+  getSessionFromCookie,
+} from "../lib/connect-cookies.ts";
 import { nanoid } from "nanoid";
 
 export const connectRouter = new Hono<Env>()
@@ -123,7 +126,11 @@ export const connectRouter = new Hono<Env>()
     // We don't need app_id here
     const appId = c.req.param("app_id");
     const connectionId = c.req.param("connection_id");
-    const sessionId = await ensureSessionCookie(c, appId);
+    const sessionId = getSessionFromCookie(c);
+
+    if (!sessionId) {
+      throw new HTTPException(401);
+    }
 
     const [connection] = await connectDB
       .select()
@@ -160,9 +167,14 @@ export const connectRouter = new Hono<Env>()
       }
       const { nangoConnectionId } = c.req.valid("json");
 
+      // TODO: Remove appId param
       const appId = c.req.param("app_id");
       const connectionId = c.req.param("connection_id");
-      // const sessionId = await ensureSessionCookie(c, appId);
+      const sessionId = getSessionFromCookie(c);
+
+      if (!sessionId) {
+        throw new HTTPException(401);
+      }
 
       const [updated] = await connectDB
         .update(connectionsTable)
@@ -173,12 +185,7 @@ export const connectRouter = new Hono<Env>()
           and(
             eq(connectionsTable.id, connectionId),
             isNull(connectionsTable.nangoConnectionId),
-            // TODO: ADD SOME PROTECTION!!!
-            //       Since this is happening from the mainframe domain instead
-            //       of our user's domain, the sessions won't match.
-            //       One option is to generate a temporary random ID and use
-            //       that in the URL to identify the connection session
-            // eq(connectionsTable.sessionId, sessionId),
+            eq(connectionsTable.sessionId, sessionId),
           ),
         )
         .returning({ id: connectionsTable.id });
