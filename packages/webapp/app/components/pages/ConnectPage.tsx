@@ -11,18 +11,20 @@ import { z } from "zod";
 import { env } from "../../lib/env_client";
 import Nango from "@nangohq/frontend";
 import { datasetIcon } from "../../lib/integrations/icons/datasetIcon";
-import { uniqueId } from "lodash-es";
 import mainframeLogo from "../../images/icon-192x192.png";
+import { nanoid } from "nanoid";
 
 export function ConnectPage() {
   const params = useParams();
+  const appId = params.appId;
   const provider = params.provider;
-  const utils = trpc.useUtils();
-  const checkNangoIntegration = trpc.checkNangoIntegration.useMutation({
-    onSettled() {
-      utils.datasetsGet.invalidate();
-    },
-  });
+  const connectionId = params.connectionId;
+  // const utils = trpc.useUtils();
+  // const checkNangoIntegration = trpc.checkNangoIntegration.useMutation({
+  //   onSettled() {
+  //     utils.datasetsGet.invalidate();
+  //   },
+  // });
   const { data: integrations, isLoading: isLoadingIntegrations } =
     trpc.integrationsAll.useQuery();
   const integration = provider ? integrations?.[provider] : undefined;
@@ -36,19 +38,28 @@ export function ConnectPage() {
     });
     try {
       // TODO: Create new dataset? Create unauth user?
-      const id = uniqueId();
+      const id = nanoid();
       // TODO: Mainframe is in a new tab, and nango.auth opens yet another tab.
       //       can we limit to just one new tab?
       const nangoResult = await nango.auth(integrationId, id);
 
-      const appId = uniqueId();
+      const connRes = await fetch(
+        `${env.VITE_API_URL}/connect/apps/${appId}/connections/${connectionId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nangoConnectionId: nangoResult.connectionId,
+          }),
+        },
+      );
 
-      // await fetch(`${env.VITE_API_URL}/connect/app/${appId}/github`, {
-      //   method: "POST",
-      //   body: JSON.stringify({
-      //     nangoConnectionId: nangoResult.connectionId,
-      //   }),
-      // });
+      if (!connRes.ok) {
+        console.error(await connRes.text());
+        return;
+      }
       // Inform the backend that this is connected
       // await checkNangoIntegration.mutateAsync({ datasetId: dataset.id });
       window.close();

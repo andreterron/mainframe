@@ -36,7 +36,7 @@ export const router = createBrowserRouter([
   },
   // Mainframe Connect flow
   {
-    path: "/connect/:provider",
+    path: "/connect/:appId/:connectionId/:provider",
     element: <ConnectPage />,
   },
   // Dashboard

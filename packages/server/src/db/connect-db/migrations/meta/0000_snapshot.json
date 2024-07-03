@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "ab7f8e93-e132-406c-b931-48e3821a9ec4",
+  "id": "4096fec1-3086-456f-b829-8760f58b2d94",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "apps": {
@@ -50,7 +50,7 @@
           "name": "session_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "nango_connection_id": {
@@ -64,7 +64,7 @@
           "name": "provider",
           "type": "text check(`provider` IN ('github'))",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         }
       },
@@ -108,7 +108,7 @@
           "name": "app_id",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         }
       },

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { Env } from "../types.ts";
-import { eq } from "drizzle-orm";
+import { eq, and, isNull } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
@@ -11,7 +11,8 @@ import {
   connectionsTable,
   sessionsTable,
 } from "../db/connect-db/connect-schema.ts";
-import { uniqueId } from "lodash-es";
+import { ensureSessionCookie } from "../lib/connect-cookies.ts";
+import { nanoid } from "nanoid";
 
 export const connectRouter = new Hono<Env>()
   // TODO: Review this cors() call
@@ -52,7 +53,7 @@ export const connectRouter = new Hono<Env>()
     const [inserted] = await connectDB
       .insert(sessionsTable)
       .values({
-        id: uniqueId("session_"),
+        id: `session_${nanoid()}`,
         appId: appId,
       })
       .returning({ id: sessionsTable.id });
@@ -62,12 +63,14 @@ export const connectRouter = new Hono<Env>()
     }
     return c.json({ id: inserted.id });
   })
-  .get("/sessions/:session_id/connections", async (c) => {
+  .get("/apps/:app_id/connections", async (c) => {
     if (!connectDB) {
       console.error("Missing connectDB");
       throw new HTTPException(500);
     }
-    const sessionId = c.req.param("session_id");
+
+    const appId = c.req.param("app_id");
+    const sessionId = await ensureSessionCookie(c, appId);
 
     const connections = await connectDB
       .select({ id: connectionsTable, provider: connectionsTable.provider })
@@ -77,11 +80,10 @@ export const connectRouter = new Hono<Env>()
     return c.json(connections);
   })
   .post(
-    "/sessions/:session_id/connections",
+    "/apps/:app_id/connections",
     zValidator(
       "json",
       z.object({
-        nangoConnectionId: z.string(),
         provider: z.enum(["github"]),
       }),
     ),
@@ -90,14 +92,17 @@ export const connectRouter = new Hono<Env>()
         console.error("Missing connectDB");
         throw new HTTPException(500);
       }
-      const { provider, nangoConnectionId } = c.req.valid("json");
+      const { provider } = c.req.valid("json");
+
+      const appId = c.req.param("app_id");
+      const sessionId = await ensureSessionCookie(c, appId);
 
       const [inserted] = await connectDB
         .insert(connectionsTable)
         .values({
-          id: uniqueId("conn_"),
-          nangoConnectionId: nangoConnectionId,
+          id: `conn_${nanoid()}`,
           provider: provider,
+          sessionId: sessionId,
         })
         .returning({ id: connectionsTable.id });
       // TODO: Handle if sessionId doesn't exist.
@@ -107,5 +112,84 @@ export const connectRouter = new Hono<Env>()
         });
       }
       return c.json({ id: inserted.id });
+    },
+  )
+  .get("/apps/:app_id/connections/:connection_id", async (c) => {
+    if (!connectDB) {
+      console.error("Missing connectDB");
+      throw new HTTPException(500);
+    }
+
+    // We don't need app_id here
+    const appId = c.req.param("app_id");
+    const connectionId = c.req.param("connection_id");
+    const sessionId = await ensureSessionCookie(c, appId);
+
+    const [connection] = await connectDB
+      .select()
+      .from(connectionsTable)
+      .where(
+        and(
+          eq(connectionsTable.id, connectionId),
+          eq(connectionsTable.sessionId, sessionId),
+        ),
+      )
+      .limit(1);
+
+    // TODO: Handle if any id doesn't exist.
+    if (!connection) {
+      throw new HTTPException(500, {
+        message: "Failed to create connection",
+      });
+    }
+
+    return c.json(connection);
+  })
+  .put(
+    "/apps/:app_id/connections/:connection_id",
+    zValidator(
+      "json",
+      z.object({
+        nangoConnectionId: z.string(),
+      }),
+    ),
+    async (c) => {
+      if (!connectDB) {
+        console.error("Missing connectDB");
+        throw new HTTPException(500);
+      }
+      const { nangoConnectionId } = c.req.valid("json");
+
+      const appId = c.req.param("app_id");
+      const connectionId = c.req.param("connection_id");
+      // const sessionId = await ensureSessionCookie(c, appId);
+
+      const [updated] = await connectDB
+        .update(connectionsTable)
+        .set({
+          nangoConnectionId: nangoConnectionId,
+        })
+        .where(
+          and(
+            eq(connectionsTable.id, connectionId),
+            isNull(connectionsTable.nangoConnectionId),
+            // TODO: ADD SOME PROTECTION!!!
+            //       Since this is happening from the mainframe domain instead
+            //       of our user's domain, the sessions won't match.
+            //       One option is to generate a temporary random ID and use
+            //       that in the URL to identify the connection session
+            // eq(connectionsTable.sessionId, sessionId),
+          ),
+        )
+        .returning({ id: connectionsTable.id });
+
+      // TODO: Handle if any id doesn't exist.
+      if (!updated) {
+        throw new HTTPException(500, {
+          message: "Failed to create connection",
+        });
+      }
+
+      return new Response(null, { status: 204 });
     },
   );

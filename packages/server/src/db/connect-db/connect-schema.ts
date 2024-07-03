@@ -45,6 +45,17 @@ export const appsTable = sqliteTable("apps", {
   ownerId: text("owner_id").notNull(),
 });
 
+// export const usersTable = sqliteTable("users", {
+//   id: text("id")
+//     .default(sql`(lower(hex(randomblob(16))))`)
+//     .notNull()
+//     .primaryKey(),
+//   appId: text("app_id").references(() => appsTable.id, {
+//     onDelete: "cascade",
+//     onUpdate: "cascade",
+//   }),
+// });
+
 export const sessionsTable = sqliteTable("sessions", {
   id: text("id").notNull().primaryKey(),
   userId: text("user_id"),
@@ -52,19 +63,24 @@ export const sessionsTable = sqliteTable("sessions", {
   //   onDelete: "cascade",
   //   onUpdate: "cascade",
   // }),
-  appId: text("app_id").references(() => appsTable.id, {
-    onDelete: "cascade",
-    onUpdate: "cascade",
-  }),
+  appId: text("app_id")
+    .notNull()
+    .references(() => appsTable.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
   // expires: integer("expires"),
 });
 
 export const connectionsTable = sqliteTable("connections", {
   id: text("id").notNull().primaryKey(),
-  sessionId: text("session_id").references(() => sessionsTable.id, {
-    onDelete: "cascade",
-    onUpdate: "cascade",
-  }),
+  // userId: text("user_id").references(() => usersTable.id, {
+  sessionId: text("session_id")
+    .notNull()
+    .references(() => sessionsTable.id, {
+      onDelete: "cascade",
+      onUpdate: "cascade",
+    }),
   nangoConnectionId: text("nango_connection_id"),
-  provider: enumType("provider", ["github"] as const),
+  provider: enumType("provider", ["github"] as const).notNull(),
 });

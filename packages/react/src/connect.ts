@@ -1,10 +1,40 @@
+async function getConnectionId(
+  provider: "github",
+  appId: string,
+  config?: { apiUrl?: string },
+) {
+  const res = await fetch(
+    `${
+      config?.apiUrl ?? "https://api.mainframe.so"
+    }/connect/apps/${appId}/connections`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        provider,
+      }),
+      credentials: "include",
+    },
+  );
+  const body = (await res.json()) as { id: string };
+
+  return body.id;
+}
+
 export async function initiateAuth(
   provider: "github",
-  config?: { rootUrl?: string },
+  appId: string,
+  config?: { apiUrl?: string; rootUrl?: string },
 ) {
+  const connectionId = await getConnectionId(provider, appId, config);
   // TODO: Need to inform the developer's app ID to Mainframe
+  // TODO: Remove appId and provider from URL
   const w = window.open(
-    `${config?.rootUrl ?? "https://mainframe.so"}/connect/${provider}`,
+    `${
+      config?.rootUrl ?? "https://mainframe.so"
+    }/connect/${appId}/${connectionId}/${provider}`,
     "_blank",
   );
 
