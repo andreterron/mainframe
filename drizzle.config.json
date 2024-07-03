@@ -1,4 +1,0 @@
-{
-  "out": "./packages/server/src/db/migrations",
-  "schema": "./packages/shared/src/db/schema.ts"
-}

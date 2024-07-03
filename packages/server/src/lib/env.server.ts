@@ -19,4 +19,7 @@ export const env = envsafe({
     default: "https://api.mainframe.so",
     devDefault: "http://localhost:8745",
   }),
+
+  CONNECT_DB_URL: str({ default: "", allowEmpty: true }),
+  CONNECT_DB_TOKEN: str({ default: "", allowEmpty: true }),
 });

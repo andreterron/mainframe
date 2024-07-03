@@ -5,5 +5,6 @@ export type Env = {
   Variables: {
     db?: SqliteRemoteDatabase;
     operations?: OperationsEmitter;
+    userId?: string;
   };
 };

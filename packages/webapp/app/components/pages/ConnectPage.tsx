@@ -39,7 +39,16 @@ export function ConnectPage() {
       const id = uniqueId();
       // TODO: Mainframe is in a new tab, and nango.auth opens yet another tab.
       //       can we limit to just one new tab?
-      await nango.auth(integrationId, id);
+      const nangoResult = await nango.auth(integrationId, id);
+
+      const appId = uniqueId();
+
+      // await fetch(`${env.VITE_API_URL}/connect/app/${appId}/github`, {
+      //   method: "POST",
+      //   body: JSON.stringify({
+      //     nangoConnectionId: nangoResult.connectionId,
+      //   }),
+      // });
       // Inform the backend that this is connected
       // await checkNangoIntegration.mutateAsync({ datasetId: dataset.id });
       window.close();

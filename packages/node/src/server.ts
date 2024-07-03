@@ -7,6 +7,8 @@ import {
   MainframeContext,
   getIntegrationForDataset,
   MainframeAPIOptions,
+  MainframeExternalContext,
+  wrapExternalContext,
 } from "@mainframe-so/server";
 import express, { Express } from "express";
 import { env } from "./lib/env.server.ts";
@@ -24,7 +26,7 @@ import { GLOBAL_operations } from "./lib/operations.ts";
 export interface SetupServerHooks extends MainframeAPIOptions<Env> {
   express?: (app: Express) => void;
   iterateOverDBs?: (
-    callback: (ctx: MainframeContext, userId: string) => Promise<void>,
+    callback: (ctx: MainframeExternalContext, userId: string) => Promise<void>,
   ) => Promise<void>;
   closeWithGrace?: CloseWithGraceAsyncCallback;
 }
@@ -54,9 +56,9 @@ export function setupServer(hooks: SetupServerHooks) {
   const task = cron.schedule(
     "*/10 * * * *",
     async (now) => {
-      async function syncDB(ctx: MainframeContext, userId?: string) {
+      async function syncDB(ctx: MainframeExternalContext, userId?: string) {
         try {
-          await syncAll(ctx);
+          await syncAll({ db: drizzle(ctx.db), operations: ctx.operations });
         } catch (e) {
           if (userId) {
             console.error("Failed to sync User's DB", userId);
@@ -68,7 +70,7 @@ export function setupServer(hooks: SetupServerHooks) {
       if (hooks.iterateOverDBs) {
         await hooks.iterateOverDBs(syncDB);
       } else {
-        await syncDB({ db: localDb, operations: GLOBAL_operations });
+        await syncDB({ db: dbClient, operations: GLOBAL_operations });
       }
     },
     {
@@ -184,7 +186,7 @@ export function setupServer(hooks: SetupServerHooks) {
       if (hooks.iterateOverDBs) {
         await hooks.iterateOverDBs(async (ctx, userId) => {
           try {
-            await setupWebhooks(baseApiUrl, ctx);
+            await setupWebhooks(baseApiUrl, wrapExternalContext(ctx));
           } catch (e) {
             console.error(`Failed to setup webhook for user ${userId}`);
             console.error(e);

@@ -11,6 +11,7 @@ import { trpcServer } from "@hono/trpc-server";
 import { appRouter } from "./lib/trpc/trpc_router.ts";
 import { CreateContextHooks, createContext } from "./lib/trpc/trpc_context.ts";
 import { cors } from "hono/cors";
+import { connectRouter } from "./routers/connect-router.ts";
 
 export type MainframeAPIOptions<E extends Env = Env> = {
   /**
@@ -31,9 +32,18 @@ export type MainframeAPIOptions<E extends Env = Env> = {
     c: Context<E>,
   ) =>
     | Promise<
-        { db: SqliteRemoteDatabase; operations?: OperationsEmitter } | undefined
+        | {
+            db: SqliteRemoteDatabase;
+            operations?: OperationsEmitter;
+            userId?: string;
+          }
+        | undefined
       >
-    | { db: SqliteRemoteDatabase; operations?: OperationsEmitter }
+    | {
+        db: SqliteRemoteDatabase;
+        operations?: OperationsEmitter;
+        userId?: string;
+      }
     | undefined;
 } & Partial<ApiRouterHooks> &
   CreateContextHooks<E>;
@@ -48,6 +58,7 @@ export function createMainframeAPI<E extends Env = Env>(
     const db = ctx?.db;
     c.set("db", db);
     c.set("operations", ctx?.operations);
+    c.set("userId", ctx?.userId);
     await next();
   });
 
@@ -76,6 +87,7 @@ export function createMainframeAPI<E extends Env = Env>(
           },
         }),
       )
+      .route("/connect", connectRouter)
       .get("/healthcheck", async (c) => {
         return c.json({ success: true });
       })

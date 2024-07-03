@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.0",
-    "drizzle-kit": "^0.20.18",
+    "drizzle-kit": "^0.22.8",
     "nanoid": "^4.0.2",
     "turbo": "^2.0.4"
   },
