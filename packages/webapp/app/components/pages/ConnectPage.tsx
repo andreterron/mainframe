@@ -30,7 +30,7 @@ export function ConnectPage() {
   const integration = provider ? integrations?.[provider] : undefined;
 
   const handleNangoConnection = async (integrationId: string) => {
-    if (!env.VITE_NANGO_PUBLIC_KEY) {
+    if (!env.VITE_NANGO_PUBLIC_KEY || !connectionId) {
       return;
     }
     const nango = new Nango({
@@ -38,10 +38,9 @@ export function ConnectPage() {
     });
     try {
       // TODO: Create new dataset? Create unauth user?
-      const id = nanoid();
       // TODO: Mainframe is in a new tab, and nango.auth opens yet another tab.
       //       can we limit to just one new tab?
-      const nangoResult = await nango.auth(integrationId, id);
+      const nangoResult = await nango.auth(integrationId, connectionId);
 
       const connRes = await fetch(
         `${env.VITE_API_URL}/connect/apps/${appId}/connections/${connectionId}`,
@@ -71,6 +70,9 @@ export function ConnectPage() {
   const nangoIntegration = integration?.authTypes?.nango;
 
   if (!nangoIntegration || !provider) {
+    if (isLoadingIntegrations) {
+      return <div></div>;
+    }
     return <div>Integration not found</div>;
   }
   const icon = datasetIcon(provider);

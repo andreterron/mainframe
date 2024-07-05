@@ -16,6 +16,9 @@ import {
   getSessionFromCookie,
 } from "../lib/connect-cookies.ts";
 import { nanoid } from "nanoid";
+import { getIntegrationFromType } from "../lib/integrations.ts";
+import { nango } from "../lib/nango.ts";
+import { AuthModes } from "@nangohq/node";
 
 export const connectRouter = new Hono<Env>()
   // TODO: Review this cors() call
@@ -76,11 +79,21 @@ export const connectRouter = new Hono<Env>()
     const sessionId = await ensureSessionCookie(c, appId);
 
     const connections = await connectDB
-      .select({ id: connectionsTable, provider: connectionsTable.provider })
+      .select({
+        id: connectionsTable,
+        provider: connectionsTable.provider,
+        nangoConnectionId: connectionsTable.nangoConnectionId,
+      })
       .from(connectionsTable)
       .where(eq(connectionsTable.sessionId, sessionId));
 
-    return c.json(connections);
+    return c.json(
+      connections.map((c) => ({
+        id: c.id,
+        provider: c.provider,
+        connected: !!c.nangoConnectionId,
+      })),
+    );
   })
   .post(
     "/apps/:app_id/connections",
@@ -133,7 +146,11 @@ export const connectRouter = new Hono<Env>()
     }
 
     const [connection] = await connectDB
-      .select()
+      .select({
+        id: connectionsTable.id,
+        provider: connectionsTable.provider,
+        nangoConnectionId: connectionsTable.nangoConnectionId,
+      })
       .from(connectionsTable)
       .where(
         and(
@@ -150,7 +167,11 @@ export const connectRouter = new Hono<Env>()
       });
     }
 
-    return c.json(connection);
+    return c.json({
+      id: connection.id,
+      provider: connection.provider,
+      connected: !!connection.nangoConnectionId,
+    });
   })
   .put(
     "/apps/:app_id/connections/:connection_id",
@@ -199,4 +220,80 @@ export const connectRouter = new Hono<Env>()
 
       return new Response(null, { status: 204 });
     },
-  );
+  )
+  .all("/proxy/:connection_id/*", async (c) => {
+    if (!connectDB) {
+      console.error("Missing connectDB");
+      throw new HTTPException(500);
+    }
+    const sessionId = getSessionFromCookie(c);
+
+    if (!sessionId) {
+      throw new HTTPException(407);
+    }
+    // Read from Hono context
+    const req = c.req.raw;
+    const connectionId = c.req.param("connection_id");
+
+    // Get integration for that dataset
+    const [connection] = await connectDB
+      .select()
+      .from(connectionsTable)
+      .where(
+        and(
+          eq(connectionsTable.id, connectionId),
+          eq(connectionsTable.sessionId, sessionId),
+        ),
+      )
+      .limit(1);
+
+    const integration = getIntegrationFromType(connection?.provider);
+
+    if (!connection?.nangoConnectionId || !integration?.proxyFetch) {
+      return c.notFound();
+    }
+
+    // Prepare path
+    const { pathname, search } = new URL(req.url);
+    // TODO: Don't use hardcoded path.
+    const apipath = `${pathname.replace(
+      `/connect/proxy/${connectionId}/`,
+      "",
+    )}${search}`;
+
+    // Delete headers
+    const headers = new Headers(req.headers);
+    headers.delete("Host");
+    headers.delete("Authorization");
+    headers.delete("Proxy-Authorization");
+    // NOTE: These might not be needed
+    headers.delete("Content-Encoding");
+    headers.delete("Content-Length");
+
+    const nangoConnection = await nango?.getConnection(
+      // TODO: Don't hardcode provider string
+      "github-oauth-app",
+      connection.id,
+      false,
+    );
+    if (nangoConnection?.credentials.type !== AuthModes.OAuth2) {
+      throw new HTTPException(407);
+    }
+    const token = nangoConnection.credentials.access_token;
+
+    // Delegate request to the integration
+    const apiRes = await integration.proxyFetch(token, apipath, {
+      ...req,
+      headers,
+      redirect: "manual",
+      integrity: undefined,
+    });
+
+    const res = new Response(apiRes.body, apiRes);
+
+    // The content is already decoded when using fetch
+    res.headers.delete("Content-Encoding");
+    res.headers.delete("Content-Length");
+
+    return res;
+  });

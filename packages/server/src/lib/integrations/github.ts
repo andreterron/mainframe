@@ -53,9 +53,8 @@ export const github: Integration = {
       },
     },
   },
-  async proxyFetch(dataset, path: string, init) {
+  async proxyFetch(token: string, path: string, init) {
     const headers = new Headers(init?.headers);
-    const token = await getTokenFromDataset(dataset);
     if (!token) return new Response("Unauthorized", { status: 407 });
 
     headers.set("Authorization", `Bearer ${token}`);

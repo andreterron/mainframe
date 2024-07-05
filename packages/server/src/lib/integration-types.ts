@@ -46,7 +46,7 @@ export interface Integration {
     };
   };
   proxyFetch?: (
-    dataset: Dataset,
+    token: string,
     path: string,
     init?: RequestInit,
   ) => Promise<Response>;
