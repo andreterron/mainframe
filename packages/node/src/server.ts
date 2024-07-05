@@ -7,49 +7,29 @@ import {
   MainframeContext,
   getIntegrationForDataset,
   GLOBAL_operations,
-  OperationsEmitter,
+  MainframeAPIOptions,
 } from "@mainframe-so/server";
 import express, { Express } from "express";
 import { env } from "./lib/env.server.ts";
 import { ZodError } from "zod";
 import type { Server } from "node:http";
-import { syncAll, ApiRouterHooks } from "@mainframe-so/server";
+import { syncAll } from "@mainframe-so/server";
 import { datasetsTable } from "@mainframe-so/shared";
 import { startCloudflared } from "./cloudflared.ts";
 import type { ChildProcess } from "node:child_process";
-import { CreateContextHooks } from "@mainframe-so/server";
 import chalk from "chalk";
 import { drizzle } from "drizzle-orm/libsql";
-import { Client } from "@libsql/client";
 import { Env, createHonoRequestListener } from "./hono.ts";
 
-export interface SetupServerHooks
-  extends CreateContextHooks<Env>,
-    Partial<ApiRouterHooks> {
+export interface SetupServerHooks extends MainframeAPIOptions<Env> {
   express?: (app: Express) => void;
-  getCtx?: (
-    req: express.Request,
-  ) =>
-    | Promise<{ db: Client; operations?: OperationsEmitter } | undefined>
-    | { db: Client; operations?: OperationsEmitter }
-    | undefined;
   iterateOverDBs?: (
     callback: (ctx: MainframeContext, userId: string) => Promise<void>,
   ) => Promise<void>;
   closeWithGrace?: CloseWithGraceAsyncCallback;
 }
 
-declare global {
-  namespace Express {
-    interface Request {
-      // TODO: This is optional
-      db: Client;
-      operations?: OperationsEmitter;
-    }
-  }
-}
-
-export function setupServer(hooks: SetupServerHooks = {}) {
+export function setupServer(hooks: SetupServerHooks) {
   // TODO: Try to remove this
   const localDb = drizzle(dbClient);
 
@@ -101,25 +81,6 @@ export function setupServer(hooks: SetupServerHooks = {}) {
 
   hooks.express?.(app);
 
-  app.use(async (req, _res, next) => {
-    if (hooks.getCtx) {
-      try {
-        const hookCtx = await hooks.getCtx(req);
-        if (hookCtx) {
-          req.db = hookCtx.db;
-          req.operations = hookCtx.operations;
-        }
-      } catch (e) {
-        console.log("Failed to use hook to create DB");
-        console.error(e);
-      }
-    } else {
-      req.db = dbClient;
-      req.operations = GLOBAL_operations;
-    }
-    next();
-  });
-
   process
     .on("unhandledRejection", (reason, p) => {
       console.error(reason, "Unhandled Rejection at Promise", p);
@@ -127,11 +88,6 @@ export function setupServer(hooks: SetupServerHooks = {}) {
     .on("uncaughtException", (err) => {
       console.error(err, "Uncaught Exception thrown");
     });
-
-  // Redirect the root API path to the app
-  app.get("/", (req, res) => {
-    res.redirect(env.APP_URL);
-  });
 
   app.use(async (req, res, next) => {
     try {

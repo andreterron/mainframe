@@ -10,9 +10,6 @@ export interface UserInfo {
 }
 
 export interface CreateContextHooks<E extends Env = Env> {
-  trpcGetUserId?: (
-    c: HonoContext<E>,
-  ) => Promise<string | undefined> | string | undefined;
   trpcGetUserInfo?: (
     c: HonoContext<E>,
   ) => Promise<UserInfo | undefined> | UserInfo | undefined;

@@ -6,7 +6,6 @@ import { drizzle, type LibSQLDatabase } from "drizzle-orm/libsql";
 import { oauthRouter } from "./routers/oauth-router.ts";
 import { isApiRequestAuthorizedForPasswordAuth } from "./lib/password-based-auth/password-auth-api-check.ts";
 import { env } from "./lib/env.server.ts";
-import { MainframeContext } from "./lib/context.ts";
 import { OperationsEmitter } from "./lib/operations.ts";
 import { Client } from "@libsql/client/.";
 import { trpcServer } from "@hono/trpc-server";
@@ -14,47 +13,38 @@ import { appRouter } from "./lib/trpc/trpc_router.ts";
 import { CreateContextHooks, createContext } from "./lib/trpc/trpc_context.ts";
 import { cors } from "hono/cors";
 
+export type MainframeAPIOptions<E extends Env = Env> = {
+  /**
+   * Callback that can be used to add middleware or extra endpoints
+   * to the API
+   * @param app Hono app
+   */
+  initHonoApp?: (app: Hono<E>) => void;
+
+  /**
+   * Callback that returns the database variable for this request
+   *
+   * @param c Hono context. Please don't call response methods.
+   * @returns MainframeContext. The `db` property is required for some
+   *          endpoints. The `operations` property enables reactive updates
+   */
+  getRequestCtx: (
+    c: Context<E>,
+  ) =>
+    | Promise<{ db: Client; operations?: OperationsEmitter } | undefined>
+    | { db: Client; operations?: OperationsEmitter }
+    | undefined;
+} & Partial<ApiRouterHooks> &
+  CreateContextHooks<E>;
+
 export function createMainframeAPI<E extends Env = Env>(
-  init: {
-    /**
-     * Callback that can be used to add middleware or extra endpoints
-     * to the API
-     * @param app Hono app
-     */
-    initHonoApp?: (app: Hono<E>) => void;
-
-    /**
-     * Callback that returns the database variable for this request
-     *
-     * @deprecated Please use `getRequestCtx`
-     * @param c Hono context. Please don't call response methods.
-     * @returns LibSQLDatabase. Required for some endpoints
-     */
-    getRequestDB?: (
-      c: Context<E>,
-    ) => Promise<LibSQLDatabase | undefined> | LibSQLDatabase | undefined;
-
-    /**
-     * Callback that returns the database variable for this request
-     *
-     * @param c Hono context. Please don't call response methods.
-     * @returns MainframeContext. The `db` property is required for some
-     *          endpoints. The `operations` property enables reactive updates
-     */
-    getRequestCtx: (
-      c: Context<E>,
-    ) =>
-      | Promise<{ db: Client; operations?: OperationsEmitter } | undefined>
-      | { db: Client; operations?: OperationsEmitter }
-      | undefined;
-  } & Partial<ApiRouterHooks> &
-    CreateContextHooks,
+  init: MainframeAPIOptions<E>,
 ) {
   const app = new Hono<E>();
 
   app.use(async (c, next) => {
     const ctx = await init.getRequestCtx(c);
-    const db = ctx?.db ? drizzle(ctx.db) : await init.getRequestDB?.(c);
+    const db = ctx?.db ? drizzle(ctx.db) : undefined;
     c.set("db", db);
     c.set("operations", ctx?.operations);
     await next();
@@ -62,28 +52,35 @@ export function createMainframeAPI<E extends Env = Env>(
 
   init.initHonoApp?.(app);
 
-  return app
-    .route(
-      "/api",
-      createApiRouter({
-        isApiRequestAuthorized:
-          init.isApiRequestAuthorized ?? isApiRequestAuthorizedForPasswordAuth,
-      }),
-    )
-    .route("/oauth", oauthRouter)
-    .route("/webhooks", webhookRouter)
-    .use(
-      "/trpc/*",
-      cors({ credentials: true, origin: env.APP_URL }),
-      trpcServer({
-        router: appRouter,
-        createContext: createContext(init),
-        onError: ({ error, path }) => {
-          console.error(path, error);
-        },
-      }),
-    )
-    .get("/healthcheck", async (c) => {
-      return c.json({ success: true });
-    });
+  return (
+    app
+      .route(
+        "/api",
+        createApiRouter({
+          isApiRequestAuthorized:
+            init.isApiRequestAuthorized ??
+            isApiRequestAuthorizedForPasswordAuth,
+        }),
+      )
+      .route("/oauth", oauthRouter)
+      .route("/webhooks", webhookRouter)
+      .use(
+        "/trpc/*",
+        cors({ credentials: true, origin: env.APP_URL }),
+        trpcServer({
+          router: appRouter,
+          createContext: createContext(init),
+          onError: ({ error, path }) => {
+            console.error(path, error);
+          },
+        }),
+      )
+      .get("/healthcheck", async (c) => {
+        return c.json({ success: true });
+      })
+      // Redirect the root API path to the app
+      .get("/", (c) => {
+        return c.redirect(env.APP_URL);
+      })
+  );
 }
