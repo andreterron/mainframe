@@ -6,7 +6,6 @@ import { dbClient } from "./db/db.server.ts";
 import {
   MainframeContext,
   getIntegrationForDataset,
-  GLOBAL_operations,
   MainframeAPIOptions,
 } from "@mainframe-so/server";
 import express, { Express } from "express";
@@ -20,6 +19,7 @@ import type { ChildProcess } from "node:child_process";
 import chalk from "chalk";
 import { drizzle } from "drizzle-orm/libsql";
 import { Env, createHonoRequestListener } from "./hono.ts";
+import { GLOBAL_operations } from "./lib/operations.ts";
 
 export interface SetupServerHooks extends MainframeAPIOptions<Env> {
   express?: (app: Express) => void;

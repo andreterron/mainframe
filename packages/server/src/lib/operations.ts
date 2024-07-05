@@ -10,8 +10,6 @@ export type OperationsEmitter = TypedEmitter<{
   operation: (operation: Operation) => void;
 }>;
 
-export const GLOBAL_operations = new EventEmitter() as OperationsEmitter;
-
 export async function writeOperation(
   emitter: OperationsEmitter | undefined,
   op: Operation,
