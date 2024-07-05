@@ -28,14 +28,14 @@ export default defineConfig({
     {
       name: "replace-ts-with-js",
       setup(build) {
-        build.onResolve({ filter: /\.[jt]sx?$/ }, (args) => {
+        build.onResolve({ filter: /./ }, async (args) => {
           if (args.importer && args.path.match(/\.tsx?$/)) {
             return {
               path: args.path.replace(/\.t(sx?)$/, ".j$1"),
               external: true,
             };
           }
-          if (args.kind !== "entry-point") {
+          if (args.kind !== "entry-point" && !args.path.endsWith(".txt")) {
             return { path: args.path, external: true };
           }
         });

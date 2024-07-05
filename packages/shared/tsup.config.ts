@@ -28,7 +28,7 @@ export default defineConfig({
     {
       name: "replace-ts-with-js",
       setup(build) {
-        build.onResolve({ filter: /\.[jt]sx?$/ }, (args) => {
+        build.onResolve({ filter: /./ }, (args) => {
           if (args.importer && args.path.match(/\.tsx?$/)) {
             return {
               path: args.path.replace(/\.t(sx?)$/, ".j$1"),

@@ -4,7 +4,7 @@ import { Env as ApiEnv, ApiRouterHooks } from "@mainframe-so/server";
 import express from "express";
 import { createMainframeAPI } from "@mainframe-so/server";
 
-type Env = ApiEnv & {
+export type Env = ApiEnv & {
   // Based on import("@hono/node-server").HttpBindings
   Bindings: {
     incoming: express.Request;

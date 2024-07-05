@@ -34,9 +34,13 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "@hono/trpc-server": "^0.3.2",
     "@libsql/client": "^0.7.0",
     "@mainframe-so/shared": "0.5.0",
     "@nangohq/node": "^0.39.13",
+    "@sentry/core": "^8.15.0",
+    "@trpc/server": "^10.45.2",
+    "bcryptjs": "^2.4.3",
     "cookie": "^0.6.0",
     "cookie-signature": "^1.2.1",
     "dotenv": "^16.3.1",
@@ -44,9 +48,11 @@
     "envsafe": "^2.0.3",
     "googleapis": "^128.0.0",
     "hono": "^4.4.3",
+    "json-to-ts": "^2.1.0",
     "local-devices": "^3.0.0",
     "lodash-es": "^4.17.21",
     "nanoid": "^5.0.7",
+    "openai": "^4.52.3",
     "typed-emitter": "^2.1.0",
     "zod": "^3.21.4"
   },

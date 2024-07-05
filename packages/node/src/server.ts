@@ -10,7 +10,6 @@ import {
   OperationsEmitter,
 } from "@mainframe-so/server";
 import express, { Express } from "express";
-import bodyParser from "body-parser";
 import { env } from "./lib/env.server.ts";
 import { ZodError } from "zod";
 import type { Server } from "node:http";
@@ -18,19 +17,14 @@ import { syncAll, ApiRouterHooks } from "@mainframe-so/server";
 import { datasetsTable } from "@mainframe-so/shared";
 import { startCloudflared } from "./cloudflared.ts";
 import type { ChildProcess } from "node:child_process";
-import { initTRPC } from "@trpc/server";
-import * as trpcExpress from "@trpc/server/adapters/express";
-import { Context, CreateContextHooks, createContext } from "./trpc_context.ts";
-import { appRouter } from "./trpc_router.ts";
-export type { AppRouter } from "./trpc_router.ts";
-import cors from "cors";
+import { CreateContextHooks } from "@mainframe-so/server";
 import chalk from "chalk";
-import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
+import { drizzle } from "drizzle-orm/libsql";
 import { Client } from "@libsql/client";
-import { createHonoRequestListener } from "./hono.ts";
+import { Env, createHonoRequestListener } from "./hono.ts";
 
 export interface SetupServerHooks
-  extends CreateContextHooks,
+  extends CreateContextHooks<Env>,
     Partial<ApiRouterHooks> {
   express?: (app: Express) => void;
   getCtx?: (
@@ -133,19 +127,6 @@ export function setupServer(hooks: SetupServerHooks = {}) {
     .on("uncaughtException", (err) => {
       console.error(err, "Uncaught Exception thrown");
     });
-
-  app.use(
-    "/trpc",
-    cors({ credentials: true, origin: env.APP_URL }),
-    bodyParser.json(),
-    trpcExpress.createExpressMiddleware({
-      router: appRouter,
-      createContext: createContext(hooks),
-      onError: ({ error, path }) => {
-        console.error(path, error);
-      },
-    }),
-  );
 
   // Redirect the root API path to the app
   app.get("/", (req, res) => {

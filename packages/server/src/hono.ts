@@ -9,6 +9,10 @@ import { env } from "./lib/env.server.ts";
 import { MainframeContext } from "./lib/context.ts";
 import { OperationsEmitter } from "./lib/operations.ts";
 import { Client } from "@libsql/client/.";
+import { trpcServer } from "@hono/trpc-server";
+import { appRouter } from "./lib/trpc/trpc_router.ts";
+import { CreateContextHooks, createContext } from "./lib/trpc/trpc_context.ts";
+import { cors } from "hono/cors";
 
 export function createMainframeAPI<E extends Env = Env>(
   init: {
@@ -43,7 +47,8 @@ export function createMainframeAPI<E extends Env = Env>(
       | Promise<{ db: Client; operations?: OperationsEmitter } | undefined>
       | { db: Client; operations?: OperationsEmitter }
       | undefined;
-  } & Partial<ApiRouterHooks>,
+  } & Partial<ApiRouterHooks> &
+    CreateContextHooks,
 ) {
   const app = new Hono<E>();
 
@@ -67,6 +72,17 @@ export function createMainframeAPI<E extends Env = Env>(
     )
     .route("/oauth", oauthRouter)
     .route("/webhooks", webhookRouter)
+    .use(
+      "/trpc/*",
+      cors({ credentials: true, origin: env.APP_URL }),
+      trpcServer({
+        router: appRouter,
+        createContext: createContext(init),
+        onError: ({ error, path }) => {
+          console.error(path, error);
+        },
+      }),
+    )
     .get("/healthcheck", async (c) => {
       return c.json({ success: true });
     });

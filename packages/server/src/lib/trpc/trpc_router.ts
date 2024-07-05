@@ -14,12 +14,12 @@ import {
 import { z } from "zod";
 import { Context, UserInfo } from "./trpc_context.ts";
 import { and, eq } from "drizzle-orm";
-import { syncDataset, syncObject, syncTable } from "@mainframe-so/server";
+import { syncDataset, syncObject, syncTable } from "../../sync.ts";
 import {
   commitSession,
   destroySession,
   getSessionFromCookies,
-} from "@mainframe-so/server";
+} from "../sessions.ts";
 import {
   createClientIntegration,
   getDatasetFunction,
@@ -28,34 +28,34 @@ import {
   getIntegrationForDataset,
   zOAuthCredentials,
   zTokenCredentials,
-} from "@mainframe-so/server";
-import { deserializeData } from "./utils/serialization.ts";
-import { createUserAccount, validateUserAccount } from "./lib/auth.server.ts";
-import { checkIfUserExists } from "./db/helpers.ts";
-import { github } from "@mainframe-so/server";
-import { network } from "@mainframe-so/server";
-import { peloton } from "@mainframe-so/server";
-import { posthog } from "@mainframe-so/server";
-import { toggl } from "@mainframe-so/server";
-import { google } from "@mainframe-so/server";
-import { zotero } from "@mainframe-so/server";
-import { notion } from "@mainframe-so/server";
-import { oura } from "@mainframe-so/server";
-import { valtown } from "@mainframe-so/server";
-import { env } from "./lib/env.server.ts";
-import { nango } from "@mainframe-so/server";
-import * as Sentry from "@sentry/node";
-import { getTokenFromDataset } from "@mainframe-so/server";
-import { spotify } from "@mainframe-so/server";
-import { render } from "@mainframe-so/server";
-import { vercel } from "@mainframe-so/server";
-import { bitbucket } from "@mainframe-so/server";
-import { getTableData } from "./lib/table-data.ts";
+} from "../integrations.ts";
+import { deserializeData } from "../../utils/serialization.ts";
+import { createUserAccount, validateUserAccount } from "./auth.ts";
+import { checkIfUserExists } from "./db-helpers.ts";
+import { env } from "../env.server.ts";
+import { nango } from "../nango.ts";
+import { trpcMiddleware } from "@sentry/core";
+import { getTokenFromDataset } from "../integration-token.ts";
+import { github } from "../integrations/github.ts";
+import { network } from "../integrations/network.ts";
+import { peloton } from "../integrations/peloton.ts";
+import { posthog } from "../integrations/posthog.ts";
+import { toggl } from "../integrations/toggl.ts";
+import { google } from "../integrations/google.ts";
+import { zotero } from "../integrations/zotero.ts";
+import { notion } from "../integrations/notion.ts";
+import { oura } from "../integrations/oura.ts";
+import { valtown } from "../integrations/valtown.ts";
+import { spotify } from "../integrations/spotify.ts";
+import { render } from "../integrations/render.ts";
+import { vercel } from "../integrations/vercel.ts";
+import { bitbucket } from "../integrations/bitbucket.ts";
+import { getTableData } from "./table-data.ts";
 import {
   generateObjectComponent,
   generateTableComponent,
-} from "./lib/llm/openai.ts";
-import { getObjectAndDataset } from "./lib/object-data.ts";
+} from "../llm/openai.ts";
+import { getObjectAndDataset } from "./object-data.ts";
 import { nanoid } from "nanoid";
 
 /**
@@ -66,7 +66,7 @@ const t = initTRPC.context<Context>().create();
 
 // const t = initTRPC.context().create();
 const sentryMiddleware = t.middleware(
-  Sentry.Handlers.trpcMiddleware({
+  trpcMiddleware({
     // attachRpcInput: true, // defaults to false
   }),
 );
@@ -194,7 +194,10 @@ export const appRouter = router({
 
       session.data.userId = account.id;
 
-      ctx.res.appendHeader("Set-Cookie", await commitSession(session, ctx.db));
+      ctx.honoContext.header(
+        "Set-Cookie",
+        await commitSession(session, ctx.db),
+      );
 
       return {
         redirect: "/",
@@ -242,7 +245,10 @@ export const appRouter = router({
 
       session.data.userId = account.id;
 
-      ctx.res.appendHeader("Set-Cookie", await commitSession(session, ctx.db));
+      ctx.honoContext.header(
+        "Set-Cookie",
+        await commitSession(session, ctx.db),
+      );
 
       return {
         redirect: "/",
@@ -260,7 +266,7 @@ export const appRouter = router({
 
         hasUsers = await checkIfUserExists(ctx.db);
 
-        ctx.res.appendHeader(
+        ctx.honoContext.header(
           "Set-Cookie",
           await destroySession(session, ctx.db),
         );
