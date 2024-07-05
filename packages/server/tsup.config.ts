@@ -1,4 +1,7 @@
 import { defineConfig } from "tsup";
+import { extname } from "node:path";
+
+const BUNDLED_EXTENSIONS = [".txt", ".json"];
 
 export default defineConfig({
   entry: ["src/**/*.ts"],
@@ -35,7 +38,10 @@ export default defineConfig({
               external: true,
             };
           }
-          if (args.kind !== "entry-point" && !args.path.endsWith(".txt")) {
+          if (
+            args.kind !== "entry-point" &&
+            !BUNDLED_EXTENSIONS.includes(extname(args.path))
+          ) {
             return { path: args.path, external: true };
           }
         });
