@@ -29,6 +29,8 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@types/cookie": "^0.6.0",
+    "@types/cookie-signature": "^1.1.2",
     "@types/lodash-es": "^4.17.12",
     "jsr": "^0.12.4",
     "typescript": "^5.0.4"
