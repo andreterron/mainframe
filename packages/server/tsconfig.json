@@ -4,6 +4,7 @@
   "include": ["src/**/*.ts"],
 
   "compilerOptions": {
+    "resolveJsonModule": true,
     "noEmit": false,
     "emitDeclarationOnly": true,
     "outDir": "./dist"

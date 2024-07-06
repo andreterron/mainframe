@@ -1,7 +1,5 @@
 import { migrate } from "drizzle-orm/sqlite-proxy/migrator";
 import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
-import { drizzle } from "drizzle-orm/libsql";
-import { Client } from "@libsql/client";
 import { resolve } from "node:path";
 import { src__dirnameFromImportMetaUrl } from "../utils/dirname.ts";
 import journal from "./migrations/meta/_journal.json";
@@ -22,10 +20,6 @@ export function migrateDB(
     },
     { migrationsFolder: folder },
   );
-}
-
-export function migrateClient(client: Client) {
-  return migrateDB(drizzle(client));
 }
 
 export const dbVersion = journal.entries.reduce(
