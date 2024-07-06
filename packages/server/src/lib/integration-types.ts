@@ -1,10 +1,10 @@
 import { Dataset, AuthType, ComputedDataParamsDef } from "@mainframe-so/shared";
-import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 import { MainframeContext } from "./context";
 
 export interface IntegrationTable {
   name: string;
-  get?: (dataset: Dataset, db: LibSQLDatabase) => Promise<any>;
+  get?: (dataset: Dataset, db: SqliteRemoteDatabase) => Promise<any>;
   rowId?: (dataset: Dataset, row: any) => string;
 }
 
@@ -41,7 +41,7 @@ export interface Integration {
       onSubmit(
         dataset: Dataset,
         params: Record<string, string>,
-        db: LibSQLDatabase<Record<string, never>>,
+        db: SqliteRemoteDatabase<Record<string, never>>,
       ): Promise<void>;
     };
   };
@@ -59,7 +59,7 @@ export interface Integration {
     baseUrl: string,
     dataset: Dataset,
     query: { code: string },
-    db: LibSQLDatabase,
+    db: SqliteRemoteDatabase,
   ) => Promise<void>;
   setupWebhooks?: (
     ctx: MainframeContext,

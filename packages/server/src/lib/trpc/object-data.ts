@@ -2,12 +2,12 @@ import { and, eq } from "drizzle-orm";
 import { deserializeData } from "../../utils/serialization.ts";
 import { getDatasetObject } from "../integrations.ts";
 import { datasetsTable, objectsTable } from "@mainframe-so/shared";
-import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 
 export async function getObjectAndDataset(
   datasetId: string | undefined,
   objectType: string | undefined,
-  db: LibSQLDatabase<Record<string, never>>,
+  db: SqliteRemoteDatabase<Record<string, never>>,
 ) {
   if (!datasetId || !objectType) {
     return undefined;

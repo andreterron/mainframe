@@ -3,9 +3,9 @@ import { Dataset } from "@mainframe-so/shared";
 import { google as api, calendar_v3 } from "googleapis";
 import { datasetsTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
-import { type LibSQLDatabase } from "drizzle-orm/libsql";
+import { type SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 
-async function getAuth(dataset: Dataset, db: LibSQLDatabase) {
+async function getAuth(dataset: Dataset, db: SqliteRemoteDatabase) {
   if (
     !dataset.credentials ||
     !dataset.credentials.clientId ||

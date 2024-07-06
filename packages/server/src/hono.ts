@@ -2,12 +2,11 @@ import { Context, Hono } from "hono";
 import { Env } from "./types.ts";
 import { ApiRouterHooks, createApiRouter } from "./routers/api-router.ts";
 import { webhookRouter } from "./routers/webhook-router.ts";
-import { drizzle, type LibSQLDatabase } from "drizzle-orm/libsql";
+import { type SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 import { oauthRouter } from "./routers/oauth-router.ts";
 import { isApiRequestAuthorizedForPasswordAuth } from "./lib/password-based-auth/password-auth-api-check.ts";
 import { env } from "./lib/env.server.ts";
 import { OperationsEmitter } from "./lib/operations.ts";
-import { Client } from "@libsql/client/.";
 import { trpcServer } from "@hono/trpc-server";
 import { appRouter } from "./lib/trpc/trpc_router.ts";
 import { CreateContextHooks, createContext } from "./lib/trpc/trpc_context.ts";
@@ -31,8 +30,10 @@ export type MainframeAPIOptions<E extends Env = Env> = {
   getRequestCtx: (
     c: Context<E>,
   ) =>
-    | Promise<{ db: Client; operations?: OperationsEmitter } | undefined>
-    | { db: Client; operations?: OperationsEmitter }
+    | Promise<
+        { db: SqliteRemoteDatabase; operations?: OperationsEmitter } | undefined
+      >
+    | { db: SqliteRemoteDatabase; operations?: OperationsEmitter }
     | undefined;
 } & Partial<ApiRouterHooks> &
   CreateContextHooks<E>;
@@ -44,7 +45,7 @@ export function createMainframeAPI<E extends Env = Env>(
 
   app.use(async (c, next) => {
     const ctx = await init.getRequestCtx(c);
-    const db = ctx?.db ? drizzle(ctx.db) : undefined;
+    const db = ctx?.db;
     c.set("db", db);
     c.set("operations", ctx?.operations);
     await next();

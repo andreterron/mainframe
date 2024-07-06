@@ -1,6 +1,6 @@
 import { datasetsTable, rowsTable, tablesTable } from "@mainframe-so/shared";
 import { and, eq } from "drizzle-orm";
-import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 import { getDatasetTable } from "../integrations.ts";
 import { ROW_LIMIT } from "../../utils/constants.ts";
 import { deserializeData } from "../../utils/serialization.ts";
@@ -8,7 +8,7 @@ import { deserializeData } from "../../utils/serialization.ts";
 export async function getTableData(
   datasetId: string | undefined,
   tableId: string | undefined,
-  db: LibSQLDatabase<Record<string, never>>,
+  db: SqliteRemoteDatabase<Record<string, never>>,
 ) {
   if (!datasetId || !tableId) {
     return undefined;

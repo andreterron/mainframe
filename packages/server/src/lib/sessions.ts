@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { env } from "./env.server.ts";
 import { CookieSerializeOptions, parse, serialize } from "cookie";
 import cookieSignature from "cookie-signature";
-import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 import { nanoid } from "nanoid";
 
 export interface MainframeSession {
@@ -77,7 +77,7 @@ function serializeSessionCookie(
 }
 
 async function updateData(
-  db: LibSQLDatabase,
+  db: SqliteRemoteDatabase,
   id: string,
   data: MainframeSession["data"],
   expires: Date | undefined,
@@ -92,11 +92,13 @@ async function updateData(
     .where(eq(sessionsTable.id, id));
 }
 
-async function deleteData(db: LibSQLDatabase, id: string) {
+async function deleteData(db: SqliteRemoteDatabase, id: string) {
   await db.delete(sessionsTable).where(eq(sessionsTable.id, id));
 }
 
-async function createSession(db: LibSQLDatabase): Promise<MainframeSession> {
+async function createSession(
+  db: SqliteRemoteDatabase,
+): Promise<MainframeSession> {
   // TODO: Remove dynamic import
   const id = nanoid(32);
   await db.insert(sessionsTable).values({
@@ -113,7 +115,7 @@ async function createSession(db: LibSQLDatabase): Promise<MainframeSession> {
 }
 
 export async function getSessionFromId(
-  db: LibSQLDatabase,
+  db: SqliteRemoteDatabase,
   sessionId: string,
 ): Promise<MainframeSession | undefined> {
   const [row] = await db
@@ -135,7 +137,7 @@ export async function getSessionFromId(
 }
 
 export async function getSessionFromIdOrCreate(
-  db: LibSQLDatabase,
+  db: SqliteRemoteDatabase,
   sessionId: string,
 ) {
   const session = await getSessionFromId(db, sessionId);
@@ -144,7 +146,7 @@ export async function getSessionFromIdOrCreate(
 }
 
 export async function getSessionFromCookies(
-  db: LibSQLDatabase,
+  db: SqliteRemoteDatabase,
   cookieHeader?: string | null | undefined,
   cookieSecrets: string[] = env.COOKIE_SECRET ? [env.COOKIE_SECRET] : [],
   options?: any,
@@ -160,7 +162,7 @@ export async function getSessionFromCookies(
 
 export async function commitSession(
   session: MainframeSession,
-  db: LibSQLDatabase,
+  db: SqliteRemoteDatabase,
   cookieSecrets: string[] = env.COOKIE_SECRET ? [env.COOKIE_SECRET] : [],
   options?: CookieSerializeOptions,
 ) {
@@ -192,7 +194,7 @@ export async function commitSession(
 
 export async function destroySession(
   session: MainframeSession,
-  db: LibSQLDatabase,
+  db: SqliteRemoteDatabase,
   cookieSecrets: string[] = env.COOKIE_SECRET ? [env.COOKIE_SECRET] : [],
   options?: CookieSerializeOptions,
 ) {

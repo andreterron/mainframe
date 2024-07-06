@@ -1,17 +1,27 @@
-import { migrate } from "drizzle-orm/libsql/migrator";
-import { LibSQLDatabase, drizzle } from "drizzle-orm/libsql";
+import { migrate } from "drizzle-orm/sqlite-proxy/migrator";
+import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
+import { drizzle } from "drizzle-orm/libsql";
 import { Client } from "@libsql/client";
 import { resolve } from "node:path";
 import { src__dirnameFromImportMetaUrl } from "../utils/dirname.ts";
 import journal from "./migrations/meta/_journal.json";
+import { sql } from "drizzle-orm";
 
 const __dirname = src__dirnameFromImportMetaUrl(import.meta.url);
 
 export function migrateDB(
-  db: LibSQLDatabase,
+  db: SqliteRemoteDatabase,
   folder: string = resolve(__dirname, "migrations"),
 ) {
-  return migrate(db, { migrationsFolder: folder });
+  return migrate(
+    db,
+    async (queries) => {
+      for (let q of queries) {
+        await db.run(sql.raw(q));
+      }
+    },
+    { migrationsFolder: folder },
+  );
 }
 
 export function migrateClient(client: Client) {

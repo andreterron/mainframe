@@ -1,7 +1,7 @@
-import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 import { OperationsEmitter } from "./operations";
 
 export interface MainframeContext {
-  db: LibSQLDatabase;
+  db: SqliteRemoteDatabase;
   operations?: OperationsEmitter;
 }

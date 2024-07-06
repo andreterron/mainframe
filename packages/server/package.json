@@ -37,7 +37,6 @@
   },
   "dependencies": {
     "@hono/trpc-server": "^0.3.2",
-    "@libsql/client": "^0.7.0",
     "@mainframe-so/shared": "0.5.1",
     "@nangohq/node": "^0.39.13",
     "@sentry/core": "^8.15.0",

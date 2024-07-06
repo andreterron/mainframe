@@ -1,13 +1,13 @@
 import bcryptjs from "bcryptjs";
 import { usersTable } from "@mainframe-so/shared";
 import { eq } from "drizzle-orm";
-import { LibSQLDatabase } from "drizzle-orm/libsql";
+import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 import { env } from "../env.server.ts";
 
 const { hash } = bcryptjs;
 
 export async function createUserAccount(
-  db: LibSQLDatabase,
+  db: SqliteRemoteDatabase,
   username: string,
   password: string,
 ) {
@@ -23,7 +23,7 @@ export async function createUserAccount(
 }
 
 export async function validateUserAccount(
-  db: LibSQLDatabase,
+  db: SqliteRemoteDatabase,
   username: string,
   password: string,
 ): Promise<{ id: string } | null> {

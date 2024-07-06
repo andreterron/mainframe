@@ -1,4 +1,3 @@
-import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
 import { createClient } from "@libsql/client";
 import { mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";

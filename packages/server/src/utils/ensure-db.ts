@@ -1,9 +1,9 @@
-import { type LibSQLDatabase } from "drizzle-orm/libsql";
+import { type SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 import { HTTPException } from "hono/http-exception";
 
 export function ensureDB(
-  db: LibSQLDatabase | undefined,
-): asserts db is LibSQLDatabase {
+  db: SqliteRemoteDatabase | undefined,
+): asserts db is SqliteRemoteDatabase {
   if (!db) {
     throw new HTTPException(500, {
       message:
