@@ -42,6 +42,7 @@
     "@hono/trpc-server": "^0.3.2",
     "@hono/zod-validator": "^0.2.2",
     "@mainframe-so/shared": "0.5.3",
+    "@nangohq/node": "~0.39.33",
     "@sentry/core": "^8.15.0",
     "@trpc/server": "^10.45.2",
     "bcryptjs": "^2.4.3",

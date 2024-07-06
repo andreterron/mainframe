@@ -7,8 +7,6 @@ import {
   MainframeContext,
   getIntegrationForDataset,
   MainframeAPIOptions,
-  MainframeExternalContext,
-  wrapExternalContext,
 } from "@mainframe-so/server";
 import express, { Express } from "express";
 import { env } from "./lib/env.server.ts";
@@ -26,7 +24,7 @@ import { GLOBAL_operations } from "./lib/operations.ts";
 export interface SetupServerHooks extends MainframeAPIOptions<Env> {
   express?: (app: Express) => void;
   iterateOverDBs?: (
-    callback: (ctx: MainframeExternalContext, userId: string) => Promise<void>,
+    callback: (ctx: MainframeContext) => Promise<void>,
   ) => Promise<void>;
   closeWithGrace?: CloseWithGraceAsyncCallback;
 }
@@ -56,12 +54,12 @@ export function setupServer(hooks: SetupServerHooks) {
   const task = cron.schedule(
     "*/10 * * * *",
     async (now) => {
-      async function syncDB(ctx: MainframeExternalContext, userId?: string) {
+      async function syncDB(ctx: MainframeContext) {
         try {
-          await syncAll({ db: drizzle(ctx.db), operations: ctx.operations });
+          await syncAll(ctx);
         } catch (e) {
-          if (userId) {
-            console.error("Failed to sync User's DB", userId);
+          if (ctx.userId) {
+            console.error("Failed to sync User's DB", ctx.userId);
           }
           console.error(e);
         }
@@ -70,7 +68,7 @@ export function setupServer(hooks: SetupServerHooks) {
       if (hooks.iterateOverDBs) {
         await hooks.iterateOverDBs(syncDB);
       } else {
-        await syncDB({ db: dbClient, operations: GLOBAL_operations });
+        await syncDB({ db: localDb, operations: GLOBAL_operations });
       }
     },
     {
@@ -184,11 +182,13 @@ export function setupServer(hooks: SetupServerHooks) {
       await serverPromise;
 
       if (hooks.iterateOverDBs) {
-        await hooks.iterateOverDBs(async (ctx, userId) => {
+        await hooks.iterateOverDBs(async (ctx) => {
           try {
-            await setupWebhooks(baseApiUrl, wrapExternalContext(ctx));
+            await setupWebhooks(baseApiUrl, ctx);
           } catch (e) {
-            console.error(`Failed to setup webhook for user ${userId}`);
+            console.error(
+              `Failed to setup webhook for user ${ctx.userId ?? "(NO_ID)"}`,
+            );
             console.error(e);
           }
         });
