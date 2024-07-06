@@ -1,6 +1,6 @@
 {
   "name": "@mainframe-so/node",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "private": false,
   "description": "",
   "sideEffects": false,
@@ -37,8 +37,8 @@
   "dependencies": {
     "@hono/node-server": "^1.11.2",
     "@libsql/client": "^0.5.6",
-    "@mainframe-so/server": "0.5.2",
-    "@mainframe-so/shared": "0.5.2",
+    "@mainframe-so/server": "0.5.3",
+    "@mainframe-so/shared": "0.5.3",
     "address": "^2.0.1",
     "chalk": "^5.3.0",
     "close-with-grace": "^1.2.0",
