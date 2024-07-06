@@ -1,6 +1,6 @@
 {
   "name": "@mainframe-so/server",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "private": false,
   "description": "",
   "sideEffects": false,
@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@hono/trpc-server": "^0.3.2",
-    "@mainframe-so/shared": "0.5.1",
+    "@mainframe-so/shared": "0.5.2",
     "@nangohq/node": "^0.39.13",
     "@sentry/core": "^8.15.0",
     "@trpc/server": "^10.45.2",
