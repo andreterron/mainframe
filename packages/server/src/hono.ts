@@ -12,6 +12,7 @@ import { appRouter } from "./lib/trpc/trpc_router.ts";
 import { CreateContextHooks, createContext } from "./lib/trpc/trpc_context.ts";
 import { cors } from "hono/cors";
 import { connectRouter } from "./routers/connect-router.ts";
+import { MainframeContext } from "./lib/context.ts";
 
 export type MainframeAPIOptions<E extends Env = Env> = {
   /**
@@ -30,21 +31,7 @@ export type MainframeAPIOptions<E extends Env = Env> = {
    */
   getRequestCtx: (
     c: Context<E>,
-  ) =>
-    | Promise<
-        | {
-            db: SqliteRemoteDatabase;
-            operations?: OperationsEmitter;
-            userId?: string;
-          }
-        | undefined
-      >
-    | {
-        db: SqliteRemoteDatabase;
-        operations?: OperationsEmitter;
-        userId?: string;
-      }
-    | undefined;
+  ) => Promise<MainframeContext | undefined> | MainframeContext | undefined;
 } & Partial<ApiRouterHooks> &
   CreateContextHooks<E>;
 
@@ -97,3 +84,5 @@ export function createMainframeAPI<E extends Env = Env>(
       })
   );
 }
+
+export type AppType = ReturnType<typeof createMainframeAPI<Env>>;

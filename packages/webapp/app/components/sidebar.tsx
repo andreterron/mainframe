@@ -3,7 +3,7 @@ import { Link, NavLink, useMatch } from "react-router-dom";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 import { Dataset } from "@mainframe-so/shared";
 import { useLogout } from "../lib/use-logout";
-import { LayoutGridIcon, Loader2Icon } from "lucide-react";
+import { LayoutGridIcon, LineChartIcon, Loader2Icon } from "lucide-react";
 import { trpc } from "../lib/trpc_client";
 import { ReactNode } from "react";
 
@@ -134,11 +134,16 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
           </svg>
         </Link>
         <section className="pt-8">
+          <SidebarButton
+            href="/projects"
+            name={() => "Projects"}
+            icon={<LayoutGridIcon className="relative w-5 h-5" />}
+          />
           {!hideDashboard && (
             <SidebarButton
               href="/dashboard"
               name={() => "Dashboard"}
-              icon={<LayoutGridIcon className="relative w-5 h-5" />}
+              icon={<LineChartIcon className="relative w-5 h-5" />}
             />
           )}
           <SidebarButton

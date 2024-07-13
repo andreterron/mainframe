@@ -1,4 +1,9 @@
-import { sqliteTable, text, customType } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  text,
+  customType,
+  integer,
+} from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
 
 const enumType = <VALUES extends readonly string[]>(
@@ -43,6 +48,7 @@ export const appsTable = sqliteTable("apps", {
     .primaryKey(),
   name: text("name").default("").notNull(),
   ownerId: text("owner_id").notNull(),
+  showSetup: integer("show_setup", { mode: "boolean" }).notNull().default(true),
 });
 
 // export const usersTable = sqliteTable("users", {

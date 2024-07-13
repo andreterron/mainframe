@@ -28,7 +28,7 @@ export const connectRouter = new Hono<Env>()
       credentials: true,
     }),
   )
-  .post("/apps", zValidator("json", z.object({})), async (c) => {
+  .get("/apps", async (c) => {
     if (!c.var.userId) {
       throw new HTTPException(401);
     }
@@ -36,16 +36,132 @@ export const connectRouter = new Hono<Env>()
       console.error("Missing connectDB");
       throw new HTTPException(500);
     }
-    const [inserted] = await connectDB
-      .insert(appsTable)
-      .values({
-        ownerId: c.var.userId,
+    const apps = await connectDB
+      .select({
+        id: appsTable.id,
+        name: appsTable.name,
+        ownerId: appsTable.ownerId,
       })
-      .returning({ id: appsTable.id });
-    if (!inserted) {
-      throw new HTTPException(500, { message: "Failed to create app" });
+      .from(appsTable)
+      .where(eq(appsTable.ownerId, c.var.userId));
+    return c.json(apps);
+  })
+  .post(
+    "/apps",
+    zValidator(
+      "json",
+      z.object({
+        // TODO: Make name optional
+        name: z.string().min(1),
+      }),
+    ),
+    async (c) => {
+      if (!c.var.userId) {
+        throw new HTTPException(401);
+      }
+      if (!connectDB) {
+        console.error("Missing connectDB");
+        throw new HTTPException(500);
+      }
+      const body = c.req.valid("json");
+      const [inserted] = await connectDB
+        .insert(appsTable)
+        .values({
+          ownerId: c.var.userId,
+          name: body.name,
+        })
+        .returning({ id: appsTable.id });
+      if (!inserted) {
+        throw new HTTPException(500, { message: "Failed to create app" });
+      }
+      return c.json({ id: inserted.id });
+    },
+  )
+  .get("/apps/:app_id", async (c) => {
+    if (!c.var.userId) {
+      throw new HTTPException(401);
     }
-    return c.json({ id: inserted.id });
+    if (!connectDB) {
+      console.error("Missing connectDB");
+      throw new HTTPException(500);
+    }
+    const [app] = await connectDB
+      .select({
+        id: appsTable.id,
+        name: appsTable.name,
+        ownerId: appsTable.ownerId,
+        showSetup: appsTable.showSetup,
+      })
+      .from(appsTable)
+      .where(
+        and(
+          eq(appsTable.ownerId, c.var.userId),
+          eq(appsTable.id, c.req.param().app_id),
+        ),
+      );
+    if (!app) {
+      throw new HTTPException(404);
+    }
+    return c.json(app);
+  })
+  .put(
+    "/apps/:app_id",
+    zValidator(
+      "json",
+      z
+        .object({
+          name: z.string().min(1).optional(),
+          showSetup: z.boolean().optional(),
+        })
+        .refine((arg) =>
+          Object.keys(arg).some((key) => arg[key] !== undefined),
+        ),
+    ),
+    async (c) => {
+      if (!c.var.userId) {
+        throw new HTTPException(401);
+      }
+      if (!connectDB) {
+        console.error("Missing connectDB");
+        throw new HTTPException(500);
+      }
+      const body = c.req.valid("json");
+      const [app] = await connectDB
+        .update(appsTable)
+        .set({
+          name: body.name,
+          showSetup: body.showSetup,
+        })
+        .where(
+          and(
+            eq(appsTable.ownerId, c.var.userId),
+            eq(appsTable.id, c.req.param().app_id),
+          ),
+        )
+        .returning();
+      if (!app) {
+        throw new HTTPException(404);
+      }
+      return c.json(app);
+    },
+  )
+  .delete("/apps/:app_id", async (c) => {
+    if (!c.var.userId) {
+      throw new HTTPException(401);
+    }
+    if (!connectDB) {
+      console.error("Missing connectDB");
+      throw new HTTPException(500);
+    }
+    await connectDB
+      .delete(appsTable)
+      .where(
+        and(
+          eq(appsTable.ownerId, c.var.userId),
+          eq(appsTable.id, c.req.param().app_id),
+        ),
+      );
+    return new Response(null, { status: 204 });
   })
   .post("/apps/:app_id/sessions", async (c) => {
     // TODO: Make sure this only accepts requests from the app_id domains.
@@ -297,3 +413,5 @@ export const connectRouter = new Hono<Env>()
 
     return res;
   });
+
+export type ConnectAPIType = typeof connectRouter;

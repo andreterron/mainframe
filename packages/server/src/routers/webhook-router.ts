@@ -30,7 +30,7 @@ export const webhookRouter = new Hono<Env>().all(
     }
 
     return integration.webhook(
-      { db: c.var.db, operations: c.var.operations },
+      { db: c.var.db, operations: c.var.operations, userId: c.var.userId },
       dataset,
       c.req.raw,
     );

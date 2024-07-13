@@ -15,6 +15,9 @@ import DashboardComponentPage from "./webroutes/_app.dashboard.$id";
 import DashboardPage from "./webroutes/_app.dashboard._index";
 import DatasetComputed from "./webroutes/_app.dataset.$id.computed.$computed_id";
 import { ConnectPage } from "./components/pages/ConnectPage";
+import ProjectsPage from "./webroutes/_app.projects._index";
+import ProjectDetailsPage from "./webroutes/_app.projects.$id";
+import NewProjectPage from "./webroutes/_app.projects.new";
 
 export const router = createBrowserRouter([
   {
@@ -50,6 +53,18 @@ export const router = createBrowserRouter([
       {
         path: "/new",
         element: <NewPage />,
+      },
+      {
+        path: "/projects",
+        element: <ProjectsPage />,
+      },
+      {
+        path: "/projects/new",
+        element: <NewProjectPage />,
+      },
+      {
+        path: "/projects/:id",
+        element: <ProjectDetailsPage />,
       },
       {
         path: "/dashboard",
