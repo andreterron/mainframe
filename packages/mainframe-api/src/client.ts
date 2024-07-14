@@ -67,7 +67,6 @@ export class Mainframe {
     const config = { ...DEFAULT_HOSTS, ...this.config, ...configOverride };
     // TODO: Get the destination URL here
     const connectionId = await getConnectionId(provider, config);
-    // TODO: Need to inform the developer's app ID to Mainframe
     // TODO: Remove appId and provider from URL
     const w = window.open(
       `${config.rootUrl}/connect/${config.appId}/${connectionId}/${provider}`,
