@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "include": ["app/**/*.ts", "app/**/*.tsx", "server/**/*.ts"],
+  "include": ["app/**/*.ts", "app/**/*.tsx"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2021"],
     "isolatedModules": true,
@@ -16,7 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"],
-      "@mainframe-so/*": ["../*/src"]
+      "@mainframe-api/*": ["../*/src"]
     },
     "allowSyntheticDefaultImports": true,
     "useDefineForClassFields": true,

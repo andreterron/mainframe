@@ -1,5 +1,5 @@
 import { Integration } from "../integration-types.ts";
-import { Dataset } from "@mainframe-so/shared";
+import { Dataset } from "@mainframe-api/shared";
 import find from "local-devices";
 
 export const network: Integration = {

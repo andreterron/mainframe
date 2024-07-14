@@ -1,4 +1,4 @@
-import { datasetsTable, rowsTable, tablesTable } from "@mainframe-so/shared";
+import { datasetsTable, rowsTable, tablesTable } from "@mainframe-api/shared";
 import { and, eq } from "drizzle-orm";
 import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 import { getDatasetTable } from "../integrations.ts";

@@ -1,6 +1,6 @@
 {
   "name": "root",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "author": "Andre Terron (https://andreterron.com)",
   "private": true,
   "license": "MIT",
@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "turbo run \"@mainframe-so/node#serve\" dev --env-mode=loose --filter=!@mainframe-so/node",
+    "dev": "turbo run \"@mainframe-api/node#serve\" dev --env-mode=loose --filter=!@mainframe-api/node",
     "build": "turbo run build --env-mode=loose",
     "publish-package": "turbo run publish-package",
     "publish-jsr": "turbo run publish-jsr",
@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.0",
-    "drizzle-kit": "^0.20.18",
+    "drizzle-kit": "^0.22.8",
     "nanoid": "^4.0.2",
     "turbo": "^2.0.4"
   },

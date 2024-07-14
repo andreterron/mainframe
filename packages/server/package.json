@@ -1,6 +1,6 @@
 {
-  "name": "@mainframe-so/server",
-  "version": "0.5.3",
+  "name": "@mainframe-api/server",
+  "version": "0.6.0",
   "private": false,
   "description": "",
   "sideEffects": false,
@@ -16,7 +16,10 @@
     "dev-prep": "tsup --format esm",
     "build": "tsup --clean",
     "publish-package": "npm publish",
-    "publish-jsr": "jsr publish --allow-slow-types"
+    "publish-jsr": "jsr publish --allow-slow-types",
+    "connect:generate": "drizzle-kit generate --config=connect-drizzle.config.ts",
+    "connect:drop": "drizzle-kit drop --config=connect-drizzle.config.ts",
+    "connect:push": "drizzle-kit push --config=connect-drizzle.config.ts"
   },
   "exports": {
     ".": {
@@ -29,6 +32,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@libsql/client": "0.7.0",
     "@types/cookie": "^0.6.0",
     "@types/cookie-signature": "^1.1.2",
     "@types/lodash-es": "^4.17.12",
@@ -37,15 +41,16 @@
   },
   "dependencies": {
     "@hono/trpc-server": "^0.3.2",
-    "@mainframe-so/shared": "0.5.3",
-    "@nangohq/node": "^0.39.13",
+    "@hono/zod-validator": "^0.2.2",
+    "@mainframe-api/shared": "0.6.0",
+    "@nangohq/node": "~0.39.33",
     "@sentry/core": "^8.15.0",
     "@trpc/server": "^10.45.2",
     "bcryptjs": "^2.4.3",
     "cookie": "^0.6.0",
     "cookie-signature": "^1.2.1",
     "dotenv": "^16.3.1",
-    "drizzle-orm": "^0.29.5",
+    "drizzle-orm": "^0.31.2",
     "envsafe": "^2.0.3",
     "googleapis": "^128.0.0",
     "hono": "^4.4.3",
@@ -56,6 +61,14 @@
     "openai": "^4.52.3",
     "typed-emitter": "^2.1.0",
     "zod": "^3.21.4"
+  },
+  "peerDependencies": {
+    "@libsql/client": "*"
+  },
+  "peerDependenciesMeta": {
+    "@libsql/client": {
+      "optional": true
+    }
   },
   "optionalDependencies": {
     "@esbuild/linux-x64": "^0.21.5",

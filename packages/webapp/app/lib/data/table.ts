@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { useOperationsData } from "../hooks/use-operations";
 import { trpc } from "../trpc_client";
-import { zTableOperation } from "@mainframe-so/shared";
+import { zTableOperation } from "@mainframe-api/shared";
 import { z } from "zod";
 
 export function useTable(

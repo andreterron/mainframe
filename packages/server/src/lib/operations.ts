@@ -1,4 +1,4 @@
-import { Operation } from "@mainframe-so/shared";
+import { Operation } from "@mainframe-api/shared";
 import { EventEmitter } from "node:events";
 import { type EventMap } from "typed-emitter";
 

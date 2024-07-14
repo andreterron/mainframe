@@ -1,7 +1,7 @@
 import { createClient } from "@libsql/client";
 import { mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";
-import { __dirnameFromImportMetaUrl } from "@mainframe-so/server";
+import { __dirnameFromImportMetaUrl } from "@mainframe-api/server";
 
 const __dirname = __dirnameFromImportMetaUrl(import.meta.url);
 

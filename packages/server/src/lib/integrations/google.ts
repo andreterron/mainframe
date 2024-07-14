@@ -1,7 +1,7 @@
 import { Integration } from "../integration-types.ts";
-import { Dataset } from "@mainframe-so/shared";
+import { Dataset } from "@mainframe-api/shared";
 import { google as api, calendar_v3 } from "googleapis";
-import { datasetsTable } from "@mainframe-so/shared";
+import { datasetsTable } from "@mainframe-api/shared";
 import { eq } from "drizzle-orm";
 import { type SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 

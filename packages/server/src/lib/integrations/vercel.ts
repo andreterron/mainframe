@@ -1,6 +1,6 @@
 import { getTokenFromDataset } from "../integration-token.ts";
 import { Integration } from "../integration-types.ts";
-import { Dataset } from "@mainframe-so/shared";
+import { Dataset } from "@mainframe-api/shared";
 
 export const vercel: Integration = {
   name: "Vercel",

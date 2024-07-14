@@ -5,7 +5,7 @@ import {
   datasetsTable,
   objectsTable,
   rowsTable,
-} from "@mainframe-so/shared";
+} from "@mainframe-api/shared";
 import { and, eq } from "drizzle-orm";
 import { getIntegrationFromType } from "../lib/integrations.ts";
 import { ensureDB } from "../utils/ensure-db.ts";
@@ -92,8 +92,14 @@ export function createApiRouter<E extends Env = Env>(hooks: ApiRouterHooks<E>) {
         headers.delete("Content-Encoding");
         headers.delete("Content-Length");
 
+        const token = await getTokenFromDataset(dataset);
+
+        if (!token) {
+          throw new HTTPException(407);
+        }
+
         // Delegate request to the integration
-        const apiRes = await integration.proxyFetch(dataset, apipath, {
+        const apiRes = await integration.proxyFetch(token, apipath, {
           ...req,
           headers,
           redirect: "manual",

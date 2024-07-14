@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { Env } from "../types.ts";
-import { datasetsTable } from "@mainframe-so/shared";
+import { datasetsTable } from "@mainframe-api/shared";
 import { eq } from "drizzle-orm";
 import { getIntegrationForDataset } from "../lib/integrations.ts";
 import { ensureDB } from "../utils/ensure-db.ts";
@@ -30,7 +30,7 @@ export const webhookRouter = new Hono<Env>().all(
     }
 
     return integration.webhook(
-      { db: c.var.db, operations: c.var.operations },
+      { db: c.var.db, operations: c.var.operations, userId: c.var.userId },
       dataset,
       c.req.raw,
     );

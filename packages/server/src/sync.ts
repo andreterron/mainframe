@@ -14,7 +14,7 @@ import {
   rowsTable,
   tablesTable,
   Dataset,
-} from "@mainframe-so/shared";
+} from "@mainframe-api/shared";
 import { and, eq } from "drizzle-orm";
 import { deserialize, serialize } from "./utils/serialization.ts";
 import { writeOperation } from "./lib/operations.ts";

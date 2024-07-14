@@ -1,4 +1,4 @@
-import { Dataset } from "@mainframe-so/shared";
+import { Dataset } from "@mainframe-api/shared";
 import { nango } from "./nango.ts";
 import { AuthModes } from "@nangohq/node";
 

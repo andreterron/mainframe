@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { deserializeData } from "../../utils/serialization.ts";
 import { getDatasetObject } from "../integrations.ts";
-import { datasetsTable, objectsTable } from "@mainframe-so/shared";
+import { datasetsTable, objectsTable } from "@mainframe-api/shared";
 import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 
 export async function getObjectAndDataset(

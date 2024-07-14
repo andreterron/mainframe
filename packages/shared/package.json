@@ -1,6 +1,6 @@
 {
-  "name": "@mainframe-so/shared",
-  "version": "0.5.3",
+  "name": "@mainframe-api/shared",
+  "version": "0.6.0",
   "private": false,
   "description": "",
   "sideEffects": false,
@@ -33,7 +33,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "drizzle-orm": "^0.29.5",
+    "drizzle-orm": "^0.31.2",
     "drizzle-zod": "^0.5.1",
     "tsup": "^8.1.0",
     "zod": "^3.21.4"

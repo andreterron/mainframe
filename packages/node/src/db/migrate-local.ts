@@ -1,5 +1,4 @@
 import { dbClient } from "./db.server.ts";
-import { migrateDB } from "@mainframe-so/server";
-import { drizzle } from "drizzle-orm/libsql/driver";
+import { migrateLibsqlDBClient } from "@mainframe-api/server";
 
-migrateDB(drizzle(dbClient));
+migrateLibsqlDBClient(dbClient);

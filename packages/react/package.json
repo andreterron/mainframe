@@ -1,17 +1,20 @@
 {
-  "name": "@mainframe-so/react",
-  "version": "0.5.3",
+  "name": "@mainframe-api/react",
+  "version": "0.6.0",
   "private": false,
   "description": "",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "tsc --watch",
     "build": "tsc",
     "publish-package": "npm publish"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./dist/index.js"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +23,11 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "mainframe-api": "0.6.0",
     "swr": "^2.2.5"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0"
   }
 }

@@ -1,5 +1,5 @@
 import { getIntegrationForDataset } from "../lib/integrations.ts";
-import { datasetsTable } from "@mainframe-so/shared";
+import { datasetsTable } from "@mainframe-api/shared";
 import { eq } from "drizzle-orm";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";

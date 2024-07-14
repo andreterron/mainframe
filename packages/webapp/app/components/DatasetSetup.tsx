@@ -1,4 +1,4 @@
-import { ClientIntegration } from "@mainframe-so/shared";
+import { ClientIntegration } from "@mainframe-api/shared";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 import { trpc } from "../lib/trpc_client";
 import { PageHeader } from "./PageHeader";

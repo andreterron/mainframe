@@ -1,8 +1,8 @@
 import { getRequestListener } from "@hono/node-server";
 import { env } from "./lib/env.server.ts";
-import { Env as ApiEnv, MainframeAPIOptions } from "@mainframe-so/server";
+import { Env as ApiEnv, MainframeAPIOptions } from "@mainframe-api/server";
 import express from "express";
-import { createMainframeAPI } from "@mainframe-so/server";
+import { createMainframeAPI } from "@mainframe-api/server";
 
 export type Env = ApiEnv & {
   // Based on import("@hono/node-server").HttpBindings

@@ -1,4 +1,4 @@
-import { Dataset, ClientIntegration } from "@mainframe-so/shared";
+import { Dataset, ClientIntegration } from "@mainframe-api/shared";
 import { DatasetHeader } from "./DatasetHeader";
 import { Button } from "./ui/button";
 import Nango from "@nangohq/frontend";

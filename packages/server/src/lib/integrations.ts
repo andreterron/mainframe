@@ -4,7 +4,7 @@ import {
   IntegrationObject,
   IntegrationTable,
 } from "./integration-types.ts";
-import { Dataset, ClientIntegration } from "@mainframe-so/shared";
+import { Dataset, ClientIntegration } from "@mainframe-api/shared";
 import { github } from "./integrations/github.ts";
 import { network } from "./integrations/network.ts";
 import { peloton } from "./integrations/peloton.ts";

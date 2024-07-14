@@ -7,13 +7,13 @@ import {
   MainframeContext,
   getIntegrationForDataset,
   MainframeAPIOptions,
-} from "@mainframe-so/server";
+} from "@mainframe-api/server";
 import express, { Express } from "express";
 import { env } from "./lib/env.server.ts";
 import { ZodError } from "zod";
 import type { Server } from "node:http";
-import { syncAll } from "@mainframe-so/server";
-import { datasetsTable } from "@mainframe-so/shared";
+import { syncAll } from "@mainframe-api/server";
+import { datasetsTable } from "@mainframe-api/shared";
 import { startCloudflared } from "./cloudflared.ts";
 import type { ChildProcess } from "node:child_process";
 import chalk from "chalk";
@@ -24,7 +24,7 @@ import { GLOBAL_operations } from "./lib/operations.ts";
 export interface SetupServerHooks extends MainframeAPIOptions<Env> {
   express?: (app: Express) => void;
   iterateOverDBs?: (
-    callback: (ctx: MainframeContext, userId: string) => Promise<void>,
+    callback: (ctx: MainframeContext) => Promise<void>,
   ) => Promise<void>;
   closeWithGrace?: CloseWithGraceAsyncCallback;
 }
@@ -54,12 +54,12 @@ export function setupServer(hooks: SetupServerHooks) {
   const task = cron.schedule(
     "*/10 * * * *",
     async (now) => {
-      async function syncDB(ctx: MainframeContext, userId?: string) {
+      async function syncDB(ctx: MainframeContext) {
         try {
           await syncAll(ctx);
         } catch (e) {
-          if (userId) {
-            console.error("Failed to sync User's DB", userId);
+          if (ctx.userId) {
+            console.error("Failed to sync User's DB", ctx.userId);
           }
           console.error(e);
         }
@@ -182,11 +182,13 @@ export function setupServer(hooks: SetupServerHooks) {
       await serverPromise;
 
       if (hooks.iterateOverDBs) {
-        await hooks.iterateOverDBs(async (ctx, userId) => {
+        await hooks.iterateOverDBs(async (ctx) => {
           try {
             await setupWebhooks(baseApiUrl, ctx);
           } catch (e) {
-            console.error(`Failed to setup webhook for user ${userId}`);
+            console.error(
+              `Failed to setup webhook for user ${ctx.userId ?? "(NO_ID)"}`,
+            );
             console.error(e);
           }
         });

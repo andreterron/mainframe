@@ -2,15 +2,15 @@ import { Context, Hono } from "hono";
 import { Env } from "./types.ts";
 import { ApiRouterHooks, createApiRouter } from "./routers/api-router.ts";
 import { webhookRouter } from "./routers/webhook-router.ts";
-import { type SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 import { oauthRouter } from "./routers/oauth-router.ts";
 import { isApiRequestAuthorizedForPasswordAuth } from "./lib/password-based-auth/password-auth-api-check.ts";
 import { env } from "./lib/env.server.ts";
-import { OperationsEmitter } from "./lib/operations.ts";
 import { trpcServer } from "@hono/trpc-server";
 import { appRouter } from "./lib/trpc/trpc_router.ts";
 import { CreateContextHooks, createContext } from "./lib/trpc/trpc_context.ts";
 import { cors } from "hono/cors";
+import { connectRouter } from "./routers/connect-router.ts";
+import { MainframeContext } from "./lib/context.ts";
 
 export type MainframeAPIOptions<E extends Env = Env> = {
   /**
@@ -29,12 +29,7 @@ export type MainframeAPIOptions<E extends Env = Env> = {
    */
   getRequestCtx: (
     c: Context<E>,
-  ) =>
-    | Promise<
-        { db: SqliteRemoteDatabase; operations?: OperationsEmitter } | undefined
-      >
-    | { db: SqliteRemoteDatabase; operations?: OperationsEmitter }
-    | undefined;
+  ) => Promise<MainframeContext | undefined> | MainframeContext | undefined;
 } & Partial<ApiRouterHooks> &
   CreateContextHooks<E>;
 
@@ -48,6 +43,7 @@ export function createMainframeAPI<E extends Env = Env>(
     const db = ctx?.db;
     c.set("db", db);
     c.set("operations", ctx?.operations);
+    c.set("userId", ctx?.userId);
     await next();
   });
 
@@ -76,6 +72,7 @@ export function createMainframeAPI<E extends Env = Env>(
           },
         }),
       )
+      .route("/connect", connectRouter)
       .get("/healthcheck", async (c) => {
         return c.json({ success: true });
       })
@@ -85,3 +82,5 @@ export function createMainframeAPI<E extends Env = Env>(
       })
   );
 }
+
+export type AppType = ReturnType<typeof createMainframeAPI<Env>>;

@@ -1,7 +1,7 @@
 import { deserialize } from "../../utils/serialization.ts";
 import { Integration } from "../integration-types.ts";
-import { Dataset } from "@mainframe-so/shared";
-import { rowsTable, tablesTable } from "@mainframe-so/shared";
+import { Dataset } from "@mainframe-api/shared";
+import { rowsTable, tablesTable } from "@mainframe-api/shared";
 import { and, eq } from "drizzle-orm";
 import { type SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 

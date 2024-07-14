@@ -10,7 +10,7 @@ import {
   ClientIntegration,
   componentsTable,
   DatasetCredentials,
-} from "@mainframe-so/shared";
+} from "@mainframe-api/shared";
 import { z } from "zod";
 import { Context, UserInfo } from "./trpc_context.ts";
 import { and, eq } from "drizzle-orm";

@@ -1,5 +1,5 @@
 import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
-import { usersTable } from "@mainframe-so/shared";
+import { usersTable } from "@mainframe-api/shared";
 import { env } from "../env.server.ts";
 
 export async function checkIfUserExists(db: SqliteRemoteDatabase) {

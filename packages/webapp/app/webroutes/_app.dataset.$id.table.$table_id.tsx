@@ -361,7 +361,7 @@ export function DatasetTableDetails() {
           <TabsContent value="playground" className="p-4">
             <WebStandardsPlaygroundTab
               onGenerateCode={generateCode}
-              appTsxCode={`import { useMainframeTable } from "@mainframe-so/react";
+              appTsxCode={`import { useMainframeTable } from "@mainframe-api/react";
 
 // TODO: Get environment variables from your app
 import { env } from "./env.ts";
