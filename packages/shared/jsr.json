@@ -1,6 +1,6 @@
 {
   "$schema": "https://jsr.io/schema/config-file.v1.json",
   "name": "@mainframe-api/shared",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "exports": "./src/index.ts"
 }
