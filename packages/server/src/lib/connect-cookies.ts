@@ -52,6 +52,7 @@ export async function ensureSessionCookie(c: Context, appId: string) {
   setCookie(c, COOKIE_NAME, inserted.id, {
     maxAge: COOKIE_MAX_AGE,
     secure: true,
+    sameSite: "None",
     // TODO: We might need to set the cookie to different domains
     // domain: ??
   });
