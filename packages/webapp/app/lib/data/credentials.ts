@@ -1,4 +1,4 @@
-import { Dataset, DatasetCredentials } from "@mainframe-so/shared";
+import { Dataset, DatasetCredentials } from "@mainframe-api/shared";
 
 type VisibleCredentialKey = Exclude<
   keyof DatasetCredentials,

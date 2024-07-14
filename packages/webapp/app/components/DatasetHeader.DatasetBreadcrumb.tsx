@@ -1,5 +1,5 @@
 import { PropsWithChildren } from "react";
-import { Dataset } from "@mainframe-so/shared";
+import { Dataset } from "@mainframe-api/shared";
 import {
   BreadcrumbItem,
   BreadcrumbLink,

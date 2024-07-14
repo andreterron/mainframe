@@ -1,5 +1,5 @@
 export const baseTemplate = `
-import { useMainframeCredentials } from "@mainframe-so/react";
+import { useMainframeCredentials } from "@mainframe-api/react";
 import { env } from "./env.ts";
 
 export default function DynamicApp(props) {
@@ -20,7 +20,7 @@ export default function DynamicApp(props) {
 }`;
 
 export const areaTemplate = `
-import { useMainframeCredentials } from "@mainframe-so/react";
+import { useMainframeCredentials } from "@mainframe-api/react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { env } from "./env.ts";
 
@@ -78,7 +78,7 @@ export default function DynamicApp(props) {
 }`;
 
 export const positiveNegativeTemplate = `
-import { useMainframeCredentials } from "@mainframe-so/react";
+import { useMainframeCredentials } from "@mainframe-api/react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, ResponsiveContainer } from "recharts";
 import { env } from "./env.ts";
 
@@ -145,7 +145,7 @@ export default function DynamicApp(props) {
 }`;
 
 export const positiveNegativeComposedTemplate = `
-import { useMainframeCredentials } from "@mainframe-so/react";
+import { useMainframeCredentials } from "@mainframe-api/react";
 import { ComposedChart, BarChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ReferenceLine, ResponsiveContainer } from "recharts";
 import { env } from "./env.ts";
 

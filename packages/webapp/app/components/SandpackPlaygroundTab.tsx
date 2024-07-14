@@ -45,10 +45,10 @@ export function SandpackClient({ appTsxCode }: { appTsxCode: string }) {
               code: envCode(apiKey ?? ""),
             },
             // NOTE: Uncomment the packages below for local dependencies
-            // "/node_modules/@mainframe-so/react/dist/index.js":
+            // "/node_modules/@mainframe-api/react/dist/index.js":
             //   mainframeReactRaw,
-            // "/node_modules/@mainframe-so/react/package.json": JSON.stringify({
-            //   name: "@mainframe-so/react",
+            // "/node_modules/@mainframe-api/react/package.json": JSON.stringify({
+            //   name: "@mainframe-api/react",
             //   main: "./dist/index.js",
             // }),
           },
@@ -62,7 +62,7 @@ export function SandpackClient({ appTsxCode }: { appTsxCode: string }) {
           customSetup={{
             dependencies: {
               // NOTE: Comment the packages below for local dependencies
-              "@mainframe-so/react": "^0.4.22",
+              "@mainframe-api/react": "^0.4.22",
               // NOTE: Uncomment the packages below for local dependencies
               // ...mainframeReactPkgJsonRaw.dependencies,
             },

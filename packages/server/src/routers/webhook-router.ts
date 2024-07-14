@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { Env } from "../types.ts";
-import { datasetsTable } from "@mainframe-so/shared";
+import { datasetsTable } from "@mainframe-api/shared";
 import { eq } from "drizzle-orm";
 import { getIntegrationForDataset } from "../lib/integrations.ts";
 import { ensureDB } from "../utils/ensure-db.ts";

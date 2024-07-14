@@ -1,6 +1,6 @@
 {
-  "name": "@mainframe-so/shared",
-  "version": "0.5.3",
+  "name": "@mainframe-api/shared",
+  "version": "0.6.0",
   "private": false,
   "description": "",
   "sideEffects": false,

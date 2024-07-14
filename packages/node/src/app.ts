@@ -6,7 +6,7 @@ import {
   getSessionFromId,
   getSessionIdFromCookieHeader,
   parseBearerHeader,
-} from "@mainframe-so/server";
+} from "@mainframe-api/server";
 
 const GLOBAL_db = drizzle(dbClient);
 

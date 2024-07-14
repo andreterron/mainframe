@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
-import { datasetsTable } from "@mainframe-so/shared";
+import { datasetsTable } from "@mainframe-api/shared";
 import { Integration } from "../integration-types.ts";
-import { Dataset } from "@mainframe-so/shared";
+import { Dataset } from "@mainframe-api/shared";
 import { z } from "zod";
 
 const zPelotonAuthResponseBody = z.object({

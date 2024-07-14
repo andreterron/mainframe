@@ -4,7 +4,7 @@ import DatasetTokenInput from "../components/DatasetTokenInput";
 import { DatasetPage } from "../components/DatasetPage";
 import { trpc } from "../lib/trpc_client";
 import { SadPath } from "../components/SadPath";
-import { DatasetCredentials } from "@mainframe-so/shared";
+import { DatasetCredentials } from "@mainframe-api/shared";
 
 export default function DatasetDetails() {
   const { id } = useParams();

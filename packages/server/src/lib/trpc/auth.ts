@@ -1,5 +1,5 @@
 import bcryptjs from "bcryptjs";
-import { usersTable } from "@mainframe-so/shared";
+import { usersTable } from "@mainframe-api/shared";
 import { eq } from "drizzle-orm";
 import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 import { env } from "../env.server.ts";

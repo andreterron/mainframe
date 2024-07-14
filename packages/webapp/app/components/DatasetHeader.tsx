@@ -1,7 +1,7 @@
 import { PropsWithChildren, ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { trpc } from "../lib/trpc_client";
-import { Dataset } from "@mainframe-so/shared";
+import { Dataset } from "@mainframe-api/shared";
 import { PageHeader } from "./PageHeader";
 import { Button } from "./ui/button";
 import {

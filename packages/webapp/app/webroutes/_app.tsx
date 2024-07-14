@@ -9,7 +9,7 @@ import {
   useNavigate,
   useNavigation,
 } from "react-router-dom";
-import { Dataset } from "@mainframe-so/shared";
+import { Dataset } from "@mainframe-api/shared";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 import { trpc } from "../lib/trpc_client";
 import { useLogout } from "../lib/use-logout";

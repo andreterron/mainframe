@@ -5,7 +5,7 @@ import {
   datasetsTable,
   objectsTable,
   rowsTable,
-} from "@mainframe-so/shared";
+} from "@mainframe-api/shared";
 import { and, eq } from "drizzle-orm";
 import { getIntegrationFromType } from "../lib/integrations.ts";
 import { ensureDB } from "../utils/ensure-db.ts";

@@ -86,7 +86,7 @@ export async function generateComponent(
       { role: "user", content: "Display the raw JSON of the data" },
       {
         role: "assistant",
-        content: `import { ${mainframeImports} } from "@mainframe-so/react";
+        content: `import { ${mainframeImports} } from "@mainframe-api/react";
 import { env } from "./env.ts";
 
 export default function App(): JSX.Element {

@@ -11,14 +11,14 @@ export function ProjectSetupInstructions({
     <div className="w-[80ch] space-y-4">
       {/* TODO: Copy button */}
       <pre className="bg-black font-mono p-4 text-white rounded">
-        npm i @mainframe-so/react
+        npm i @mainframe-api/react
       </pre>
       {/* TODO: Copy button */}
       {/* TODO: Syntax highlight */}
       <pre className="bg-black font-mono p-4 text-white rounded">
         {`// App.tsx
 import { HomePage } from "./components/pages/Home";
-import { MainframeProvider } from "@mainframe-so/react";
+import { MainframeProvider } from "@mainframe-api/react";
 
 function App() {
   return (

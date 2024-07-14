@@ -1,4 +1,4 @@
-import { ClientIntegration } from "@mainframe-so/shared";
+import { ClientIntegration } from "@mainframe-api/shared";
 
 export function UnderReviewMessage({
   integration,

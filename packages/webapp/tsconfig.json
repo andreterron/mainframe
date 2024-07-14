@@ -16,7 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./app/*"],
-      "@mainframe-so/*": ["../*/src"]
+      "@mainframe-api/*": ["../*/src"]
     },
     "allowSyntheticDefaultImports": true,
     "useDefineForClassFields": true,

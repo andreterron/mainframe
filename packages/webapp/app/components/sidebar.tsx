@@ -1,7 +1,7 @@
 import { cn } from "~/lib/utils";
 import { Link, NavLink, useMatch } from "react-router-dom";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
-import { Dataset } from "@mainframe-so/shared";
+import { Dataset } from "@mainframe-api/shared";
 import { useLogout } from "../lib/use-logout";
 import { LayoutGridIcon, LineChartIcon, Loader2Icon } from "lucide-react";
 import { trpc } from "../lib/trpc_client";

@@ -1,9 +1,9 @@
 import { Integration } from "../integration-types.ts";
-import { Dataset, Row } from "@mainframe-so/shared";
+import { Dataset, Row } from "@mainframe-api/shared";
 import { syncTable, updateObject, updateRowFromTableType } from "../../sync.ts";
 import { getDatasetObject, getDatasetTable } from "../integrations.ts";
 import crypto from "node:crypto";
-import { objectsTable, rowsTable, tablesTable } from "@mainframe-so/shared";
+import { objectsTable, rowsTable, tablesTable } from "@mainframe-api/shared";
 import { and, eq } from "drizzle-orm";
 import { deserialize } from "../../utils/serialization.ts";
 import { HTTPException } from "hono/http-exception";

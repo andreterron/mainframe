@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useOperationsData } from "../hooks/use-operations";
 import { trpc } from "../trpc_client";
-import { zObjectOperation, zTableOperation } from "@mainframe-so/shared";
+import { zObjectOperation, zTableOperation } from "@mainframe-api/shared";
 
 export function useObject(
   datasetId: string | undefined,

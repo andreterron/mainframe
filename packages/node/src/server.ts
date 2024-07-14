@@ -7,13 +7,13 @@ import {
   MainframeContext,
   getIntegrationForDataset,
   MainframeAPIOptions,
-} from "@mainframe-so/server";
+} from "@mainframe-api/server";
 import express, { Express } from "express";
 import { env } from "./lib/env.server.ts";
 import { ZodError } from "zod";
 import type { Server } from "node:http";
-import { syncAll } from "@mainframe-so/server";
-import { datasetsTable } from "@mainframe-so/shared";
+import { syncAll } from "@mainframe-api/server";
+import { datasetsTable } from "@mainframe-api/shared";
 import { startCloudflared } from "./cloudflared.ts";
 import type { ChildProcess } from "node:child_process";
 import chalk from "chalk";

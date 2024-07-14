@@ -1,4 +1,4 @@
-import { sessionsTable } from "@mainframe-so/shared";
+import { sessionsTable } from "@mainframe-api/shared";
 import { eq } from "drizzle-orm";
 import { env } from "./env.server.ts";
 import { CookieSerializeOptions, parse, serialize } from "cookie";

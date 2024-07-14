@@ -201,7 +201,7 @@ export default function DatasetCredentials() {
               </TabsContent>
               <TabsContent value="playground" className="p-4">
                 <WebStandardsPlaygroundTab
-                  appTsxCode={`import { useMainframeCredentials } from "@mainframe-so/react";
+                  appTsxCode={`import { useMainframeCredentials } from "@mainframe-api/react";
 
 // TODO: Get environment variables from your app
 import { env } from "./env.ts";

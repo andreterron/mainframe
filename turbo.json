@@ -23,7 +23,7 @@
       "dependsOn": ["^dev-prep"],
       "outputs": ["dist/**"]
     },
-    "@mainframe-so/node#serve": {
+    "@mainframe-api/node#serve": {
       "dependsOn": ["dev-prep"],
       "cache": false,
       "persistent": true

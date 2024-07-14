@@ -1,6 +1,6 @@
 import { getTokenFromDataset } from "../integration-token.ts";
 import { Integration } from "../integration-types.ts";
-import { Dataset } from "@mainframe-so/shared";
+import { Dataset } from "@mainframe-api/shared";
 
 // Their OpenAPI schema can be found here: https://api-docs.render.com/openapi
 

@@ -1,4 +1,8 @@
-import { Dataset, AuthType, ComputedDataParamsDef } from "@mainframe-so/shared";
+import {
+  Dataset,
+  AuthType,
+  ComputedDataParamsDef,
+} from "@mainframe-api/shared";
 import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 import { MainframeContext } from "./context";
 

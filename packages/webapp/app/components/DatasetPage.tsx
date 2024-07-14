@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Dataset, ClientIntegration } from "@mainframe-so/shared";
+import { Dataset, ClientIntegration } from "@mainframe-api/shared";
 import { DatasetHeader } from "./DatasetHeader";
 import { getDatasetCredentialsKeys } from "../lib/data/credentials";
 import { CheckIcon, FunctionSquareIcon, PencilIcon } from "lucide-react";

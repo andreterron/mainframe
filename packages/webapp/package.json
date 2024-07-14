@@ -1,6 +1,6 @@
 {
-  "name": "@mainframe-so/webapp",
-  "version": "0.5.3",
+  "name": "@mainframe-api/webapp",
+  "version": "0.6.0",
   "private": true,
   "author": "Andre Terron (https://andreterron.com)",
   "sideEffects": false,
@@ -12,9 +12,9 @@
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.2",
     "@codesandbox/sandpack-react": "^2.13.7",
-    "@mainframe-so/react": "*",
-    "@mainframe-so/server": "*",
-    "@mainframe-so/shared": "*",
+    "@mainframe-api/react": "*",
+    "@mainframe-api/server": "*",
+    "@mainframe-api/shared": "*",
     "@nangohq/frontend": "^0.39.13",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
