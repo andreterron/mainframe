@@ -32,6 +32,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "@libsql/client": "0.7.0",
     "@types/cookie": "^0.6.0",
     "@types/cookie-signature": "^1.1.2",
     "@types/lodash-es": "^4.17.12",
@@ -60,6 +61,14 @@
     "openai": "^4.52.3",
     "typed-emitter": "^2.1.0",
     "zod": "^3.21.4"
+  },
+  "peerDependencies": {
+    "@libsql/client": "*"
+  },
+  "peerDependenciesMeta": {
+    "@libsql/client": {
+      "optional": true
+    }
   },
   "optionalDependencies": {
     "@esbuild/linux-x64": "^0.21.5",

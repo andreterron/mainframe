@@ -27,6 +27,8 @@ export * from "./lib/trpc/trpc_context.ts";
 export * from "./lib/trpc/trpc_router.ts";
 export * from "./lib/password-based-auth/password-auth-api-check.ts";
 export * from "./db/migrate.ts";
+export * from "./db/migrate-libsql.ts";
+export * from "./db/migrate-proxy.ts";
 export * from "./routers/api-router.ts";
 export * from "./routers/webhook-router.ts";
 export * from "./routers/connect-router.ts";
