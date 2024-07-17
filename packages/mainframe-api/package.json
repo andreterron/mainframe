@@ -14,7 +14,15 @@
     "publish-package": "npm publish"
   },
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/index.js",
+    "./react": {
+      "import": {
+        "types": "./dist/react/index.d.ts",
+        "default": "./dist/react/index.js"
+      },
+      "types": "./dist/react/index.d.ts",
+      "default": "./dist/react/index.js"
+    }
   },
   "keywords": [],
   "author": "",

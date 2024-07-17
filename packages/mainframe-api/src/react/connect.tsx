@@ -4,9 +4,8 @@ import React, {
   useContext,
   useMemo,
 } from "react";
-import { Mainframe, type MainframeClientConfig } from "mainframe-api";
-
-export * from "mainframe-api";
+import { Mainframe } from "../client";
+import { type MainframeClientConfig } from "../types";
 
 const mainframeReactContext = createContext<Mainframe | undefined>(undefined);
 
