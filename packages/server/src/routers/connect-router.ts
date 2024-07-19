@@ -196,7 +196,7 @@ export const connectRouter = new Hono<Env>()
 
     const connections = await connectDB
       .select({
-        id: connectionsTable,
+        id: connectionsTable.id,
         provider: connectionsTable.provider,
         nangoConnectionId: connectionsTable.nangoConnectionId,
       })

@@ -6,3 +6,5 @@ export interface HostConfig {
 export interface MainframeClientConfig extends HostConfig {
   appId: string;
 }
+
+export type ProviderName = "github";

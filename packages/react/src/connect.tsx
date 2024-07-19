@@ -4,7 +4,12 @@ import React, {
   useContext,
   useMemo,
 } from "react";
-import { Mainframe, type MainframeClientConfig } from "mainframe-api";
+import {
+  Connection,
+  Mainframe,
+  type MainframeClientConfig,
+} from "mainframe-api";
+import useSWR from "swr";
 
 export * from "mainframe-api";
 
@@ -30,3 +35,39 @@ export function useMainframeClient() {
   }
   return client;
 }
+
+export function useConnections() {
+  const client = useMainframeClient();
+
+  return useSWR("__mainframe.connections", async (arg) => {
+    const res = await client.api.apps[":app_id"].connections.$get({
+      param: {
+        app_id: client.appId,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(await res.text());
+    }
+
+    const connections = await res.json();
+    return connections.map((c) => new Connection(c, client.config));
+  });
+}
+
+export function useProxyGetter<T>(
+  connection: Connection | undefined,
+  fetcher: (connection: Connection) => Promise<T> | T,
+) {
+  return useSWR(
+    ["__mainframe.connection.proxy_get", connection] as const,
+    async ([, conn]) => {
+      if (!conn) {
+        return undefined;
+      }
+      return fetcher(conn);
+    },
+  );
+}
+
+// TODO: Use mutation

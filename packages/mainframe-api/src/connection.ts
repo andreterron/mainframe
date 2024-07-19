@@ -1,12 +1,23 @@
 import { DEFAULT_HOSTS } from "./constants";
-import { HostConfig } from "./types";
+import { HostConfig, ProviderName } from "./types";
 
 function joinPaths(path1: string, path2: string) {
   return `${path1.replace(/\/$/, "")}/${path2.replace(/^\//, "")}`;
 }
 
 export class Connection {
-  constructor(public id: string, private config: HostConfig) {}
+  id: string;
+  connected: boolean;
+  provider: ProviderName;
+
+  constructor(
+    init: { id: string; connected: boolean; provider: ProviderName },
+    readonly config: HostConfig,
+  ) {
+    this.id = init.id;
+    this.connected = init.connected;
+    this.provider = init.provider;
+  }
 
   proxyFetch(path: string /* TODO: | URL | Request */, init?: RequestInit) {
     const config = { ...DEFAULT_HOSTS, ...this.config };
