@@ -39,20 +39,45 @@ export function useMainframeClient() {
 export function useConnections() {
   const client = useMainframeClient();
 
-  return useSWR("__mainframe.connections", async (arg) => {
-    const res = await client.api.apps[":app_id"].connections.$get({
-      param: {
-        app_id: client.appId,
+  return useSWR(
+    "__mainframe.connections",
+    async () => {
+      const res = await client.api.apps[":app_id"].connections.$get({
+        param: {
+          app_id: client.appId,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+
+      const connections = await res.json();
+      return connections.map((c) => new Connection(c, client.config));
+    },
+    {
+      compare(a, b) {
+        if (!a && !b) {
+          return true;
+        }
+        if (!a || !b || a.length !== b.length) {
+          return false;
+        }
+        for (let i = 0; i < a.length; i++) {
+          if (
+            a[i]!.id !== b[i]!.id ||
+            a[i]!.config.apiUrl !== b[i]!.config.apiUrl ||
+            a[i]!.config.rootUrl !== b[i]!.config.rootUrl ||
+            a[i]!.connected !== b[i]!.connected ||
+            a[i]!.provider !== b[i]!.provider
+          ) {
+            return false;
+          }
+        }
+        return true;
       },
-    });
-
-    if (!res.ok) {
-      throw new Error(await res.text());
-    }
-
-    const connections = await res.json();
-    return connections.map((c) => new Connection(c, client.config));
-  });
+    },
+  );
 }
 
 export function useProxyGetter<T>(
