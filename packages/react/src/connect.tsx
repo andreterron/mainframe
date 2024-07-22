@@ -4,11 +4,7 @@ import React, {
   useContext,
   useMemo,
 } from "react";
-import {
-  Connection,
-  Mainframe,
-  type MainframeClientConfig,
-} from "mainframe-api";
+import { Connection, Mainframe, type HostConfig } from "mainframe-api";
 import useSWR from "swr";
 
 export * from "mainframe-api";
@@ -16,10 +12,14 @@ export * from "mainframe-api";
 const mainframeReactContext = createContext<Mainframe | undefined>(undefined);
 
 export function MainframeProvider({
+  appId,
   config,
   children,
-}: PropsWithChildren<{ config: MainframeClientConfig }>) {
-  const mainframe = useMemo(() => new Mainframe(config), [config]);
+}: PropsWithChildren<{ appId: string; config?: HostConfig }>) {
+  const mainframe = useMemo(
+    () => new Mainframe({ ...config, appId }),
+    [appId, config],
+  );
   return (
     <mainframeReactContext.Provider value={mainframe}>
       {children}

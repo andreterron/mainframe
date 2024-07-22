@@ -79,7 +79,7 @@ export function ProjectSetupInstructions({
         showLineNumbers={true}
         lineNumberStyle={{ display: "none" }}
         lineProps={(lineNumber) => {
-          if ((lineNumber >= 7 && lineNumber <= 11) || lineNumber === 13) {
+          if (lineNumber == 7 || lineNumber === 9) {
             return { style: highlightedLineStyle };
           }
           return { style: lineStyle };
@@ -91,11 +91,7 @@ import { MainframeProvider } from "@mainframe-api/react";
 
 function App() {
   return (
-    <MainframeProvider
-      config={{
-        appId: "${appId}",
-      }}
-    >
+    <MainframeProvider appId="${appId}">
       <HomePage />
     </MainframeProvider>
   );
