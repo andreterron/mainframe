@@ -37,6 +37,21 @@ export function ProjectSetupInstructions({
         <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
           1
         </div>
+        <h2 className="font-bold text-lg">Create project</h2>
+      </div>
+
+      <SyntaxHighlighter
+        customStyle={{ ...customStyle, padding: "1rem" }}
+        language={"bash"}
+        style={codeStyle}
+      >
+        npm create vite@latest
+      </SyntaxHighlighter>
+      {/* TODO: Copy button */}
+      <div className="flex gap-2 items-center !mt-10">
+        <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
+          2
+        </div>
         <h2 className="font-bold text-lg">Install Mainframe client</h2>
       </div>
 
@@ -49,7 +64,7 @@ export function ProjectSetupInstructions({
       </SyntaxHighlighter>
       <div className="flex gap-2 items-center !mt-10">
         <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
-          2
+          3
         </div>
         <h2 className="font-bold text-lg">Add MainframeProvider</h2>
       </div>
@@ -93,7 +108,7 @@ export default App;`}
       </pre> */}
       <div className="flex gap-2 items-center !mt-10">
         <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
-          3
+          4
         </div>
         <h2 className="font-bold text-lg">Initiate authentication</h2>
       </div>
@@ -135,7 +150,7 @@ export function HomePage() {
 
       <div className="flex gap-2 items-center !mt-10">
         <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
-          4
+          5
         </div>
         <h2 className="font-bold text-lg">Access APIs</h2>
       </div>
