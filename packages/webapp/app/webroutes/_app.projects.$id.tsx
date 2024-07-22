@@ -13,6 +13,12 @@ import {
 import { ProjectSetupInstructions } from "../components/ProjectSetupInstructions";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "../components/ui/tabs";
 
 export default function ProjectDetailsPage() {
   const params = useParams();
@@ -122,8 +128,8 @@ export default function ProjectDetailsPage() {
           </svg>
         </Button>
       </PageHeader>
-      <div className="p-4 space-y-4">
-        {!app ? null : app.showSetup ? (
+      {!app ? null : app.showSetup ? (
+        <div className="p-4 space-y-4">
           <ProjectSetupInstructions appId={app?.id ?? ""}>
             <Button
               onClick={() => {
@@ -133,20 +139,39 @@ export default function ProjectDetailsPage() {
               Continue
             </Button>
           </ProjectSetupInstructions>
-        ) : (
-          <div className="w-96">
-            {/* TODO: Copy button */}
-            <Label>
-              <span>Project ID:</span>
-              <Input
-                className="text-muted-foreground"
-                value={app?.id ?? ""}
-                readOnly
-              />
-            </Label>
-          </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <Tabs defaultValue="config" className="flex flex-col w-full">
+          <TabsList className="grid grid-cols-2 m-4 self-start">
+            <TabsTrigger value="config">
+              {/* <SheetIcon className="w-3.5 h-3.5 mr-1" /> */}
+              Config
+            </TabsTrigger>
+            <TabsTrigger value="instructions">
+              {/* <PlayIcon className="w-3.5 h-3.5 mr-1" /> */}
+              Instructions
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="config">
+            <div className="w-96 p-4">
+              {/* TODO: Copy button */}
+              <Label>
+                <span>Project ID:</span>
+                <Input
+                  className="text-muted-foreground"
+                  value={app?.id ?? ""}
+                  readOnly
+                />
+              </Label>
+            </div>
+          </TabsContent>
+          <TabsContent value="instructions">
+            <div className="p-4 space-y-4">
+              <ProjectSetupInstructions appId={app?.id ?? ""} />
+            </div>
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 }
