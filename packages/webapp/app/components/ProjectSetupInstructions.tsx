@@ -1,5 +1,16 @@
 import { PropsWithChildren } from "react";
-import { Label } from "./ui/label";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import codeStyle from "react-syntax-highlighter/dist/esm/styles/prism/okaidia";
+import colors from "tailwindcss/colors";
+
+const customStyle: React.CSSProperties | undefined = {
+  padding: "1rem 0",
+  borderRadius: "0.25rem",
+  // width: "720px",
+  // maxHeight: "15rem",
+  // background: "transparent",
+  overflow: "auto",
+};
 
 export function ProjectSetupInstructions({
   appId,
@@ -17,9 +28,14 @@ export function ProjectSetupInstructions({
         </div>
         <h2 className="font-bold text-lg">Install Mainframe client</h2>
       </div>
-      <pre className="bg-black font-mono p-4 text-white rounded">
+
+      <SyntaxHighlighter
+        customStyle={{ ...customStyle, padding: "1rem" }}
+        language={"bash"}
+        style={codeStyle}
+      >
         npm i @mainframe-api/react
-      </pre>
+      </SyntaxHighlighter>
       <div className="flex gap-2 items-center !mt-10">
         <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
           2
@@ -28,7 +44,26 @@ export function ProjectSetupInstructions({
       </div>
       {/* TODO: Copy button */}
       {/* TODO: Syntax highlight */}
-      <pre className="bg-black font-mono p-4 text-white rounded">
+
+      <SyntaxHighlighter
+        customStyle={customStyle}
+        language={"tsx"}
+        style={codeStyle}
+        wrapLines={true}
+        showLineNumbers={true}
+        lineNumberStyle={{ display: "none" }}
+        lineProps={(lineNumber) => {
+          const style: React.CSSProperties | undefined = {
+            width: "100%",
+            display: "block",
+            padding: "0 1rem",
+          };
+          if ((lineNumber >= 7 && lineNumber <= 11) || lineNumber === 13) {
+            style.backgroundColor = `${colors.blue[700]}66`;
+          }
+          return { style };
+        }}
+      >
         {`// App.tsx
 import { HomePage } from "./components/pages/Home";
 import { MainframeProvider } from "@mainframe-api/react";
@@ -46,14 +81,36 @@ function App() {
 }
 
 export default App;`}
-      </pre>
+      </SyntaxHighlighter>
+      {/* <pre className="bg-black font-mono p-4 text-white rounded">
+        
+      </pre> */}
       <div className="flex gap-2 items-center !mt-10">
         <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
           3
         </div>
         <h2 className="font-bold text-lg">Initiate authentication</h2>
       </div>
-      <pre className="bg-black font-mono p-4 text-white rounded">
+
+      <SyntaxHighlighter
+        customStyle={customStyle}
+        language={"tsx"}
+        style={codeStyle}
+        wrapLines={true}
+        showLineNumbers={true}
+        lineNumberStyle={{ display: "none" }}
+        lineProps={(lineNumber) => {
+          const style: React.CSSProperties | undefined = {
+            width: "100%",
+            display: "block",
+            padding: "0 1rem",
+          };
+          if (lineNumber === 11 || lineNumber === 5) {
+            style.backgroundColor = `${colors.blue[700]}66`;
+          }
+          return { style };
+        }}
+      >
         {`// Home.tsx
 import { useMainframeClient } from "@mainframe-api/react";
 
@@ -73,7 +130,7 @@ export function HomePage() {
   );
 }
 `}
-      </pre>
+      </SyntaxHighlighter>
       {children}
     </div>
   );
