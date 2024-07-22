@@ -3,61 +3,6 @@ import { Connection } from "./connection";
 import { DEFAULT_HOSTS } from "./constants";
 import { MainframeClientConfig, ProviderName } from "./types";
 
-async function getConnectionId(
-  provider: ProviderName,
-  config: Required<MainframeClientConfig>,
-) {
-  const res = await fetch(
-    `${config.apiUrl}/connect/apps/${config.appId}/connections`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        provider,
-      }),
-      credentials: "include",
-    },
-  );
-
-  if (!res.ok) {
-    throw new Error("Failed to initiate connection");
-  }
-
-  const body = (await res.json()) as { id: string };
-
-  return body.id;
-}
-
-async function getConnection(
-  connectionId: string,
-  config: Required<MainframeClientConfig>,
-) {
-  const res = await fetch(
-    `${config.apiUrl}/connect/apps/${config.appId}/connections/${connectionId}`,
-    {
-      credentials: "include",
-    },
-  );
-
-  if (!res.ok) {
-    throw new Error(
-      `Failed to retrieve connection. HTTP Status Code: ${res.status}`,
-    );
-  }
-
-  // TODO: zod
-  const body = (await res.json()) as {
-    id: string;
-    sessionId?: string;
-    connected: boolean;
-    provider: ProviderName;
-  };
-
-  return body;
-}
-
 export class Mainframe {
   constructor(private _config: MainframeClientConfig) {}
 
@@ -76,20 +21,16 @@ export class Mainframe {
     configOverride?: Partial<MainframeClientConfig>,
   ) {
     const config = { ...this.config, ...configOverride };
-    // TODO: Get the destination URL here
-    const connectionId = await getConnectionId(provider, config);
+    const { id, connectUrl } = await this.prepareConnection(provider);
     // TODO: Remove appId and provider from URL
-    const w = window.open(
-      `${config.rootUrl}/connect/${config.appId}/${connectionId}/${provider}`,
-      "_blank",
-    );
+    const w = window.open(connectUrl, "_blank");
 
     return new Promise<Connection>((resolve, reject) => {
-      async function recheck() {
+      const recheck = async () => {
         // TODO: Only remove listeners and remove if the check was successful.
         // w?.removeEventListener("message", messageCallback);
         // TODO: Check for window.closed probably isn't a good indicator
-        const connection = await getConnection(connectionId, config);
+        const connection = await this.getConnection(id);
 
         if (connection.connected) {
           window.removeEventListener("focus", recheck);
@@ -106,7 +47,7 @@ export class Mainframe {
           reject(new Error("Connection cancelled"));
           return;
         }
-      }
+      };
       // w?.addEventListener("message", (event) => {
       //   // TODO: Try to use window events to get the id of the connection so we can await the auth flow.
       //   // TODO: Only accept messages from the expected event.origin
@@ -114,5 +55,41 @@ export class Mainframe {
       window.addEventListener("focus", recheck);
       // TODO: Timeout. reject
     });
+  }
+
+  private async prepareConnection(provider: ProviderName) {
+    const res = await this.api.connect.apps[":app_id"].connections.$post({
+      param: {
+        app_id: this.appId,
+      },
+      json: {
+        provider,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to initiate connection");
+    }
+
+    return res.json();
+  }
+
+  private async getConnection(connectionId: string) {
+    const res = await this.api.connect.apps[":app_id"].connections[
+      ":connection_id"
+    ].$get({
+      param: {
+        app_id: this.appId,
+        connection_id: connectionId,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(
+        `Failed to retrieve connection. HTTP Status Code: ${res.status}`,
+      );
+    }
+
+    return res.json();
   }
 }

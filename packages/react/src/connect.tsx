@@ -42,7 +42,7 @@ export function useConnections() {
   return useSWR(
     "__mainframe.connections",
     async () => {
-      const res = await client.api.apps[":app_id"].connections.$get({
+      const res = await client.api.connect.apps[":app_id"].connections.$get({
         param: {
           app_id: client.appId,
         },
@@ -67,7 +67,6 @@ export function useConnections() {
           if (
             a[i]!.id !== b[i]!.id ||
             a[i]!.config.apiUrl !== b[i]!.config.apiUrl ||
-            a[i]!.config.rootUrl !== b[i]!.config.rootUrl ||
             a[i]!.connected !== b[i]!.connected ||
             a[i]!.provider !== b[i]!.provider
           ) {
