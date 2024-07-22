@@ -5,6 +5,7 @@ import {
   integer,
 } from "drizzle-orm/sqlite-core";
 import { sql } from "drizzle-orm";
+import { supportedConnectProviders } from "../../lib/integrations";
 
 const enumType = <VALUES extends readonly string[]>(
   name: string,
@@ -18,6 +19,31 @@ const enumType = <VALUES extends readonly string[]>(
       return `text check(\`${name}\` IN (${values
         .map((v) => `'${v}'`)
         .join(",")}))`;
+    },
+  })(name);
+
+const runtimeEnumType = <VALUES extends readonly string[]>(
+  name: string,
+  values: VALUES,
+) =>
+  customType<{
+    data: VALUES[number];
+    driverData: string;
+  }>({
+    dataType() {
+      return "text";
+    },
+    toDriver(value: VALUES[number]): string {
+      if (!values.includes(value)) {
+        throw new Error("Invalid enum value");
+      }
+      return value;
+    },
+    fromDriver(value) {
+      if (!values.includes(value)) {
+        throw new Error("Invalid enum value");
+      }
+      return value;
     },
   })(name);
 
@@ -88,5 +114,5 @@ export const connectionsTable = sqliteTable("connections", {
       onUpdate: "cascade",
     }),
   nangoConnectionId: text("nango_connection_id"),
-  provider: enumType("provider", ["github"] as const).notNull(),
+  provider: runtimeEnumType("provider", supportedConnectProviders).notNull(),
 });

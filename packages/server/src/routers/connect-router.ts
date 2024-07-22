@@ -16,7 +16,10 @@ import {
   getSessionFromCookie,
 } from "../lib/connect-cookies.ts";
 import { nanoid } from "nanoid";
-import { getIntegrationFromType } from "../lib/integrations.ts";
+import {
+  getIntegrationFromType,
+  supportedConnectProviders,
+} from "../lib/integrations.ts";
 import { nango } from "../lib/nango.ts";
 import { AuthModes } from "@nangohq/node";
 
@@ -216,7 +219,7 @@ export const connectRouter = new Hono<Env>()
     zValidator(
       "json",
       z.object({
-        provider: z.enum(["github"]),
+        provider: z.enum(supportedConnectProviders),
       }),
     ),
     async (c) => {
@@ -365,7 +368,11 @@ export const connectRouter = new Hono<Env>()
 
     const integration = getIntegrationFromType(connection?.provider);
 
-    if (!connection?.nangoConnectionId || !integration?.proxyFetch) {
+    if (
+      !connection?.nangoConnectionId ||
+      !integration?.proxyFetch ||
+      !integration.authTypes?.nango?.integrationId
+    ) {
       return c.notFound();
     }
 
@@ -387,8 +394,7 @@ export const connectRouter = new Hono<Env>()
     headers.delete("Content-Length");
 
     const nangoConnection = await nango?.getConnection(
-      // TODO: Don't hardcode provider string
-      "github-oauth-app",
+      integration.authTypes.nango.integrationId,
       connection.id,
       false,
     );

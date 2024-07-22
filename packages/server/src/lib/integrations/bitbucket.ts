@@ -88,6 +88,15 @@ export const bitbucket: Integration = {
       },
     },
   },
+  async proxyFetch(token, path, init) {
+    const headers = new Headers(init?.headers);
+    if (!token) return new Response("Unauthorized", { status: 407 });
+
+    headers.set("Authorization", `Bearer ${token}`);
+
+    // TODO: Check if the response needs to be cleaned
+    return fetch(`https://api.bitbucket.org/${path}`, { ...init, headers });
+  },
 };
 
 async function getWorkspaces(token: string) {

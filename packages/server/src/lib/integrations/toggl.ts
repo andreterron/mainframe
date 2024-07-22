@@ -523,4 +523,13 @@ export const toggl: Integration = {
       }
     },
   },
+  async proxyFetch(token, path, init) {
+    const headers = new Headers(init?.headers);
+    if (!token) return new Response("Unauthorized", { status: 407 });
+
+    headers.set("Authorization", `Basic ${btoa(`${token}:api_token`)}`);
+
+    // TODO: Check if the response needs to be cleaned
+    return fetch(`https://api.track.toggl.com/${path}`, { ...init, headers });
+  },
 };

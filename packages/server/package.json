@@ -19,7 +19,8 @@
     "publish-jsr": "jsr publish --allow-slow-types",
     "connect:generate": "drizzle-kit generate --config=connect-drizzle.config.ts",
     "connect:drop": "drizzle-kit drop --config=connect-drizzle.config.ts",
-    "connect:push": "drizzle-kit push --config=connect-drizzle.config.ts"
+    "connect:push": "drizzle-kit push --config=connect-drizzle.config.ts",
+    "connect:migrate": "drizzle-kit migrate --config=connect-drizzle.config.ts"
   },
   "exports": {
     ".": {
