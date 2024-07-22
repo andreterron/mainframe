@@ -33,6 +33,7 @@ export function ProjectSetupInstructions({
   return (
     <div className="w-[80ch] space-y-4">
       {/* TODO: Copy button */}
+      {/* TODO: Switch between npm, yarn, pnpm, bun */}
       <div className="flex gap-2 items-center">
         <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
           1
@@ -45,7 +46,7 @@ export function ProjectSetupInstructions({
         language={"bash"}
         style={codeStyle}
       >
-        npm create vite@latest
+        npm create vite@latest -- --template react-ts
       </SyntaxHighlighter>
       {/* TODO: Copy button */}
       <div className="flex gap-2 items-center !mt-10">
@@ -79,25 +80,26 @@ export function ProjectSetupInstructions({
         showLineNumbers={true}
         lineNumberStyle={{ display: "none" }}
         lineProps={(lineNumber) => {
-          if (lineNumber == 7 || lineNumber === 9) {
+          if (lineNumber == 6 || lineNumber == 10 || lineNumber === 12) {
             return { style: highlightedLineStyle };
           }
           return { style: lineStyle };
         }}
       >
-        {`// App.tsx
-import { HomePage } from "./components/pages/Home";
-import { MainframeProvider } from "@mainframe-api/react";
+        {`// main.tsx
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.tsx'
+import './index.css'
+import { MainframeProvider } from "@mainframe-api/react"
 
-function App() {
-  return (
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
     <MainframeProvider appId="${appId}">
-      <HomePage />
+      <App />
     </MainframeProvider>
-  );
-}
-
-export default App;`}
+  </React.StrictMode>,
+)`}
       </SyntaxHighlighter>
       {/* <pre className="bg-black font-mono p-4 text-white rounded">
         
@@ -117,30 +119,30 @@ export default App;`}
         showLineNumbers={true}
         lineNumberStyle={{ display: "none" }}
         lineProps={(lineNumber) => {
-          if (lineNumber === 11 || lineNumber === 5) {
+          if (lineNumber === 6 || lineNumber === 11) {
             return { style: highlightedLineStyle };
           }
           return { style: lineStyle };
         }}
       >
-        {`// Home.tsx
+        {`// App.tsx
 import { useMainframeClient } from "@mainframe-api/react";
+import './App.css'
 
-export function HomePage() {
+function App() {
   const mainframe = useMainframeClient();
 
   return (
-    <div>
-      <button
-        onClick={() => {
-          mainframe.initiateAuth("github");
-        }}
-      >
-        GitHub
+    <>
+      <h1>Mainframe</h1>
+      <button onClick={() => mainframe.initiateAuth("github")}>
+        Connect to GitHub
       </button>
-    </div>
-  );
+    </>
+  )
 }
+
+export default App
 `}
       </SyntaxHighlighter>
 
@@ -159,22 +161,24 @@ export function HomePage() {
         showLineNumbers={true}
         lineNumberStyle={{ display: "none" }}
         lineProps={(lineNumber) => {
-          if ((lineNumber >= 6 && lineNumber <= 20) || lineNumber === 24) {
+          if ((lineNumber >= 7 && lineNumber <= 22) || lineNumber === 27) {
             return { style: highlightedLineStyle };
           }
           return { style: lineStyle };
         }}
       >
-        {`// Home.tsx
-import { useMainframeClient, useConnetions, useProxyGetter } from "@mainframe-api/react";
+        {`// App.tsx
+import { useMainframeClient, useConnections, useProxyGetter } from "@mainframe-api/react";
+import './App.css'
 
-export function HomePage() {
+function App() {
   const mainframe = useMainframeClient();
-  cosnt { data: connections } = useConnetions();
+  const { data: connections } = useConnections();
 
   const { data: githubUser } = useProxyGetter(
     connections?.find((c) => c.connected && c.provider === "github"),
     async (c) => {
+      // This makes a request to the GitHub API through a Mainframe proxy
       const res = await c.proxyFetch("/user");
 
       if (!res.ok) {
@@ -187,18 +191,17 @@ export function HomePage() {
   );
 
   return (
-    <div>
+    <>
+      <h1>Mainframe</h1>
       {githubUser && <p>Connected as @{githubUser.login}</p>}
-      <button
-        onClick={() => {
-          mainframe.initiateAuth("github");
-        }}
-      >
-        GitHub
+      <button onClick={() => mainframe.initiateAuth("github")}>
+        Connect to GitHub
       </button>
-    </div>
-  );
+    </>
+  )
 }
+
+export default App
 `}
       </SyntaxHighlighter>
       {children}
