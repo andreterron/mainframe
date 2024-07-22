@@ -12,6 +12,17 @@ const customStyle: React.CSSProperties | undefined = {
   overflow: "auto",
 };
 
+const lineStyle: React.CSSProperties | undefined = {
+  width: "100%",
+  display: "block",
+  padding: "0 1rem",
+};
+
+const highlightedLineStyle: React.CSSProperties | undefined = {
+  ...lineStyle,
+  backgroundColor: `${colors.blue[700]}66`,
+};
+
 export function ProjectSetupInstructions({
   appId,
   children,
@@ -53,15 +64,10 @@ export function ProjectSetupInstructions({
         showLineNumbers={true}
         lineNumberStyle={{ display: "none" }}
         lineProps={(lineNumber) => {
-          const style: React.CSSProperties | undefined = {
-            width: "100%",
-            display: "block",
-            padding: "0 1rem",
-          };
           if ((lineNumber >= 7 && lineNumber <= 11) || lineNumber === 13) {
-            style.backgroundColor = `${colors.blue[700]}66`;
+            return { style: highlightedLineStyle };
           }
-          return { style };
+          return { style: lineStyle };
         }}
       >
         {`// App.tsx
@@ -100,15 +106,10 @@ export default App;`}
         showLineNumbers={true}
         lineNumberStyle={{ display: "none" }}
         lineProps={(lineNumber) => {
-          const style: React.CSSProperties | undefined = {
-            width: "100%",
-            display: "block",
-            padding: "0 1rem",
-          };
           if (lineNumber === 11 || lineNumber === 5) {
-            style.backgroundColor = `${colors.blue[700]}66`;
+            return { style: highlightedLineStyle };
           }
-          return { style };
+          return { style: lineStyle };
         }}
       >
         {`// Home.tsx
@@ -119,6 +120,64 @@ export function HomePage() {
 
   return (
     <div>
+      <button
+        onClick={() => {
+          mainframe.initiateAuth("github");
+        }}
+      >
+        GitHub
+      </button>
+    </div>
+  );
+}
+`}
+      </SyntaxHighlighter>
+
+      <div className="flex gap-2 items-center !mt-10">
+        <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
+          4
+        </div>
+        <h2 className="font-bold text-lg">Access APIs</h2>
+      </div>
+
+      <SyntaxHighlighter
+        customStyle={customStyle}
+        language={"tsx"}
+        style={codeStyle}
+        wrapLines={true}
+        showLineNumbers={true}
+        lineNumberStyle={{ display: "none" }}
+        lineProps={(lineNumber) => {
+          if ((lineNumber >= 6 && lineNumber <= 20) || lineNumber === 24) {
+            return { style: highlightedLineStyle };
+          }
+          return { style: lineStyle };
+        }}
+      >
+        {`// Home.tsx
+import { useMainframeClient, useConnetions, useProxyGetter } from "@mainframe-api/react";
+
+export function HomePage() {
+  const mainframe = useMainframeClient();
+  cosnt { data: connections } = useConnetions();
+
+  const { data: githubUser } = useProxyGetter(
+    connections?.find((c) => c.connected && c.provider === "github"),
+    async (c) => {
+      const res = await c.proxyFetch("/user");
+
+      if (!res.ok) {
+        console.error(await res.text());
+        return;
+      }
+
+      return res.json();
+    }
+  );
+
+  return (
+    <div>
+      {githubUser && <p>Connected as @{githubUser.login}</p>}
       <button
         onClick={() => {
           mainframe.initiateAuth("github");
