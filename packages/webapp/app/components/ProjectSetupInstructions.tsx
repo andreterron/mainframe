@@ -34,72 +34,79 @@ export function ProjectSetupInstructions({
   // TODO: Ensure this is also in our docs
 
   return (
-    <div className="w-[80ch] space-y-4">
-      {/* TODO: Copy button */}
-      {/* TODO: Switch between npm, yarn, pnpm, bun */}
-      <div className="flex gap-2 items-center">
-        <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
-          1
+    <div className="flex gap-10">
+      <div className="w-[80ch] space-y-4">
+        {/* TODO: Copy button */}
+        {/* TODO: Switch between npm, yarn, pnpm, bun */}
+        <div className="flex gap-2 items-center">
+          <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
+            1
+          </div>
+          <h2 id="create-project" className="font-bold text-lg">
+            Create project
+          </h2>
         </div>
-        <h2 className="font-bold text-lg">Create project</h2>
-      </div>
-      <p className="ml-10 text-sm text-slate-600">
-        Start by creating a new Vite project if you don’t have one set up
-        already. The most common approach is to use Create Vite.
-      </p>
+        <p className="ml-10 text-sm text-slate-600">
+          Start by creating a new Vite project if you don’t have one set up
+          already. The most common approach is to use Create Vite.
+        </p>
 
-      <SyntaxHighlighter
-        customStyle={{ ...customStyle, padding: "1rem" }}
-        language={"bash"}
-        style={codeStyle}
-      >
-        npm create vite@latest -- --template react-ts
-      </SyntaxHighlighter>
-      {/* TODO: Copy button */}
-      <div className="flex gap-2 items-center !mt-10">
-        <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
-          2
+        <SyntaxHighlighter
+          customStyle={{ ...customStyle, padding: "1rem" }}
+          language={"bash"}
+          style={codeStyle}
+        >
+          npm create vite@latest -- --template react-ts
+        </SyntaxHighlighter>
+        {/* TODO: Copy button */}
+        <div className="flex gap-2 items-center !mt-10">
+          <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
+            2
+          </div>
+          <h2 id="install-mainframe-client" className="font-bold text-lg">
+            Install Mainframe client
+          </h2>
         </div>
-        <h2 className="font-bold text-lg">Install Mainframe client</h2>
-      </div>
-      <p className="ml-10 text-sm text-slate-600">
-        Install the Mainframe client package.
-      </p>
+        <p className="ml-10 text-sm text-slate-600">
+          Install the Mainframe client package.
+        </p>
 
-      <SyntaxHighlighter
-        customStyle={{ ...customStyle, padding: "1rem" }}
-        language={"bash"}
-        style={codeStyle}
-      >
-        npm i @mainframe-api/react
-      </SyntaxHighlighter>
-      <div className="flex gap-2 items-center !mt-10">
-        <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
-          3
+        <SyntaxHighlighter
+          customStyle={{ ...customStyle, padding: "1rem" }}
+          language={"bash"}
+          style={codeStyle}
+        >
+          npm i @mainframe-api/react
+        </SyntaxHighlighter>
+        <div className="flex gap-2 items-center !mt-10">
+          <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
+            3
+          </div>
+          <h2 id="add-mainframe-provider" className="font-bold text-lg">
+            Add MainframeProvider
+          </h2>
         </div>
-        <h2 className="font-bold text-lg">Add MainframeProvider</h2>
-      </div>
-      <p className="ml-10 text-sm text-slate-600">
-        Wrap your app component with MainframeProvider and provide your appID.
-      </p>
-      {/* TODO: Copy button */}
-      {/* TODO: Syntax highlight */}
+        <p className="ml-10 text-sm text-slate-600">
+          Wrap your app component with MainframeProvider and provide your appID.
+        </p>
+        {/* TODO: Copy button */}
+        {/* TODO: Syntax highlight */}
 
-      <SyntaxHighlighter
-        customStyle={customStyle}
-        language={"tsx"}
-        style={codeStyle}
-        wrapLines={true}
-        showLineNumbers={true}
-        lineNumberStyle={{ display: "none" }}
-        lineProps={(lineNumber) => {
-          if (lineNumber == 6 || lineNumber == 10 || lineNumber === 12) {
-            return { style: highlightedLineStyle };
-          }
-          return { style: lineStyle };
-        }}
-      >
-        {`// main.tsx
+        <SyntaxHighlighter
+          customStyle={customStyle}
+          language={"tsx"}
+          style={codeStyle}
+          wrapLines={true}
+          showLineNumbers={true}
+          lineNumberStyle={{ display: "none" }}
+          lineProps={(lineNumber) => {
+            if (lineNumber == 6 || lineNumber == 10 || lineNumber === 12) {
+              return { style: highlightedLineStyle };
+            }
+            return { style: lineStyle };
+          }}
+        >
+          {`// main.tsx
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
@@ -113,37 +120,39 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     </MainframeProvider>
   </React.StrictMode>,
 )`}
-      </SyntaxHighlighter>
-      {/* <pre className="bg-black font-mono p-4 text-white rounded">
+        </SyntaxHighlighter>
+        {/* <pre className="bg-black font-mono p-4 text-white rounded">
         
       </pre> */}
-      <div className="flex gap-2 items-center !mt-10">
-        <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
-          4
+        <div className="flex gap-2 items-center !mt-10">
+          <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
+            4
+          </div>
+          <h2 id="initiate-authentication" className="font-bold text-lg">
+            Initiate authentication
+          </h2>
         </div>
-        <h2 className="font-bold text-lg">Initiate authentication</h2>
-      </div>
-      <p className="ml-10 text-sm text-slate-600">
-        Add a button to initiate authentication to your desired data provider.
-        This will open an OAuth connection allowing users to authenticate their
-        accounts.
-      </p>
+        <p className="ml-10 text-sm text-slate-600">
+          Add a button to initiate authentication to your desired data provider.
+          This will open an OAuth connection allowing users to authenticate
+          their accounts.
+        </p>
 
-      <SyntaxHighlighter
-        customStyle={customStyle}
-        language={"tsx"}
-        style={codeStyle}
-        wrapLines={true}
-        showLineNumbers={true}
-        lineNumberStyle={{ display: "none" }}
-        lineProps={(lineNumber) => {
-          if (lineNumber === 6 || lineNumber === 11) {
-            return { style: highlightedLineStyle };
-          }
-          return { style: lineStyle };
-        }}
-      >
-        {`// App.tsx
+        <SyntaxHighlighter
+          customStyle={customStyle}
+          language={"tsx"}
+          style={codeStyle}
+          wrapLines={true}
+          showLineNumbers={true}
+          lineNumberStyle={{ display: "none" }}
+          lineProps={(lineNumber) => {
+            if (lineNumber === 6 || lineNumber === 11) {
+              return { style: highlightedLineStyle };
+            }
+            return { style: lineStyle };
+          }}
+        >
+          {`// App.tsx
 import { useMainframeClient } from "@mainframe-api/react";
 import './App.css'
 
@@ -162,34 +171,36 @@ function App() {
 
 export default App
 `}
-      </SyntaxHighlighter>
+        </SyntaxHighlighter>
 
-      <div className="flex gap-2 items-center !mt-10">
-        <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
-          5
+        <div className="flex gap-2 items-center !mt-10">
+          <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
+            5
+          </div>
+          <h2 id="access-apis" className="font-bold text-lg">
+            Access APIs
+          </h2>
         </div>
-        <h2 className="font-bold text-lg">Access APIs</h2>
-      </div>
-      <p className="ml-10 text-sm text-slate-600">
-        Use Mainframe's useConnections hook to access the connections and
-        useProxyGetter to access the API.
-      </p>
+        <p className="ml-10 text-sm text-slate-600">
+          Use Mainframe's useConnections hook to access the connections and
+          useProxyGetter to access the API.
+        </p>
 
-      <SyntaxHighlighter
-        customStyle={customStyle}
-        language={"tsx"}
-        style={codeStyle}
-        wrapLines={true}
-        showLineNumbers={true}
-        lineNumberStyle={{ display: "none" }}
-        lineProps={(lineNumber) => {
-          if ((lineNumber >= 7 && lineNumber <= 22) || lineNumber === 27) {
-            return { style: highlightedLineStyle };
-          }
-          return { style: lineStyle };
-        }}
-      >
-        {`// App.tsx
+        <SyntaxHighlighter
+          customStyle={customStyle}
+          language={"tsx"}
+          style={codeStyle}
+          wrapLines={true}
+          showLineNumbers={true}
+          lineNumberStyle={{ display: "none" }}
+          lineProps={(lineNumber) => {
+            if ((lineNumber >= 7 && lineNumber <= 22) || lineNumber === 27) {
+              return { style: highlightedLineStyle };
+            }
+            return { style: lineStyle };
+          }}
+        >
+          {`// App.tsx
 import { useMainframeClient, useConnections, useProxyGetter } from "@mainframe-api/react";
 import './App.css'
 
@@ -225,8 +236,95 @@ function App() {
 
 export default App
 `}
-      </SyntaxHighlighter>
-      {children}
+        </SyntaxHighlighter>
+        {children}
+      </div>
+      <div className="text-sm text-slate-600">
+        <ul className="sticky top-20 flex flex-col gap-2">
+          <li className="text-primary font-bold mb-2">On this page</li>
+          <li>
+            <a
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById("create-project");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className="hover:text-primary"
+              href="#create-project"
+            >
+              Create project
+            </a>
+          </li>
+          <li>
+            <a
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById(
+                  "install-mainframe-client",
+                );
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className="hover:text-primary"
+              href="#install-mainframe-client"
+            >
+              Install Mainframe client
+            </a>
+          </li>
+          <li>
+            <a
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById(
+                  "add-mainframe-provider",
+                );
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className="hover:text-primary"
+              href="#add-mainframe-provider"
+            >
+              Add MainframeProvider
+            </a>
+          </li>
+          <li>
+            <a
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById(
+                  "initiate-authentication",
+                );
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className="hover:text-primary"
+              href="#initiate-authentication"
+            >
+              Initiate authentication
+            </a>
+          </li>
+          <li>
+            <a
+              onClick={(e) => {
+                e.preventDefault();
+                const element = document.getElementById("access-apis");
+                if (element) {
+                  element.scrollIntoView({ behavior: "smooth" });
+                }
+              }}
+              className="hover:text-primary"
+              href="#access-apis"
+            >
+              Access APIs
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }
