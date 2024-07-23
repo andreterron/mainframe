@@ -132,6 +132,7 @@ export default function ProjectDetailsPage() {
         <div className="p-4 space-y-4">
           <ProjectSetupInstructions appId={app?.id ?? ""}>
             <Button
+              className="ml-10"
               onClick={() => {
                 updateApp.mutate({ showSetup: false });
               }}
