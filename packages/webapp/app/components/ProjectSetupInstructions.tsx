@@ -1,4 +1,4 @@
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import codeStyle from "react-syntax-highlighter/dist/esm/styles/prism/atom-dark";
 import colors from "tailwindcss/colors";
@@ -35,18 +35,56 @@ export function ProjectSetupInstructions({
 
   const [activeSection, setActiveSection] = useState<string>("create-project");
 
+  const sectionRefs = useRef<{ [key: string]: HTMLElement | null }>({
+    "create-project": null,
+    "install-mainframe-client": null,
+    "add-mainframe-provider": null,
+    "initiate-authentication": null,
+    "access-apis": null,
+  });
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      {
+        rootMargin: "-20% 0px -80% 0px",
+        threshold: 0,
+      },
+    );
+
+    Object.values(sectionRefs.current).forEach((section) => {
+      if (section) {
+        observer.observe(section);
+      }
+    });
+
+    return () => {
+      Object.values(sectionRefs.current).forEach((section) => {
+        if (section) observer.unobserve(section);
+      });
+    };
+  }, []);
+
   return (
     <div className="flex gap-10 2xl:gap-20">
       <div className="w-2/3 max-w-[80ch] space-y-4">
         {/* TODO: Copy button */}
         {/* TODO: Switch between npm, yarn, pnpm, bun */}
-        <div className="flex gap-2 items-center">
+        <div
+          id="create-project"
+          ref={(el) => (sectionRefs.current["create-project"] = el)}
+          className="flex gap-2 items-center"
+        >
           <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
             1
           </div>
-          <h2 id="create-project" className="font-bold text-lg">
-            Create project
-          </h2>
+          <h2 className="font-bold text-lg">Create project</h2>
         </div>
         <p className="ml-10 text-sm text-slate-600">
           Start by creating a new Vite project if you don’t have one set up
@@ -62,13 +100,15 @@ export function ProjectSetupInstructions({
           npm create vite@latest -- --template react-ts
         </SyntaxHighlighter>
         {/* TODO: Copy button */}
-        <div className="flex gap-2 items-center !mt-10">
+        <div
+          id="install-mainframe-client"
+          ref={(el) => (sectionRefs.current["install-mainframe-client"] = el)}
+          className="flex gap-2 items-center !mt-10"
+        >
           <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
             2
           </div>
-          <h2 id="install-mainframe-client" className="font-bold text-lg">
-            Install Mainframe client
-          </h2>
+          <h2 className="font-bold text-lg">Install Mainframe client</h2>
         </div>
         <p className="ml-10 text-sm text-slate-600">
           Install the Mainframe client package. This package provides the
@@ -82,13 +122,15 @@ export function ProjectSetupInstructions({
         >
           npm i @mainframe-api/react
         </SyntaxHighlighter>
-        <div className="flex gap-2 items-center !mt-10">
+        <div
+          id="add-mainframe-provider"
+          ref={(el) => (sectionRefs.current["add-mainframe-provider"] = el)}
+          className="flex gap-2 items-center !mt-10"
+        >
           <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
             3
           </div>
-          <h2 id="add-mainframe-provider" className="font-bold text-lg">
-            Add MainframeProvider
-          </h2>
+          <h2 className="font-bold text-lg">Add MainframeProvider</h2>
         </div>
         <p className="ml-10 text-sm text-slate-600">
           Wrap your root component with{" "}
@@ -140,13 +182,15 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         {/* <pre className="bg-black font-mono p-4 text-white rounded">
         
       </pre> */}
-        <div className="flex gap-2 items-center !mt-10">
+        <div
+          id="initiate-authentication"
+          ref={(el) => (sectionRefs.current["initiate-authentication"] = el)}
+          className="flex gap-2 items-center !mt-10"
+        >
           <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
             4
           </div>
-          <h2 id="initiate-authentication" className="font-bold text-lg">
-            Initiate authentication
-          </h2>
+          <h2 className="font-bold text-lg">Initiate authentication</h2>
         </div>
         <p className="ml-10 text-sm text-slate-600">
           Add a button to initiate authentication to your desired data provider.
@@ -190,13 +234,15 @@ export default App
 `}
         </SyntaxHighlighter>
 
-        <div className="flex gap-2 items-center !mt-10">
+        <div
+          id="access-apis"
+          ref={(el) => (sectionRefs.current["access-apis"] = el)}
+          className="flex gap-2 items-center !mt-10"
+        >
           <div className="size-8 bg-secondary border rounded-full flex items-center justify-center">
             5
           </div>
-          <h2 id="access-apis" className="font-bold text-lg">
-            Access APIs
-          </h2>
+          <h2 className="font-bold text-lg">Access APIs</h2>
         </div>
         <p className="ml-10 text-sm text-slate-600 ">
           Use the{" "}
@@ -265,20 +311,22 @@ export default App
         {children}
       </div>
       <div className="text-sm text-slate-500 hidden lg:block">
-        <ul className="sticky top-20 flex flex-col gap-2">
+        <ul className="sticky top-20 flex flex-col gap-4">
           <li className="text-primary font-bold mb-2">On this page</li>
           <li>
             <a
               onClick={(e) => {
                 e.preventDefault();
-                setActiveSection("create-project");
                 const element = document.getElementById("create-project");
                 if (element) {
                   element.scrollIntoView({ behavior: "smooth" });
+                  setActiveSection("create-project");
                 }
               }}
-              className={`hover:text-primary ${
-                activeSection === "create-project" ? "text-primary" : ""
+              className={`border-transparent hover:text-primary ${
+                activeSection === "create-project"
+                  ? "text-primary font-medium"
+                  : ""
               }`}
               href="#create-project"
             >
@@ -289,17 +337,17 @@ export default App
             <a
               onClick={(e) => {
                 e.preventDefault();
-                setActiveSection("install-mainframe-client");
                 const element = document.getElementById(
                   "install-mainframe-client",
                 );
                 if (element) {
                   element.scrollIntoView({ behavior: "smooth" });
+                  setActiveSection("install-mainframe-client");
                 }
               }}
-              className={`hover:text-primary ${
+              className={`border-transparent hover:text-primary ${
                 activeSection === "install-mainframe-client"
-                  ? "text-primary"
+                  ? "text-primary font-medium"
                   : ""
               }`}
               href="#install-mainframe-client"
@@ -311,16 +359,18 @@ export default App
             <a
               onClick={(e) => {
                 e.preventDefault();
-                setActiveSection("add-mainframe-provider");
                 const element = document.getElementById(
                   "add-mainframe-provider",
                 );
                 if (element) {
                   element.scrollIntoView({ behavior: "smooth" });
+                  setActiveSection("add-mainframe-provider");
                 }
               }}
-              className={`hover:text-primary ${
-                activeSection === "add-mainframe-provider" ? "text-primary" : ""
+              className={`border-transparent hover:text-primary ${
+                activeSection === "add-mainframe-provider"
+                  ? "text-primary font-medium"
+                  : ""
               }`}
               href="#add-mainframe-provider"
             >
@@ -331,17 +381,17 @@ export default App
             <a
               onClick={(e) => {
                 e.preventDefault();
-                setActiveSection("initiate-authentication");
                 const element = document.getElementById(
                   "initiate-authentication",
                 );
                 if (element) {
                   element.scrollIntoView({ behavior: "smooth" });
+                  setActiveSection("initiate-authentication");
                 }
               }}
-              className={`hover:text-primary ${
+              className={`border-transparent hover:text-primary ${
                 activeSection === "initiate-authentication"
-                  ? "text-primary"
+                  ? "text-primary font-medium"
                   : ""
               }`}
               href="#initiate-authentication"
@@ -353,14 +403,16 @@ export default App
             <a
               onClick={(e) => {
                 e.preventDefault();
-                setActiveSection("access-apis");
                 const element = document.getElementById("access-apis");
                 if (element) {
                   element.scrollIntoView({ behavior: "smooth" });
+                  setActiveSection("access-apis");
                 }
               }}
-              className={`hover:text-primary ${
-                activeSection === "access-apis" ? "text-primary" : ""
+              className={`border-transparent hover:text-primary ${
+                activeSection === "access-apis"
+                  ? "text-primary font-medium"
+                  : ""
               }`}
               href="#access-apis"
             >
