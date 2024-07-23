@@ -4,8 +4,14 @@ import React, {
   useContext,
   useMemo,
 } from "react";
-import { Connection, Mainframe, type HostConfig } from "mainframe-api";
+import {
+  Connection,
+  Mainframe,
+  ProviderName,
+  type HostConfig,
+} from "mainframe-api";
 import useSWR from "swr";
+import MimeType from "whatwg-mimetype";
 
 export * from "mainframe-api";
 
@@ -79,6 +85,41 @@ export function useConnections() {
   );
 }
 
+// TODO: Let the developer provide a unique ID
+export function useConnection(provider: ProviderName) {
+  const mainframe = useMainframeClient();
+  const { data: connections, isLoading } = useConnections();
+
+  const connection = connections?.find(
+    (c) => c.connected && c.provider === provider,
+  );
+
+  return {
+    connection,
+    isLoading,
+    initiateAuth: () => mainframe.initiateAuth(provider),
+  };
+}
+
+/**
+ * @param contentType "Content-Type" header value
+ * @returns true if mimetype subtype ends in "+json" or if its essence is "application/json" or "text/json"
+ * @see https://mimesniff.spec.whatwg.org/#json-mime-type
+ */
+function isJsonMimeType(contentType: string | null) {
+  if (!contentType) {
+    return false;
+  }
+  const mimeType = new MimeType(contentType);
+  if (!mimeType) {
+    return false;
+  }
+  return (
+    ["application/json", "text/json"].includes(mimeType.essence) ||
+    mimeType.subtype.endsWith("+json")
+  );
+}
+
 export function useProxyGetter<T>(
   connection: Connection | undefined,
   fetcher: (connection: Connection) => Promise<T> | T,
@@ -92,6 +133,43 @@ export function useProxyGetter<T>(
       return fetcher(conn);
     },
   );
+}
+
+export function useRequest(
+  connection: Connection | undefined,
+  path: string,
+  init?: RequestInit,
+) {
+  const {
+    data: swrData,
+    error,
+    isLoading,
+    isValidating,
+  } = useSWR(
+    ["__mainframe.connection.proxy_req", connection] as const,
+    async ([, conn]) => {
+      if (!conn) {
+        return undefined;
+      }
+      const res = await conn.proxyFetch(path, init);
+
+      // TODO: Support non-json
+      const data =
+        res.ok && isJsonMimeType(res.headers.get("content-type"))
+          ? await res.json()
+          : undefined;
+
+      return { data, res };
+    },
+  );
+
+  return {
+    data: swrData?.data,
+    res: swrData?.res,
+    error,
+    isLoading,
+    isValidating,
+  };
 }
 
 // TODO: Use mutation

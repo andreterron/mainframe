@@ -91,7 +91,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
 import './index.css'
-import { MainframeProvider } from "@mainframe-api/react"
+import { MainframeProvider } from '@mainframe-api/react'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -119,25 +119,23 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         showLineNumbers={true}
         lineNumberStyle={{ display: "none" }}
         lineProps={(lineNumber) => {
-          if (lineNumber === 6 || lineNumber === 11) {
+          if ([2, 6, 11].includes(lineNumber)) {
             return { style: highlightedLineStyle };
           }
           return { style: lineStyle };
         }}
       >
         {`// App.tsx
-import { useMainframeClient } from "@mainframe-api/react";
+import { useConnection, useRequest } from '@mainframe-api/react'
 import './App.css'
 
 function App() {
-  const mainframe = useMainframeClient();
+  const { connection, initiateAuth } = useConnection('github')
 
   return (
     <>
       <h1>Mainframe</h1>
-      <button onClick={() => mainframe.initiateAuth("github")}>
-        Connect to GitHub
-      </button>
+      <button onClick={() => initiateAuth()}>Connect to GitHub</button>
     </>
   )
 }
@@ -161,42 +159,27 @@ export default App
         showLineNumbers={true}
         lineNumberStyle={{ display: "none" }}
         lineProps={(lineNumber) => {
-          if ((lineNumber >= 7 && lineNumber <= 22) || lineNumber === 27) {
+          if ([8, 9, 15].includes(lineNumber)) {
             return { style: highlightedLineStyle };
           }
           return { style: lineStyle };
         }}
       >
         {`// App.tsx
-import { useMainframeClient, useConnections, useProxyGetter } from "@mainframe-api/react";
+import { useConnection, useRequest } from '@mainframe-api/react'
 import './App.css'
 
 function App() {
-  const mainframe = useMainframeClient();
-  const { data: connections } = useConnections();
+  const { connection, initiateAuth } = useConnection('github')
 
-  const { data: githubUser } = useProxyGetter(
-    connections?.find((c) => c.connected && c.provider === "github"),
-    async (c) => {
-      // This makes a request to the GitHub API through a Mainframe proxy
-      const res = await c.proxyFetch("/user");
-
-      if (!res.ok) {
-        console.error(await res.text());
-        return;
-      }
-
-      return res.json();
-    }
-  );
+  // This makes a request to the GitHub API through a Mainframe proxy
+  const { data } = useRequest(connection, '/user')
 
   return (
     <>
       <h1>Mainframe</h1>
-      {githubUser && <p>Connected as @{githubUser.login}</p>}
-      <button onClick={() => mainframe.initiateAuth("github")}>
-        Connect to GitHub
-      </button>
+      <button onClick={() => initiateAuth()}>Connect to GitHub</button>
+      {data && <p>Connected as @{data.login}</p>}
     </>
   )
 }
