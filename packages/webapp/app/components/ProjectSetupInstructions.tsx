@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import codeStyle from "react-syntax-highlighter/dist/esm/styles/prism/atom-dark";
 import colors from "tailwindcss/colors";
@@ -33,9 +33,11 @@ export function ProjectSetupInstructions({
   // TODO: Get inspiration from tailwind, shadcn and other dev tools setups
   // TODO: Ensure this is also in our docs
 
+  const [activeSection, setActiveSection] = useState<string>("create-project");
+
   return (
-    <div className="flex gap-10">
-      <div className="w-[80ch] space-y-4">
+    <div className="flex gap-10 2xl:gap-20">
+      <div className="w-2/3 max-w-[80ch] space-y-4">
         {/* TODO: Copy button */}
         {/* TODO: Switch between npm, yarn, pnpm, bun */}
         <div className="flex gap-2 items-center">
@@ -48,7 +50,8 @@ export function ProjectSetupInstructions({
         </div>
         <p className="ml-10 text-sm text-slate-600">
           Start by creating a new Vite project if you don’t have one set up
-          already. The most common approach is to use Create Vite.
+          already. The most common approach is to by using the Create Vite
+          terminal command.
         </p>
 
         <SyntaxHighlighter
@@ -68,7 +71,8 @@ export function ProjectSetupInstructions({
           </h2>
         </div>
         <p className="ml-10 text-sm text-slate-600">
-          Install the Mainframe client package.
+          Install the Mainframe client package. This package provides the
+          necessary tools to use Mainframe within your application.
         </p>
 
         <SyntaxHighlighter
@@ -87,7 +91,19 @@ export function ProjectSetupInstructions({
           </h2>
         </div>
         <p className="ml-10 text-sm text-slate-600">
-          Wrap your app component with MainframeProvider and provide your appID.
+          Wrap your root component with{" "}
+          <code className="text-primary font-medium bg-secondary rounded-sm py-[1px] px-1">
+            `MainframeProvider`
+          </code>
+          . This provider requires an{" "}
+          <code className="text-primary font-medium bg-secondary rounded-sm py-[1px] px-1">
+            `appId`
+          </code>{" "}
+          which you can obtain from your Mainframe project ID. Update your{" "}
+          <code className="text-primary font-medium bg-secondary rounded-sm py-[1px] px-1">
+            `main.tsx`
+          </code>{" "}
+          file as follows:
         </p>
         {/* TODO: Copy button */}
         {/* TODO: Syntax highlight */}
@@ -135,7 +151,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <p className="ml-10 text-sm text-slate-600">
           Add a button to initiate authentication to your desired data provider.
           This will open an OAuth connection allowing users to authenticate
-          their accounts.
+          their accounts. This example demonstrates how to add a button to
+          connect to GitHub using OAuth.
         </p>
 
         <SyntaxHighlighter
@@ -181,9 +198,17 @@ export default App
             Access APIs
           </h2>
         </div>
-        <p className="ml-10 text-sm text-slate-600">
-          Use Mainframe's useConnections hook to access the connections and
-          useProxyGetter to access the API.
+        <p className="ml-10 text-sm text-slate-600 ">
+          Use the{" "}
+          <code className="text-primary font-medium bg-secondary rounded-sm py-[1px] px-1">
+            `useConnections`
+          </code>{" "}
+          hook to access authenticated connections and the{" "}
+          <code className="text-primary font-medium bg-secondary rounded-sm py-[1px] px-1">
+            `useProxyGetter`
+          </code>{" "}
+          hook to fetch data from the API. This example shows how to fetch the
+          authenticated user's data from GitHub.
         </p>
 
         <SyntaxHighlighter
@@ -239,19 +264,22 @@ export default App
         </SyntaxHighlighter>
         {children}
       </div>
-      <div className="text-sm text-slate-600">
+      <div className="text-sm text-slate-500 hidden lg:block">
         <ul className="sticky top-20 flex flex-col gap-2">
           <li className="text-primary font-bold mb-2">On this page</li>
           <li>
             <a
               onClick={(e) => {
                 e.preventDefault();
+                setActiveSection("create-project");
                 const element = document.getElementById("create-project");
                 if (element) {
                   element.scrollIntoView({ behavior: "smooth" });
                 }
               }}
-              className="hover:text-primary"
+              className={`hover:text-primary ${
+                activeSection === "create-project" ? "text-primary" : ""
+              }`}
               href="#create-project"
             >
               Create project
@@ -261,6 +289,7 @@ export default App
             <a
               onClick={(e) => {
                 e.preventDefault();
+                setActiveSection("install-mainframe-client");
                 const element = document.getElementById(
                   "install-mainframe-client",
                 );
@@ -268,7 +297,11 @@ export default App
                   element.scrollIntoView({ behavior: "smooth" });
                 }
               }}
-              className="hover:text-primary"
+              className={`hover:text-primary ${
+                activeSection === "install-mainframe-client"
+                  ? "text-primary"
+                  : ""
+              }`}
               href="#install-mainframe-client"
             >
               Install Mainframe client
@@ -278,6 +311,7 @@ export default App
             <a
               onClick={(e) => {
                 e.preventDefault();
+                setActiveSection("add-mainframe-provider");
                 const element = document.getElementById(
                   "add-mainframe-provider",
                 );
@@ -285,7 +319,9 @@ export default App
                   element.scrollIntoView({ behavior: "smooth" });
                 }
               }}
-              className="hover:text-primary"
+              className={`hover:text-primary ${
+                activeSection === "add-mainframe-provider" ? "text-primary" : ""
+              }`}
               href="#add-mainframe-provider"
             >
               Add MainframeProvider
@@ -295,6 +331,7 @@ export default App
             <a
               onClick={(e) => {
                 e.preventDefault();
+                setActiveSection("initiate-authentication");
                 const element = document.getElementById(
                   "initiate-authentication",
                 );
@@ -302,7 +339,11 @@ export default App
                   element.scrollIntoView({ behavior: "smooth" });
                 }
               }}
-              className="hover:text-primary"
+              className={`hover:text-primary ${
+                activeSection === "initiate-authentication"
+                  ? "text-primary"
+                  : ""
+              }`}
               href="#initiate-authentication"
             >
               Initiate authentication
@@ -312,12 +353,15 @@ export default App
             <a
               onClick={(e) => {
                 e.preventDefault();
+                setActiveSection("access-apis");
                 const element = document.getElementById("access-apis");
                 if (element) {
                   element.scrollIntoView({ behavior: "smooth" });
                 }
               }}
-              className="hover:text-primary"
+              className={`hover:text-primary ${
+                activeSection === "access-apis" ? "text-primary" : ""
+              }`}
               href="#access-apis"
             >
               Access APIs
