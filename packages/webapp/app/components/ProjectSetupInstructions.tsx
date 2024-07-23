@@ -1,15 +1,18 @@
 import { PropsWithChildren } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import codeStyle from "react-syntax-highlighter/dist/esm/styles/prism/okaidia";
+import codeStyle from "react-syntax-highlighter/dist/esm/styles/prism/atom-dark";
 import colors from "tailwindcss/colors";
 
 const customStyle: React.CSSProperties | undefined = {
+  margin: "1rem 0 0 2.5rem",
   padding: "1rem 0",
-  borderRadius: "0.25rem",
+  borderRadius: "0.5rem",
+  border: "1px solid #27272a",
   // width: "720px",
   // maxHeight: "15rem",
   // background: "transparent",
   overflow: "auto",
+  fontSize: "0.825rem",
 };
 
 const lineStyle: React.CSSProperties | undefined = {
@@ -20,7 +23,7 @@ const lineStyle: React.CSSProperties | undefined = {
 
 const highlightedLineStyle: React.CSSProperties | undefined = {
   ...lineStyle,
-  backgroundColor: `${colors.blue[700]}66`,
+  backgroundColor: `${colors.slate[600]}66`,
 };
 
 export function ProjectSetupInstructions({
@@ -40,6 +43,10 @@ export function ProjectSetupInstructions({
         </div>
         <h2 className="font-bold text-lg">Create project</h2>
       </div>
+      <p className="ml-10 text-sm text-slate-600">
+        Start by creating a new Vite project if you don’t have one set up
+        already. The most common approach is to use Create Vite.
+      </p>
 
       <SyntaxHighlighter
         customStyle={{ ...customStyle, padding: "1rem" }}
@@ -55,6 +62,9 @@ export function ProjectSetupInstructions({
         </div>
         <h2 className="font-bold text-lg">Install Mainframe client</h2>
       </div>
+      <p className="ml-10 text-sm text-slate-600">
+        Install the Mainframe client package.
+      </p>
 
       <SyntaxHighlighter
         customStyle={{ ...customStyle, padding: "1rem" }}
@@ -69,6 +79,9 @@ export function ProjectSetupInstructions({
         </div>
         <h2 className="font-bold text-lg">Add MainframeProvider</h2>
       </div>
+      <p className="ml-10 text-sm text-slate-600">
+        Wrap your app component with MainframeProvider and provide your appID.
+      </p>
       {/* TODO: Copy button */}
       {/* TODO: Syntax highlight */}
 
@@ -110,6 +123,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </div>
         <h2 className="font-bold text-lg">Initiate authentication</h2>
       </div>
+      <p className="ml-10 text-sm text-slate-600">
+        Add a button to initiate authentication to your desired data provider.
+        This will open an OAuth connection allowing users to authenticate their
+        accounts.
+      </p>
 
       <SyntaxHighlighter
         customStyle={customStyle}
@@ -152,6 +170,10 @@ export default App
         </div>
         <h2 className="font-bold text-lg">Access APIs</h2>
       </div>
+      <p className="ml-10 text-sm text-slate-600">
+        Use Mainframe's useConnections hook to access the connections and
+        useProxyGetter to access the API.
+      </p>
 
       <SyntaxHighlighter
         customStyle={customStyle}
