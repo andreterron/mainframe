@@ -119,14 +119,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         showLineNumbers={true}
         lineNumberStyle={{ display: "none" }}
         lineProps={(lineNumber) => {
-          if ([2, 6, 11].includes(lineNumber)) {
+          if ([2, 6, 11, 12, 13].includes(lineNumber)) {
             return { style: highlightedLineStyle };
           }
           return { style: lineStyle };
         }}
       >
         {`// App.tsx
-import { useConnection, useRequest } from '@mainframe-api/react'
+import { useConnection } from '@mainframe-api/react'
 import './App.css'
 
 function App() {
@@ -135,7 +135,9 @@ function App() {
   return (
     <>
       <h1>Mainframe</h1>
-      <button onClick={() => initiateAuth()}>Connect to GitHub</button>
+      <button onClick={() => initiateAuth()}>
+        {connection ? 'Connected ✓' : 'Connect to GitHub'}
+      </button>
     </>
   )
 }
@@ -159,7 +161,7 @@ export default App
         showLineNumbers={true}
         lineNumberStyle={{ display: "none" }}
         lineProps={(lineNumber) => {
-          if ([8, 9, 15].includes(lineNumber)) {
+          if ([2, 8, 9, 17].includes(lineNumber)) {
             return { style: highlightedLineStyle };
           }
           return { style: lineStyle };
@@ -178,7 +180,9 @@ function App() {
   return (
     <>
       <h1>Mainframe</h1>
-      <button onClick={() => initiateAuth()}>Connect to GitHub</button>
+      <button onClick={() => initiateAuth()}>
+        {connection ? 'Connected ✓' : 'Connect to GitHub'}
+      </button>
       {data && <p>Connected as @{data.login}</p>}
     </>
   )
