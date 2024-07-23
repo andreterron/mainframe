@@ -125,7 +125,7 @@ export function useProxyGetter<T>(
   fetcher: (connection: Connection) => Promise<T> | T,
 ) {
   return useSWR(
-    ["__mainframe.connection.proxy_get", connection] as const,
+    ["__mainframe.connection.proxy_get", connection, fetcher] as const,
     async ([, conn]) => {
       if (!conn) {
         return undefined;
@@ -146,8 +146,9 @@ export function useRequest(
     isLoading,
     isValidating,
   } = useSWR(
-    ["__mainframe.connection.proxy_req", connection] as const,
-    async ([, conn]) => {
+    // TODO: Check if we need to add `init` here
+    ["__mainframe.connection.proxy_req", connection, path] as const,
+    async ([, conn, path]) => {
       if (!conn) {
         return undefined;
       }
