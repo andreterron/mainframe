@@ -1,8 +1,9 @@
 import { hc } from "hono/client";
-// TODO: Use AppType instead of ConnectAPIType
-import type { ConnectAPIType } from "@mainframe-api/server";
+import type { AppType } from "@mainframe-api/server";
 
 export const createApiClient = (apiURL: string) =>
-  hc<ConnectAPIType>(`${apiURL}/connect`, {
+  hc<AppType>(apiURL, {
     init: { credentials: "include" },
   });
+
+export type MainframeApiClient = ReturnType<typeof createApiClient>;

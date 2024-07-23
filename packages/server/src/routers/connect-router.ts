@@ -22,6 +22,7 @@ import {
 } from "../lib/integrations.ts";
 import { nango } from "../lib/nango.ts";
 import { AuthModes } from "@nangohq/node";
+import { env } from "../lib/env.server.ts";
 
 export const connectRouter = new Hono<Env>()
   // TODO: Review this cors() call
@@ -211,6 +212,9 @@ export const connectRouter = new Hono<Env>()
         id: c.id,
         provider: c.provider,
         connected: !!c.nangoConnectionId,
+        connectUrl: c.nangoConnectionId
+          ? undefined
+          : `${env.APP_URL}/connect/${appId}/${c.id}/${c.provider}`,
       })),
     );
   })
@@ -239,14 +243,20 @@ export const connectRouter = new Hono<Env>()
           provider: provider,
           sessionId: sessionId,
         })
-        .returning({ id: connectionsTable.id });
+        .returning({
+          id: connectionsTable.id,
+          provider: connectionsTable.provider,
+        });
       // TODO: Handle if sessionId doesn't exist.
       if (!inserted) {
         throw new HTTPException(500, {
           message: "Failed to create connection",
         });
       }
-      return c.json({ id: inserted.id });
+      return c.json({
+        id: inserted.id,
+        connectUrl: `${env.APP_URL}/connect/${appId}/${inserted.id}/${inserted.provider}`,
+      });
     },
   )
   .get("/apps/:app_id/connections/:connection_id", async (c) => {
@@ -290,6 +300,9 @@ export const connectRouter = new Hono<Env>()
       id: connection.id,
       provider: connection.provider,
       connected: !!connection.nangoConnectionId,
+      connectUrl: connection.nangoConnectionId
+        ? undefined
+        : `${env.APP_URL}/connect/${appId}/${connection.id}/${connection.provider}`,
     });
   })
   .put(

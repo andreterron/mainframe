@@ -49,6 +49,20 @@ export function createMainframeAPI<E extends Env = Env>(
 
   init.initHonoApp?.(app);
 
+  // TRPC endpoints don't show up on the api client type.
+  // We could try to use .all, but it wouldn't show individual functions.
+  app.use(
+    "/trpc/*",
+    cors({ credentials: true, origin: env.APP_URL }),
+    trpcServer({
+      router: appRouter,
+      createContext: createContext(init),
+      onError: ({ error, path }) => {
+        console.error(path, error);
+      },
+    }),
+  );
+
   return (
     app
       .route(
@@ -61,17 +75,6 @@ export function createMainframeAPI<E extends Env = Env>(
       )
       .route("/oauth", oauthRouter)
       .route("/webhooks", webhookRouter)
-      .use(
-        "/trpc/*",
-        cors({ credentials: true, origin: env.APP_URL }),
-        trpcServer({
-          router: appRouter,
-          createContext: createContext(init),
-          onError: ({ error, path }) => {
-            console.error(path, error);
-          },
-        }),
-      )
       .route("/connect", connectRouter)
       .get("/healthcheck", async (c) => {
         return c.json({ success: true });
