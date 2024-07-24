@@ -3,6 +3,7 @@ import React, {
   createContext,
   useContext,
   useMemo,
+  useState,
 } from "react";
 import {
   Connection,
@@ -124,8 +125,9 @@ export function useProxyGetter<T>(
   connection: Connection | undefined,
   fetcher: (connection: Connection) => Promise<T> | T,
 ) {
+  const [key] = useState(Math.random());
   return useSWR(
-    ["__mainframe.connection.proxy_get", connection, fetcher] as const,
+    ["__mainframe.connection.proxy_get", connection, key] as const,
     async ([, conn]) => {
       if (!conn) {
         return undefined;

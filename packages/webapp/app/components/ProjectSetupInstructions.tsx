@@ -252,14 +252,10 @@ export default App
         <p className="ml-10 text-sm text-slate-600 ">
           Use the{" "}
           <code className="text-primary font-medium bg-secondary rounded-sm py-[1px] px-1">
-            `useConnections`
+            `useRequest`
           </code>{" "}
-          hook to access authenticated connections and the{" "}
-          <code className="text-primary font-medium bg-secondary rounded-sm py-[1px] px-1">
-            `useProxyGetter`
-          </code>{" "}
-          hook to fetch data from the API. This example shows how to fetch the
-          authenticated user's data from GitHub.
+          hook to fetch data from the underlying API. This example shows how to
+          fetch the authenticated user's data from GitHub.
         </p>
 
         <SyntaxHighlighter
