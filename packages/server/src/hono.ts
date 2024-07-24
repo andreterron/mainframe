@@ -11,6 +11,7 @@ import { CreateContextHooks, createContext } from "./lib/trpc/trpc_context.ts";
 import { cors } from "hono/cors";
 import { connectRouter } from "./routers/connect-router.ts";
 import { MainframeContext } from "./lib/context.ts";
+import { HTTPException } from "hono/http-exception";
 
 export type MainframeAPIOptions<E extends Env = Env> = {
   /**
@@ -45,6 +46,18 @@ export function createMainframeAPI<E extends Env = Env>(
     c.set("operations", ctx?.operations);
     c.set("userId", ctx?.userId);
     await next();
+  });
+
+  // TODO: Consider making this error handler more configurable
+  app.onError((err, c) => {
+    if (err instanceof HTTPException) {
+      // Get the custom response
+      return err.getResponse();
+    }
+
+    console.error("Hono Handler Error at:", c.req.path);
+    console.error(err);
+    return new HTTPException(500).getResponse();
   });
 
   init.initHonoApp?.(app);
