@@ -11,6 +11,7 @@ import { sessionsTable } from "../db/connect-db/connect-schema.ts";
 import { connectDB } from "./connect-db.ts";
 import { nanoid } from "nanoid";
 import { LibsqlError } from "@libsql/client";
+import { env } from "./env.server.ts";
 
 const COOKIE_NAME = "mfm_conn_session_id";
 const COOKIE_MAX_AGE = 366 * 24 * 60 * 60;
@@ -54,7 +55,7 @@ export async function ensureSessionCookie(c: Context, appId: string) {
     setCookie(c, COOKIE_NAME, inserted.id, {
       maxAge: COOKIE_MAX_AGE,
       secure: true,
-      sameSite: "Lax",
+      sameSite: "None",
       httpOnly: true,
       // TODO: We might need to set the cookie to different domains
       // domain: ??
