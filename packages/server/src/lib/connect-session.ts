@@ -1,37 +1,47 @@
 import { Context } from "hono";
-import {
-  getCookie,
-  getSignedCookie,
-  setCookie,
-  setSignedCookie,
-  deleteCookie,
-} from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
 import { sessionsTable } from "../db/connect-db/connect-schema.ts";
 import { connectDB } from "./connect-db.ts";
 import { nanoid } from "nanoid";
 import { LibsqlError } from "@libsql/client";
-import { env } from "./env.server.ts";
+import { parseBearerHeader } from "./parse-bearer-header.ts";
+import { MAINFRAME_SESSION_HEADER } from "../utils/constants.ts";
 
-const COOKIE_NAME = "mfm_conn_session_id";
-const COOKIE_MAX_AGE = 366 * 24 * 60 * 60;
-
-export function getSessionFromCookie(c: Context) {
+function getSessionId(c: Context, options?: { authHeader?: string }) {
   if (!connectDB) {
     console.error("Missing connectDB");
     throw new HTTPException(500);
   }
 
-  return getCookie(c, COOKIE_NAME);
+  const token = parseBearerHeader(
+    c.req.header(options?.authHeader ?? "Authorization"),
+  );
+  return token;
 }
 
-export async function ensureSessionCookie(c: Context, appId: string) {
+export function getSessionFromContext(
+  c: Context,
+  options?: { authHeader?: string },
+) {
   if (!connectDB) {
     console.error("Missing connectDB");
     throw new HTTPException(500);
   }
 
-  const sessionId = getCookie(c, COOKIE_NAME);
+  return getSessionId(c, options);
+}
+
+export async function ensureSession(
+  c: Context,
+  appId: string,
+  options?: { authHeader?: string },
+) {
+  if (!connectDB) {
+    console.error("Missing connectDB");
+    throw new HTTPException(500);
+  }
+
+  const sessionId = getSessionId(c, options);
   if (sessionId) {
     return sessionId;
   }
@@ -52,14 +62,7 @@ export async function ensureSessionCookie(c: Context, appId: string) {
       throw new HTTPException(500, { message: "Failed to create session" });
     }
 
-    setCookie(c, COOKIE_NAME, inserted.id, {
-      maxAge: COOKIE_MAX_AGE,
-      secure: true,
-      sameSite: "None",
-      httpOnly: true,
-      // TODO: We might need to set the cookie to different domains
-      // domain: ??
-    });
+    c.res.headers.set(MAINFRAME_SESSION_HEADER, inserted.id);
 
     return inserted.id;
   } catch (e) {

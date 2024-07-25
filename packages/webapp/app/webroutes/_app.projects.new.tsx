@@ -20,7 +20,7 @@ export default function NewProjectPage() {
 
   const createApp = useMutation({
     mutationFn: async ({ name }: { name: string }) => {
-      const res = await apiClient.apps.$post({
+      const res = await apiClient.connect.apps.$post({
         json: {
           name,
         },

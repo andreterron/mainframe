@@ -1,8 +1,4 @@
 import { env } from "../lib/env_client";
-import { hc } from "hono/client";
-// TODO: Use AppType instead of ConnectAPIType
-import type { ConnectAPIType } from "@mainframe-api/server";
+import { createApiClient } from "mainframe-api";
 
-export const apiClient = hc<ConnectAPIType>(`${env.VITE_API_URL}/connect`, {
-  init: { credentials: "include" },
-});
+export const apiClient = createApiClient(env.VITE_API_URL);

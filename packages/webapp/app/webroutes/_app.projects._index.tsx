@@ -22,7 +22,7 @@ export default function ProjectsPage() {
   const { data: apps } = useQuery({
     queryKey: ["projects"],
     queryFn: async () => {
-      const res = await apiClient.apps.$get();
+      const res = await apiClient.connect.apps.$get();
       return res.json();
     },
   });

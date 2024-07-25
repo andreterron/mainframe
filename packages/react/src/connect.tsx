@@ -60,7 +60,9 @@ export function useConnections() {
       }
 
       const connections = await res.json();
-      return connections.map((c) => new Connection(c, client.config));
+      return connections.map(
+        (c) => new Connection(c, client.config, client.sessionStore),
+      );
     },
     {
       compare(a, b) {
@@ -74,7 +76,6 @@ export function useConnections() {
           if (
             a[i]!.id !== b[i]!.id ||
             a[i]!.config.apiUrl !== b[i]!.config.apiUrl ||
-            a[i]!.connected !== b[i]!.connected ||
             a[i]!.provider !== b[i]!.provider
           ) {
             return false;
@@ -91,9 +92,7 @@ export function useConnection(provider: ProviderName) {
   const mainframe = useMainframeClient();
   const { data: connections, isLoading } = useConnections();
 
-  const connection = connections?.find(
-    (c) => c.connected && c.provider === provider,
-  );
+  const connection = connections?.find((c) => c.provider === provider);
 
   return {
     connection,

@@ -2,18 +2,7 @@ import { Context } from "hono";
 import { Env } from "../../types.ts";
 import { getSessionFromId, getSessionIdFromCookieHeader } from "../sessions.ts";
 import { ensureDB } from "../../utils/ensure-db.ts";
-
-export function parseBearerHeader(header: string | undefined) {
-  if (!header) {
-    return undefined;
-  }
-
-  const match = header.match(/^Bearer\s+(.*)$/);
-
-  if (match) {
-    return match[1];
-  }
-}
+import { parseBearerHeader } from "../parse-bearer-header.ts";
 
 export async function isApiRequestAuthorizedForPasswordAuth<
   E extends Env = Env,

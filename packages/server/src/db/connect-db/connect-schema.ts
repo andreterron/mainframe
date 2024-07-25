@@ -4,7 +4,7 @@ import {
   customType,
   integer,
 } from "drizzle-orm/sqlite-core";
-import { sql } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import { supportedConnectProviders } from "../../lib/integrations";
 
 const enumType = <VALUES extends readonly string[]>(
@@ -115,4 +115,23 @@ export const connectionsTable = sqliteTable("connections", {
     }),
   nangoConnectionId: text("nango_connection_id"),
   provider: runtimeEnumType("provider", supportedConnectProviders).notNull(),
+  initiatedAt: integer("initiated_at_sec", { mode: "timestamp" }).notNull(),
+  linkId: text("link_id").unique(),
 });
+
+export const connectionSessionRelation = relations(
+  connectionsTable,
+  ({ one }) => ({
+    session: one(sessionsTable, {
+      fields: [connectionsTable.sessionId],
+      references: [sessionsTable.id],
+    }),
+  }),
+);
+
+export const sessionAppRelation = relations(sessionsTable, ({ one }) => ({
+  app: one(appsTable, {
+    fields: [sessionsTable.appId],
+    references: [appsTable.id],
+  }),
+}));

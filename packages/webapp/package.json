@@ -36,7 +36,6 @@
     "clsx": "^2.0.0",
     "envsafe": "^2.0.3",
     "esbuild-wasm": "^0.20.2",
-    "hono": "^4.4.3",
     "jotai": "^2.8.0",
     "jotai-scope": "^0.6.0",
     "lodash-es": "^4.17.21",

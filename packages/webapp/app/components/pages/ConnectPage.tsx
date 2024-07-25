@@ -13,24 +13,37 @@ import Nango from "@nangohq/frontend";
 import { datasetIcon } from "../../lib/integrations/icons/datasetIcon";
 import mainframeLogo from "../../images/icon-192x192.png";
 import { nanoid } from "nanoid";
+import { apiClient } from "../../lib/api_client";
+import { useQuery } from "@tanstack/react-query";
 
 export function ConnectPage() {
   const params = useParams();
-  const appId = params.appId;
-  const provider = params.provider;
-  const connectionId = params.connectionId;
+  const linkId = params.linkId;
   // const utils = trpc.useUtils();
   // const checkNangoIntegration = trpc.checkNangoIntegration.useMutation({
   //   onSettled() {
   //     utils.datasetsGet.invalidate();
   //   },
   // });
+  const { data: connection } = useQuery(["connect_link", linkId], async () => {
+    if (!linkId) {
+      throw new Error("Invalid link ID");
+    }
+    const res = await apiClient.connect.link[":link_id"].$get({
+      param: {
+        link_id: linkId,
+      },
+    });
+    return res.json();
+  });
   const { data: integrations, isLoading: isLoadingIntegrations } =
     trpc.integrationsAll.useQuery();
-  const integration = provider ? integrations?.[provider] : undefined;
+  const integration = connection?.provider
+    ? integrations?.[connection?.provider]
+    : undefined;
 
   const handleNangoConnection = async (integrationId: string) => {
-    if (!env.VITE_NANGO_PUBLIC_KEY || !connectionId) {
+    if (!env.VITE_NANGO_PUBLIC_KEY || !connection?.id || !linkId) {
       return;
     }
     const nango = new Nango({
@@ -40,21 +53,16 @@ export function ConnectPage() {
       // TODO: Create new dataset? Create unauth user?
       // TODO: Mainframe is in a new tab, and nango.auth opens yet another tab.
       //       can we limit to just one new tab?
-      const nangoResult = await nango.auth(integrationId, connectionId);
+      const nangoResult = await nango.auth(integrationId, connection.id);
 
-      const connRes = await fetch(
-        `${env.VITE_API_URL}/connect/apps/${appId}/connections/${connectionId}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            nangoConnectionId: nangoResult.connectionId,
-          }),
-          credentials: "include",
+      const connRes = await apiClient.connect.link[":link_id"].$put({
+        param: {
+          link_id: linkId,
         },
-      );
+        json: {
+          nangoConnectionId: nangoResult.connectionId,
+        },
+      });
 
       if (!connRes.ok) {
         console.error(await connRes.text());
@@ -69,13 +77,13 @@ export function ConnectPage() {
   };
   const nangoIntegration = integration?.authTypes?.nango;
 
-  if (!nangoIntegration || !provider) {
+  if (!nangoIntegration || !connection?.provider) {
     if (isLoadingIntegrations) {
       return <div></div>;
     }
     return <div>Integration not found</div>;
   }
-  const icon = datasetIcon(provider);
+  const icon = datasetIcon(connection.provider);
 
   return (
     <div className="flex flex-col pt-32 gap-8 items-center max-w-2xl mx-auto">

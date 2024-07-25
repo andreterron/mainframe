@@ -29,7 +29,7 @@ export default function ProjectDetailsPage() {
       if (!appId) {
         return undefined;
       }
-      const res = await apiClient.apps[":app_id"].$get({
+      const res = await apiClient.connect.apps[":app_id"].$get({
         param: {
           app_id: appId,
         },
@@ -45,7 +45,7 @@ export default function ProjectDetailsPage() {
       if (!params.id || !confirm("Delete project?")) {
         return undefined;
       }
-      const res = await apiClient.apps[":app_id"].$delete({
+      const res = await apiClient.connect.apps[":app_id"].$delete({
         param: {
           app_id: params.id,
         },
@@ -67,7 +67,7 @@ export default function ProjectDetailsPage() {
       if (!params.id) {
         return undefined;
       }
-      const res = await apiClient.apps[":app_id"].$put({
+      const res = await apiClient.connect.apps[":app_id"].$put({
         param: {
           app_id: params.id,
         },

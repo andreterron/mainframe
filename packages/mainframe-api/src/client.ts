@@ -1,10 +1,20 @@
 import { createApiClient } from "./api-client";
 import { Connection } from "./connection";
-import { DEFAULT_HOSTS } from "./constants";
-import { MainframeClientConfig, ProviderName } from "./types";
+import { DEFAULT_HOSTS, MAINFRAME_SESSION_HEADER } from "./constants";
+import { LocalStorageMainframeSessionStore } from "./session-storage";
+import {
+  MainframeClientConfig,
+  MainframeSessionStore,
+  ProviderName,
+} from "./types";
 
 export class Mainframe {
-  constructor(private _config: MainframeClientConfig) {}
+  readonly sessionStore: MainframeSessionStore;
+
+  constructor(private _config: MainframeClientConfig) {
+    this.sessionStore =
+      _config.sessionStore ?? new LocalStorageMainframeSessionStore();
+  }
 
   get appId() {
     return this.config.appId;
@@ -14,7 +24,25 @@ export class Mainframe {
     return { ...DEFAULT_HOSTS, ...this._config };
   }
 
-  api = createApiClient(this.config.apiUrl);
+  api = createApiClient(this.config.apiUrl, {
+    headers: async (): Promise<Record<string, string>> => {
+      const session = await this.sessionStore.get();
+      if (!session) {
+        return {};
+      }
+      return {
+        Authorization: `Bearer ${session}`,
+      };
+    },
+    fetch: async (input, requestInit, Env, executionCtx) => {
+      const res = await fetch(input, requestInit);
+      const session = res.headers.get(MAINFRAME_SESSION_HEADER);
+      if (session) {
+        await this.sessionStore.set(session);
+      }
+      return res;
+    },
+  });
 
   async initiateAuth(
     provider: ProviderName,
@@ -38,7 +66,7 @@ export class Mainframe {
           if (!w?.closed) {
             w?.close();
           }
-          resolve(new Connection(connection, config));
+          resolve(new Connection(connection, config, this.sessionStore));
           return;
         }
 
