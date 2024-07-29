@@ -85,6 +85,19 @@ export class Mainframe {
     });
   }
 
+  async disconnect() {
+    const res = await this.api.connect.sessions.$delete();
+
+    // NOTE: we await the API call to ensure the session isn't cleared
+    // before we try to delete it in the server.
+    await this.sessionStore.clear();
+
+    if (!res.ok) {
+      console.error("Failed to delete session on server");
+      // TODO: Report error
+    }
+  }
+
   private async prepareConnection(provider: ProviderName) {
     const res = await this.api.connect.apps[":app_id"].connections.$post({
       param: {

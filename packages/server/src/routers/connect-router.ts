@@ -209,6 +209,24 @@ export const connectRouter = new Hono<Env>()
       })),
     );
   })
+  .delete("/sessions", async (c) => {
+    if (!connectDB) {
+      console.error("Missing connectDB");
+      throw new HTTPException(500);
+    }
+
+    const sessionId = getSessionFromContext(c);
+
+    if (!sessionId) {
+      return new Response(null, { status: 204 });
+    }
+
+    await connectDB
+      .delete(sessionsTable)
+      .where(eq(sessionsTable.id, sessionId));
+
+    return new Response(null, { status: 204 });
+  })
   .post(
     "/apps/:app_id/connections",
     zValidator(

@@ -22,4 +22,8 @@ export class LocalStorageMainframeSessionStore
     this._mainframeSession = session;
     localStorage.setItem(LOCALSTORAGE_KEY, session);
   }
+  clear(): void {
+    this._mainframeSession = undefined;
+    localStorage.removeItem(LOCALSTORAGE_KEY);
+  }
 }

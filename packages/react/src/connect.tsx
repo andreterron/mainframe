@@ -90,7 +90,7 @@ export function useConnections() {
 // TODO: Let the developer provide a unique ID
 export function useConnection(provider: ProviderName) {
   const mainframe = useMainframeClient();
-  const { data: connections, isLoading } = useConnections();
+  const { data: connections, isLoading, mutate } = useConnections();
 
   const connection = connections?.find((c) => c.provider === provider);
 
@@ -98,6 +98,10 @@ export function useConnection(provider: ProviderName) {
     connection,
     isLoading,
     initiateAuth: () => mainframe.initiateAuth(provider),
+    disconnect: async () => {
+      await mainframe.disconnect();
+      await mutate();
+    },
   };
 }
 
