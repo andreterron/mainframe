@@ -73,11 +73,7 @@ export function useConnections() {
           return false;
         }
         for (let i = 0; i < a.length; i++) {
-          if (
-            a[i]!.id !== b[i]!.id ||
-            a[i]!.config.apiUrl !== b[i]!.config.apiUrl ||
-            a[i]!.provider !== b[i]!.provider
-          ) {
+          if (!a[i]!.isEqual(b[i]!)) {
             return false;
           }
         }
