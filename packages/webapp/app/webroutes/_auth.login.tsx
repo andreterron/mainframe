@@ -101,9 +101,7 @@ export default function AuthLogin() {
           ) : null}
           {authEnabled?.link.enabled ? (
             <Button asChild>
-              <a href={authEnabled.link.loginUrl}>
-                ō&nbsp;&nbsp;&nbsp;Continue with Hellō
-              </a>
+              <a href={authEnabled.link.loginUrl}>Continue to Login</a>
             </Button>
           ) : null}
           <div className="mt-2 text-sm text-rose-700">
