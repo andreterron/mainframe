@@ -1,6 +1,6 @@
 {
   "name": "@mainframe-api/webapp",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "private": true,
   "author": "Andre Terron (https://andreterron.com)",
   "sideEffects": false,
