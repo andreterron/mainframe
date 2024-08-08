@@ -9,6 +9,7 @@ export const Post = defineDocumentType(() => ({
     description: { type: "string", required: false },
     date: { type: "date", required: false },
     path: { type: "string", required: false },
+    basepath: { type: "string", required: false },
   },
   computedFields: {
     fileName: {
@@ -17,13 +18,7 @@ export const Post = defineDocumentType(() => ({
     },
     url: {
       type: "string",
-      resolve: (post) => {
-        console.log(post._raw);
-        return (
-          post.path ||
-          `/posts/${post._raw.sourceFileName.replace(/\.mdx$/, "")}`
-        );
-      },
+      resolve: (post) => post.path || `/${post._raw.flattenedPath}`,
     },
   },
 }));

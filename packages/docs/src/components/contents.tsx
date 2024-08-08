@@ -7,7 +7,10 @@ import { useMDXComponent } from "next-contentlayer2/hooks";
 import { mdxComponents } from "./mdx";
 
 export function PostContents({ slug }: { slug: string }) {
-  const postIndex = allPages.findIndex((post) => post.fileName === slug);
+  console.log("SLUG", slug);
+  const postIndex = allPages.findIndex(
+    (post) => post._raw.flattenedPath === slug,
+  );
   if (postIndex === -1) throw new Error(`Post not found for slug: ${slug}`);
   const post = allPages[postIndex]!;
   const previousPost = postIndex > 0 ? allPages[postIndex - 1] : undefined;

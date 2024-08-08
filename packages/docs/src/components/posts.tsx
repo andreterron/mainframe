@@ -6,7 +6,7 @@ export const sections = [
   { name: "Getting Started", pages: ["installation"] },
   {
     name: "Self-hosting",
-    pages: ["self-hosting-setup", "systemd-service", "cloudflare-tunnels"],
+    pages: ["self-hosting", "systemd-service", "cloudflare-tunnels"],
   },
   {
     name: "Integrations",
