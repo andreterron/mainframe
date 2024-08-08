@@ -6,20 +6,11 @@ import { PageBreadcrumb } from "../components/PageBreadcrumb";
 import { BreadcrumbItem, BreadcrumbPage } from "../components/ui/breadcrumb";
 import { PreviewLabel } from "../components/PreviewLabel";
 import { apiClient } from "../lib/api_client";
-import { cn } from "../lib/utils";
-import { AppWindowIcon, PlusSquareIcon } from "lucide-react";
 
-function ProjectItem({
-  className,
-  children,
-  to,
-}: PropsWithChildren<{ className?: string; to: To }>) {
+function ProjectItem({ children, to }: PropsWithChildren<{ to: To }>) {
   return (
     <Link
-      className={cn(
-        "border flex items-center h-12 w-80 rounded shadow px-3",
-        className,
-      )}
+      className="border flex items-center h-12 w-80 rounded shadow px-3"
       to={to}
     >
       {children}
@@ -59,15 +50,11 @@ export default function ProjectsPage() {
         {apps?.map((app) => {
           return (
             <ProjectItem key={app.id} to={`/projects/${app.id}`}>
-              <AppWindowIcon className="size-4 mr-2" />
               {app.name || app.id}
             </ProjectItem>
           );
         })}
-        <ProjectItem className="text-muted-foreground" to="/projects/new">
-          <PlusSquareIcon className="size-4 mr-2" />
-          New Project
-        </ProjectItem>
+        <ProjectItem to="/projects/new">+</ProjectItem>
       </div>
     </div>
   );

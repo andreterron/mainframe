@@ -1,4 +1,6 @@
-# Toggl
+---
+title: Toggl
+---
 
 1. Navigate to your [Profile Settings](https://track.toggl.com/profile)
 2. Scroll to the bottom section: **API Token**

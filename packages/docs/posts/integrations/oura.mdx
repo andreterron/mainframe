@@ -1,4 +1,6 @@
-# Oura
+---
+title: Oura
+---
 
 Official documentation: https://cloud.ouraring.com/docs/authentication#personal-access-tokens
 
