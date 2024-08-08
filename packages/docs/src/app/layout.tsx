@@ -10,7 +10,7 @@ import { Sheet } from "../components/ui/sheet";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "Docs - Mainframe",
+  title: "Mainframe Docs",
   description: "API aggregator for React devs",
 };
 

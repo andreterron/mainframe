@@ -16,7 +16,7 @@ export const generateMetadata = ({
     (post) => post._raw.flattenedPath === params.slug.join("/"),
   );
   if (!post) throw new Error(`Post not found for slug: ${params.slug}`);
-  return { title: `${post.title} - Mainframe` };
+  return { title: `${post.title} - Mainframe Docs` };
 };
 
 const PostLayout = ({ params }: { params: { slug: string[] } }) => {
