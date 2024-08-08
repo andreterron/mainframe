@@ -19,8 +19,7 @@ async function getKeyUserId(token: string) {
 export const zotero: Integration = {
   name: "Zotero",
   authType: "token",
-  authSetupDocs:
-    "https://github.com/andreterron/mainframe/blob/main/packages/docs/integrations/zotero.md",
+  authSetupDocs: "https://docs.mainframe.so/integrations/zotero",
   objects: {
     key: {
       name: "Key",

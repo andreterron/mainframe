@@ -98,8 +98,7 @@ const startEntry = async (dataset: Dataset, input: { workspaceId: string }) => {
 export const toggl: Integration = {
   name: "Toggl",
   authType: "token",
-  authSetupDocs:
-    "https://github.com/andreterron/mainframe/blob/main/packages/docs/integrations/toggl.md",
+  authSetupDocs: "https://docs.mainframe.so/integrations/toggl",
   setupWebhooks: async (ctx, dataset: Dataset, baseApiUrl: string) => {
     // Remove trailing slashes
     const normalizedBaseApiUrl = baseApiUrl.replace(/\/+$/, "");
