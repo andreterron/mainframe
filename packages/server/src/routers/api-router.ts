@@ -95,7 +95,7 @@ export function createApiRouter<E extends Env = Env>(hooks: ApiRouterHooks<E>) {
         const token = await getTokenFromDataset(dataset);
 
         if (!token) {
-          throw new HTTPException(407);
+          throw new HTTPException(401);
         }
 
         // Delegate request to the integration

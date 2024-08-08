@@ -22,7 +22,11 @@ import { valtown } from "./integrations/valtown.ts";
 import { pick } from "lodash-es";
 import { z } from "zod";
 
-export const supportedConnectProviders = ["github", "bitbucket"] as const;
+export const supportedConnectProviders = [
+  "github",
+  "bitbucket",
+  "google",
+] as const;
 
 export const zTokenCredentials = z.object({ token: z.string().min(1) });
 export const zOAuthCredentials = z.object({

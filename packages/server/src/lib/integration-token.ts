@@ -15,5 +15,6 @@ export async function getTokenFromDataset(
       return connection.credentials.access_token;
     }
   }
+  // TODO: Support non-Nango OAuth
   return dataset.credentials?.token;
 }

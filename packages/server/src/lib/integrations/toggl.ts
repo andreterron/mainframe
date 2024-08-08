@@ -524,7 +524,7 @@ export const toggl: Integration = {
   },
   async proxyFetch(token, path, init) {
     const headers = new Headers(init?.headers);
-    if (!token) return new Response("Unauthorized", { status: 407 });
+    if (!token) return new Response("Unauthorized", { status: 401 });
 
     headers.set("Authorization", `Basic ${btoa(`${token}:api_token`)}`);
 

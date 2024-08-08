@@ -4,8 +4,17 @@ import { google as api, calendar_v3 } from "googleapis";
 import { datasetsTable } from "@mainframe-api/shared";
 import { eq } from "drizzle-orm";
 import { type SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
+import { getTokenFromDataset } from "../integration-token.ts";
 
 async function getAuth(dataset: Dataset, db: SqliteRemoteDatabase) {
+  if (dataset.credentials?.nangoIntegrationId) {
+    const token = await getTokenFromDataset(dataset);
+    return new api.auth.OAuth2({
+      credentials: {
+        access_token: token,
+      },
+    });
+  }
   if (
     !dataset.credentials ||
     !dataset.credentials.clientId ||
@@ -48,6 +57,9 @@ export const google: Integration = {
   authType: "oauth2",
   // TODO: Show the markdown file in the dashboard
   authSetupDocs: "https://docs.mainframe.so/integrations/google",
+  authTypes: {
+    nango: { integrationId: "google-calendar" },
+  },
   async getOAuthUrl(baseUrl: string, dataset: Dataset) {
     if (
       !dataset.credentials ||
@@ -98,6 +110,17 @@ export const google: Integration = {
         },
       })
       .where(eq(datasetsTable.id, dataset.id));
+  },
+  async proxyFetch(token, path, init) {
+    const headers = new Headers(init?.headers);
+    if (!token) return new Response("Unauthorized", { status: 401 });
+
+    headers.set("Authorization", `Bearer ${token}`);
+
+    return fetch(`https://www.googleapis.com/${path}`, {
+      ...init,
+      headers,
+    });
   },
   tables: {
     events: {

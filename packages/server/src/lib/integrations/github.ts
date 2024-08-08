@@ -55,7 +55,7 @@ export const github: Integration = {
   },
   async proxyFetch(token: string, path: string, init) {
     const headers = new Headers(init?.headers);
-    if (!token) return new Response("Unauthorized", { status: 407 });
+    if (!token) return new Response("Unauthorized", { status: 401 });
 
     headers.set("Authorization", `Bearer ${token}`);
     // TODO: This header should be set by the client
