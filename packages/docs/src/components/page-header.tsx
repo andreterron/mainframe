@@ -5,6 +5,8 @@ import { GitHubButton } from "./github-button";
 import { DiscordIcon } from "./icons/discord-icon";
 import { Button } from "./ui/button";
 import { XIcon } from "./icons/x-icon";
+import { MenuIcon } from "lucide-react";
+import { SheetTrigger } from "./ui/sheet";
 
 export function PageHeader({ className }: { className: string }) {
   return (
@@ -14,9 +16,15 @@ export function PageHeader({ className }: { className: string }) {
         "w-full flex items-center gap-2 py-4 px-8",
         "border-b border-border/40 text-amber-950 dark:text-amber-50 bg-background/70 dark:bg-background/30 backdrop-blur-lg z-10 shadow-xs",
         "before:absolute before:inset-0 before:bg-amber-100/20 dark:before:bg-transparent [&>*]:relative",
+        "hover:[&_.rounded-md]:bg-primary/15",
         className,
       )}
     >
+      <SheetTrigger className="lg:hidden" asChild>
+        <Button variant="ghost" size="icon">
+          <MenuIcon className="size-5" />
+        </Button>
+      </SheetTrigger>
       {/* TODO: Link to localhost in dev mode */}
       <a
         href="https://mainframe.so"

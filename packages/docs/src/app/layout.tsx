@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "../components/theme-provider";
 import { Sidebar } from "../components/sidebar";
 import { PageHeader } from "../components/page-header";
+import { Sheet } from "../components/ui/sheet";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -33,11 +34,13 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <div className="min-h-screen flex flex-col">
-            <PageHeader className="grow-0" />
-            <div className="flex-1 flex">
-              <Sidebar />
-              {children}
-            </div>
+            <Sheet>
+              <PageHeader className="grow-0" />
+              <div className="flex-1 flex">
+                <Sidebar />
+                {children}
+              </div>
+            </Sheet>
           </div>
         </ThemeProvider>
       </body>
