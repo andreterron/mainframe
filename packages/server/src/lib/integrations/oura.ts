@@ -50,8 +50,7 @@ function dateTable(name: string, path: string): IntegrationTable {
 export const oura: Integration = {
   name: "Oura",
   authType: "token",
-  authSetupDocs:
-    "https://github.com/andreterron/mainframe/blob/main/packages/docs/integrations/oura.md",
+  authSetupDocs: "https://docs.mainframe.so/integrations/oura",
   objects: {
     user: {
       name: "User",
