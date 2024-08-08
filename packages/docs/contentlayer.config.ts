@@ -2,7 +2,7 @@ import { defineDocumentType, makeSource } from "contentlayer2/source-files";
 
 export const Post = defineDocumentType(() => ({
   name: "Post",
-  filePathPattern: `**/*.mdx`,
+  filePathPattern: `**/*.{md,mdx}`,
   contentType: "mdx",
   fields: {
     title: { type: "string", required: true },
@@ -14,7 +14,7 @@ export const Post = defineDocumentType(() => ({
   computedFields: {
     fileName: {
       type: "string",
-      resolve: (post) => post._raw.sourceFileName.replace(/\.mdx$/, ""),
+      resolve: (post) => post._raw.sourceFileName.replace(/\.mdx?$/, ""),
     },
     url: {
       type: "string",
