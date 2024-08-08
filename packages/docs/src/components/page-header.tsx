@@ -10,15 +10,17 @@ export function PageHeader({ className }: { className: string }) {
   return (
     <div
       className={cn(
-        "w-full flex items-center gap-2 py-4 px-8 border-b",
+        "sticky top-0",
+        "w-full flex items-center gap-2 py-4 px-8",
+        "border-b border-border/40 text-amber-950 dark:text-amber-50 bg-background/70 dark:bg-background/30 backdrop-blur-lg z-10 shadow-xs",
+        "before:absolute before:inset-0 before:bg-amber-100/20 dark:before:bg-transparent [&>*]:relative",
         className,
       )}
     >
       {/* TODO: Link to localhost in dev mode */}
       <a
         href="https://mainframe.so"
-        target="_self"
-        className="text-lg font-bold inline-block shrink-0"
+        className="pt-1.5 px-0.5 pb-1 border-b-2 border-b-amber-300 dark:border-b-amber-500 -mr-0.5"
       >
         <MainframeLogo className="w-36" />
       </a>

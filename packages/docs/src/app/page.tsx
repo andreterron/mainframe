@@ -1,5 +1,6 @@
-import { PostContents } from "../components/contents";
+import { redirect } from "next/navigation";
+import { allPages } from "../components/posts";
 
 export default function Home() {
-  return <PostContents slug="installation" />;
+  redirect(allPages[0].url);
 }

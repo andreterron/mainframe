@@ -7,7 +7,6 @@ import { useMDXComponent } from "next-contentlayer2/hooks";
 import { mdxComponents } from "./mdx";
 
 export function PostContents({ slug }: { slug: string }) {
-  console.log("SLUG", slug);
   const postIndex = allPages.findIndex(
     (post) => post._raw.flattenedPath === slug,
   );
@@ -28,7 +27,7 @@ export function PostContents({ slug }: { slug: string }) {
         >
           {format(parseISO(post.date), "LLLL d, yyyy")}
         </time> */}
-        <div className="mb-1 text-xs text-accent-foreground uppercase">
+        <div className="mb-1 text-xs text-primary uppercase font-bold">
           {post.section}
         </div>
         <div className="mb-3">
