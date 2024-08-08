@@ -22,9 +22,8 @@ function SidebarContent() {
             <div className="flex flex-col gap-1">
               {section.pages.map((post) => {
                 return (
-                  <SheetClose asChild>
+                  <SheetClose key={post._id} asChild>
                     <Button
-                      key={post._id}
                       variant="ghost"
                       size="sm"
                       className={cn(
