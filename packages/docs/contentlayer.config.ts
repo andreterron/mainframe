@@ -7,6 +7,8 @@ export const Post = defineDocumentType(() => ({
   fields: {
     title: { type: "string", required: true },
     description: { type: "string", required: false },
+    section: { type: "string", required: false },
+    highlight: { type: "string", required: false },
     date: { type: "date", required: false },
     path: { type: "string", required: false },
     basepath: { type: "string", required: false },

@@ -1,0 +1,117 @@
+---
+title: Install Mainframe with Vite
+section: Getting Started
+highlight: /installation
+date: "2024-08-05"
+---
+
+<Steps>
+  <Step title="Create project">
+    Start by creating a new Vite project if you don’t have one set up already. The most common approach is to by using the Create Vite terminal command.
+
+    ```bash
+    npm create vite@latest my-project -- --template react-ts
+    ```
+
+    Run the commands suggested by vite:
+
+    ```bash
+    cd my-project
+    npm install
+    npm run dev
+    ```
+
+  </Step>
+  <Step title="Install Mainframe client">
+    Install the Mainframe client package. This package provides the necessary tools to use Mainframe within your application.
+
+
+    ```bash
+    npm i @mainframe-api/react
+    ```
+
+  </Step>
+  <Step title="Add MainframeProvider">
+    Wrap your root component with `MainframeProvider`. This provider requires an `appId`. You can obtain the `appId` for other projects on their respective pages. Update your `main.tsx` file as follows:
+
+    {/* TODO: Create a better way to set the app ID here */}
+
+    <Alert>
+      <MessageCircleWarningIcon className="size-4" />
+      <AlertTitle>Replace `APP_ID` with your app ID</AlertTitle>
+      <AlertDescription>You can find your app ID on your [projects page](https://app.mainframe.so/projects)</AlertDescription>
+    </Alert>
+
+    ```tsx
+    // main.tsx
+    import React from 'react'
+    import ReactDOM from 'react-dom/client'
+    import App from './App.tsx'
+    import './index.css'
+    import { MainframeProvider } from '@mainframe-api/react'
+
+    ReactDOM.createRoot(document.getElementById('root')!).render(
+      <React.StrictMode>
+        <MainframeProvider appId="APP_ID">
+          <App />
+        </MainframeProvider>
+      </React.StrictMode>,
+    )
+    ```
+
+  </Step>
+  <Step title="Initiate authentication">
+    Add a button to initiate authentication to your desired data provider. This will open an OAuth connection allowing users to authenticate their accounts. This example demonstrates how to add a button to connect to GitHub using OAuth.
+
+    ```tsx
+    // App.tsx
+    import { useConnection } from '@mainframe-api/react'
+    import './App.css'
+
+    function App() {
+      const { connection, initiateAuth } = useConnection('github')
+
+      return (
+        <>
+          <h1>Mainframe</h1>
+          <button onClick={() => initiateAuth()}>
+            {connection ? 'Connected ✓' : 'Connect to GitHub'}
+          </button>
+        </>
+      )
+    }
+
+    export default App
+    ```
+
+  </Step>
+  <Step title="Access APIs">
+    Use the `useRequest` hook to fetch data from the underlying API. This example shows how to fetch the authenticated user's data from GitHub.
+
+    ```tsx
+    // App.tsx
+    import { useConnection, useRequest } from '@mainframe-api/react'
+    import './App.css'
+
+    function App() {
+      const { connection, initiateAuth } = useConnection('github')
+
+      // This makes a request to the GitHub API through a Mainframe proxy
+      const { data } = useRequest(connection, '/user')
+
+      return (
+        <>
+          <h1>Mainframe</h1>
+          <button onClick={() => initiateAuth()}>
+            {connection ? 'Connected ✓' : 'Connect to GitHub'}
+          </button>
+          {data && <p>Connected as @{data.login}</p>}
+        </>
+      )
+    }
+
+    export default App
+    ```
+
+  </Step>
+</Steps>

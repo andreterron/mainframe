@@ -7,9 +7,16 @@ import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
 import { useMediaQuery } from "../lib/use-media-query";
 import { SheetClose, SheetContent } from "./ui/sheet";
+import { useMemo } from "react";
+import { allPosts } from "contentlayer/generated";
 
 function SidebarContent() {
   const pathname = usePathname();
+
+  const activePost = useMemo(
+    () => allPosts.find((page) => page.url === pathname),
+    [pathname],
+  );
 
   return (
     <div className="w-72 py-8 flex flex-col gap-1">
@@ -28,7 +35,8 @@ function SidebarContent() {
                       size="sm"
                       className={cn(
                         "w-full px-4 py-1 text-start justify-start transition-none",
-                        pathname === post.url
+                        pathname === post.url ||
+                          activePost?.highlight === post.url
                           ? "!text-primary !bg-primary/10 dark:!bg-primary/20"
                           : "text-muted-foreground hover:text-foreground",
                       )}
