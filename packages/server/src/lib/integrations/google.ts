@@ -54,6 +54,7 @@ async function getAuth(dataset: Dataset, db: SqliteRemoteDatabase) {
 
 export const google: Integration = {
   name: "Google Calendar",
+  underReview: true,
   authType: "oauth2",
   // TODO: Show the markdown file in the dashboard
   authSetupDocs: "https://docs.mainframe.so/integrations/google",
