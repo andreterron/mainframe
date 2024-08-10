@@ -1,12 +1,21 @@
 import { cn } from "../lib/utils";
-import { ThemeToggle } from "./theme-toggle";
-import { MainframeLogo } from "./mainframe-logo";
-import { GitHubButton } from "./github-button";
+import { ThemeSubmenu, ThemeToggle } from "./theme-toggle";
+import { LinkedMainframeLogo } from "./mainframe-logo";
+import { GitHubButton, GitHubStars } from "./github-button";
 import { DiscordIcon } from "./icons/discord-icon";
 import { Button } from "./ui/button";
 import { XIcon } from "./icons/x-icon";
-import { MenuIcon } from "lucide-react";
+import { MenuIcon, MoreVerticalIcon } from "lucide-react";
 import { SheetTrigger } from "./ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { GitHubIcon } from "./icons/github-icon";
+import { DropdownMenuItemIndicator } from "@radix-ui/react-dropdown-menu";
+import Link from "next/link";
 
 export function PageHeader({ className }: { className: string }) {
   return (
@@ -25,17 +34,57 @@ export function PageHeader({ className }: { className: string }) {
           <MenuIcon className="size-5" />
         </Button>
       </SheetTrigger>
-      {/* TODO: Link to localhost in dev mode */}
-      <a
-        href="https://mainframe.so"
-        className="pt-1.5 px-0.5 pb-1 border-b-2 border-b-amber-300 dark:border-b-amber-500 -mr-0.5"
-      >
-        <MainframeLogo className="w-36" />
-      </a>
+      <LinkedMainframeLogo className="w-36" />
       <div className="flex-1"></div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            className="sm:hidden"
+            variant="ghost"
+            size="icon"
+            title="More items"
+          >
+            <MoreVerticalIcon className="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="sm:hidden" align="end">
+          <DropdownMenuItem asChild>
+            <a
+              href="https://github.com/andreterron/mainframe"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <GitHubIcon className="size-4 mr-2" />
+              GitHub
+              <GitHubStars className="ml-4" />
+            </a>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <a
+              href="https://discord.gg/HUS4y59Dxw"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <DiscordIcon className="size-4 mr-2" />
+              Discord
+            </a>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <a
+              href="https://x.com/MainframeAPI"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <XIcon className="w-4 h-3 mr-2" />
+              Follow us
+            </a>
+          </DropdownMenuItem>
+          <ThemeSubmenu />
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-      <GitHubButton />
-      <Button variant="ghost" size="icon" asChild>
+      <GitHubButton className="max-sm:hidden" />
+      <Button className="max-sm:hidden" variant="ghost" size="icon" asChild>
         <a
           href="https://discord.gg/HUS4y59Dxw"
           target="_blank"
@@ -44,7 +93,7 @@ export function PageHeader({ className }: { className: string }) {
           <DiscordIcon className="size-4" />
         </a>
       </Button>
-      <Button variant="ghost" size="icon" asChild>
+      <Button className="max-sm:hidden" variant="ghost" size="icon" asChild>
         <a
           href="https://x.com/MainframeAPI"
           target="_blank"
@@ -53,7 +102,7 @@ export function PageHeader({ className }: { className: string }) {
           <XIcon className="size-3" />
         </a>
       </Button>
-      <ThemeToggle variant="ghost" size="icon" />
+      <ThemeToggle className="max-sm:hidden" variant="ghost" size="icon" />
     </div>
   );
 }

@@ -1,5 +1,17 @@
 import { SVGProps } from "react";
 
+export function LinkedMainframeLogo(props: SVGProps<SVGSVGElement>) {
+  // TODO: Link to localhost in dev mode
+  return (
+    <a
+      href="https://mainframe.so"
+      className="pt-1.5 px-0.5 pb-1 border-b-2 border-b-amber-300 dark:border-b-amber-500 -ml-0.5 block w-fit"
+    >
+      <MainframeLogo {...props} />
+    </a>
+  );
+}
+
 export function MainframeLogo(props: SVGProps<SVGSVGElement>) {
   return (
     <svg

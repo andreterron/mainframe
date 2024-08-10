@@ -51,9 +51,13 @@ export function PostContents({ slug }: { slug: string }) {
       {(previousPost || nextPost) && (
         <div className="prose dark:prose-invert max-w-none">
           <hr className="mb-8 mt-12" />
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {previousPost && (
-              <Button variant="outline" className="col-start-1 w-fit" asChild>
+              <Button
+                variant="outline"
+                className="sm:col-start-1 sm:w-fit justify-start"
+                asChild
+              >
                 <Link href={previousPost.url}>
                   <ChevronLeft className="size-4 mr-2" />
                   {previousPost.title}
@@ -63,7 +67,7 @@ export function PostContents({ slug }: { slug: string }) {
             {nextPost && (
               <Button
                 variant="outline"
-                className="col-start-2 w-fit ml-auto"
+                className="sm:col-start-2 sm:w-fit sm:ml-auto justify-end"
                 asChild
               >
                 <Link href={nextPost.url}>

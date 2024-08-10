@@ -9,6 +9,11 @@ import { useMediaQuery } from "../lib/use-media-query";
 import { SheetClose, SheetContent } from "./ui/sheet";
 import { useMemo } from "react";
 import { allPosts } from "contentlayer/generated";
+import { LinkedMainframeLogo } from "./mainframe-logo";
+import { GitHubButton } from "./github-button";
+import { DiscordIcon } from "./icons/discord-icon";
+import { XIcon } from "./icons/x-icon";
+import { ThemeToggle } from "./theme-toggle";
 
 function SidebarContent() {
   const pathname = usePathname();
@@ -19,7 +24,7 @@ function SidebarContent() {
   );
 
   return (
-    <div className="w-72 py-8 flex flex-col gap-1">
+    <div className="w-full py-8 flex flex-col gap-1">
       {sections.map((section) => {
         return (
           <div key={section.name} className="mb-6">
@@ -62,7 +67,7 @@ export function Sidebar() {
     // TODO: Review how the sidebar is positioned and scrolled. I'm suspicious
     // of these classes: sticky top-[73px] max-h-[calc(100vh-73px)]
     return (
-      <div className="grow-0 sticky top-[73px] self-start overflow-auto max-h-[calc(100vh-73px)] shrink-0 px-4">
+      <div className="grow-0 sticky top-[73px] w-72 self-start overflow-auto max-h-[calc(100vh-73px)] shrink-0 px-4">
         <SidebarContent />
       </div>
     );
@@ -73,6 +78,9 @@ export function Sidebar() {
       side="left"
       className="data-[state=closed]:duration-150 data-[state=open]:duration-300"
     >
+      <div className="px-4">
+        <LinkedMainframeLogo className="w-36" />
+      </div>
       <SidebarContent />
     </SheetContent>
   );
