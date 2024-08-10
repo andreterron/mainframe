@@ -49,7 +49,7 @@ export function PostContents({ slug }: { slug: string }) {
         <MDXContent components={mdxComponents} />
       </div>
       {(previousPost || nextPost) && (
-        <div className="prose dark:prose-invert max-w-none">
+        <div className="prose prose-zinc dark:prose-invert max-w-none">
           <hr className="mb-8 mt-12" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {previousPost && (
