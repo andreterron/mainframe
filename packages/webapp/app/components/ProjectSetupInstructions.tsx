@@ -93,6 +93,7 @@ export function ProjectSetupInstructions({
         </p>
 
         <SyntaxHighlighter
+          className="[&_*]:!no-underline"
           customStyle={{ ...customStyle, padding: "1rem" }}
           language={"bash"}
           style={codeStyle}
@@ -116,6 +117,7 @@ export function ProjectSetupInstructions({
         </p>
 
         <SyntaxHighlighter
+          className="[&_*]:!no-underline"
           customStyle={{ ...customStyle, padding: "1rem" }}
           language={"bash"}
           style={codeStyle}
@@ -156,6 +158,7 @@ export function ProjectSetupInstructions({
         {/* TODO: Syntax highlight */}
 
         <SyntaxHighlighter
+          className="[&_*]:!no-underline"
           customStyle={customStyle}
           language={"tsx"}
           style={codeStyle}
@@ -205,6 +208,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         </p>
 
         <SyntaxHighlighter
+          className="[&_*]:!no-underline"
           customStyle={customStyle}
           language={"tsx"}
           style={codeStyle}
@@ -259,6 +263,7 @@ export default App
         </p>
 
         <SyntaxHighlighter
+          className="[&_*]:!no-underline"
           customStyle={customStyle}
           language={"tsx"}
           style={codeStyle}
