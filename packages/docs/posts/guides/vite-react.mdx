@@ -42,7 +42,7 @@ date: "2024-08-05"
       <AlertDescription>You can find your app ID on your [projects page](https://app.mainframe.so/projects)</AlertDescription>
     </Alert>
 
-    ```tsx
+    ```tsx{6,10,12}
     // main.tsx
     import React from 'react'
     import ReactDOM from 'react-dom/client'
@@ -63,7 +63,7 @@ date: "2024-08-05"
   <Step title="Initiate authentication">
     Add a button to initiate authentication to your desired data provider. This will open an OAuth connection allowing users to authenticate their accounts. This example demonstrates how to add a button to connect to GitHub using OAuth.
 
-    ```tsx
+    ```tsx{2,6,11-13}
     // App.tsx
     import { useConnection } from '@mainframe-api/react'
     import './App.css'
@@ -88,7 +88,7 @@ date: "2024-08-05"
   <Step title="Access APIs">
     Use the `useRequest` hook to fetch data from the underlying API. This example shows how to fetch the authenticated user's data from GitHub.
 
-    ```tsx
+    ```tsx{2,8,9,17}
     // App.tsx
     import { useConnection, useRequest } from '@mainframe-api/react'
     import './App.css'
