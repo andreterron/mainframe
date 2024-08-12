@@ -37,7 +37,6 @@ import { nango } from "../nango.ts";
 import { trpcMiddleware } from "@sentry/core";
 import { getTokenFromDataset } from "../integration-token.ts";
 import { github } from "../integrations/github.ts";
-import { network } from "../integrations/network.ts";
 import { peloton } from "../integrations/peloton.ts";
 import { posthog } from "../integrations/posthog.ts";
 import { toggl } from "../integrations/toggl.ts";

@@ -1,5 +1,4 @@
 export * from "./lib/integrations/github.ts";
-export * from "./lib/integrations/network.ts";
 export * from "./lib/integrations/peloton.ts";
 export * from "./lib/integrations/posthog.ts";
 export * from "./lib/integrations/toggl.ts";

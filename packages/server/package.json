@@ -56,7 +56,6 @@
     "googleapis": "^128.0.0",
     "hono": "^4.4.3",
     "json-to-ts": "^2.1.0",
-    "local-devices": "^3.0.0",
     "lodash-es": "^4.17.21",
     "nanoid": "^5.0.7",
     "openai": "^4.52.3",

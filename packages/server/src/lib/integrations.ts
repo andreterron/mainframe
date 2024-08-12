@@ -6,7 +6,6 @@ import {
 } from "./integration-types.ts";
 import { Dataset, ClientIntegration } from "@mainframe-api/shared";
 import { github } from "./integrations/github.ts";
-import { network } from "./integrations/network.ts";
 import { peloton } from "./integrations/peloton.ts";
 import { posthog } from "./integrations/posthog.ts";
 import { toggl } from "./integrations/toggl.ts";
@@ -48,9 +47,6 @@ export function getIntegrationFromType(
   }
   if (type === "peloton") {
     return peloton;
-  }
-  if (type === "network") {
-    return network;
   }
   if (type === "google") {
     return google;
