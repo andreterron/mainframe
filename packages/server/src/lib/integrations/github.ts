@@ -58,11 +58,15 @@ export const github: Integration = {
     if (!token) return new Response("Unauthorized", { status: 401 });
 
     headers.set("Authorization", `Bearer ${token}`);
-    // TODO: This header should be set by the client
-    headers.set("X-GitHub-Api-Version", "2022-11-28");
+
+    // Creates the request, then overrides the headers
+    const req = new Request(
+      new Request(`https://api.github.com/${path}`, init),
+      { headers },
+    );
 
     // TODO: Check if the response needs to be cleaned
-    return fetch(`https://api.github.com/${path}`, { ...init, headers });
+    return fetch(req);
   },
   computed: {
     issues: {

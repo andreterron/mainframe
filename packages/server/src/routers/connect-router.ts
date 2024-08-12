@@ -381,13 +381,18 @@ export const connectRouter = new Hono<Env>()
     }
     const token = nangoConnection.credentials.access_token;
 
-    // Delegate request to the integration
-    const apiRes = await integration.proxyFetch(token, apipath, {
-      ...req,
+    // Creates a new request overriding a few parameters.
+    // NOTE: Destructuring req to create a RequestInit doesn't work:
+    //       { ...req, headers }          // Doesn't work!
+    //       new Request(req, {headers})  // This works!
+    const newReq = new Request(req, {
       headers,
       redirect: "manual",
       integrity: undefined,
     });
+
+    // Delegate request to the integration
+    const apiRes = await integration.proxyFetch(token, apipath, newReq);
 
     const res = new Response(apiRes.body, apiRes);
 
