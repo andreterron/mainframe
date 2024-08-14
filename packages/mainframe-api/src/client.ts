@@ -1,7 +1,8 @@
 import { createApiClient } from "./api-client";
 import { Connection } from "./connection";
 import { DEFAULT_HOSTS, MAINFRAME_SESSION_HEADER } from "./constants";
-import { LocalStorageMainframeSessionStore } from "./session-storage";
+import { LocalStorageMainframeSessionStore } from "./session-storage/localstorage-session-storage";
+import { NoopMainframeSessionStore } from "./session-storage/noop-session-storage";
 import {
   MainframeClientConfig,
   MainframeSessionStore,
@@ -13,7 +14,10 @@ export class Mainframe {
 
   constructor(private _config: MainframeClientConfig) {
     this.sessionStore =
-      _config.sessionStore ?? new LocalStorageMainframeSessionStore();
+      _config.sessionStore ??
+      (typeof window !== "undefined"
+        ? new LocalStorageMainframeSessionStore()
+        : new NoopMainframeSessionStore());
   }
 
   get appId() {

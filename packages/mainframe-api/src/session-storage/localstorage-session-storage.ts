@@ -1,5 +1,5 @@
-import { LOCALSTORAGE_KEY } from "./constants";
-import { MainframeSessionStore } from "./types";
+import { LOCALSTORAGE_KEY } from "../constants";
+import { MainframeSessionStore } from "../types";
 
 export class LocalStorageMainframeSessionStore
   implements MainframeSessionStore

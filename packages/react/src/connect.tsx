@@ -1,5 +1,6 @@
 import React, {
   PropsWithChildren,
+  ReactNode,
   createContext,
   useContext,
   useMemo,
@@ -18,14 +19,31 @@ export * from "mainframe-api";
 
 const mainframeReactContext = createContext<Mainframe | undefined>(undefined);
 
+interface MainframeProviderClientProps extends PropsWithChildren<{}> {
+  client: Mainframe;
+}
+
+interface MainframeProviderAppIdProps extends PropsWithChildren<{}> {
+  appId: string;
+  config?: HostConfig;
+}
+
+export type MainframeProviderProps =
+  | MainframeProviderAppIdProps
+  | MainframeProviderClientProps;
+
 export function MainframeProvider({
-  appId,
-  config,
   children,
-}: PropsWithChildren<{ appId: string; config?: HostConfig }>) {
+}: MainframeProviderProps): ReactNode | null;
+export function MainframeProvider({
+  client,
+  appId,
+  children,
+  config,
+}: Partial<MainframeProviderClientProps & MainframeProviderAppIdProps>) {
   const mainframe = useMemo(
-    () => new Mainframe({ ...config, appId }),
-    [appId, config],
+    () => client ?? (appId ? new Mainframe({ ...config, appId }) : undefined),
+    [client, appId, config],
   );
   return (
     <mainframeReactContext.Provider value={mainframe}>
