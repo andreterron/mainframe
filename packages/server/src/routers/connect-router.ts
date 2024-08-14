@@ -376,7 +376,7 @@ export const connectRouter = new Hono<Env>()
       connection.id,
       false,
     );
-    if (nangoConnection?.credentials.type !== AuthModes.OAuth2) {
+    if (nangoConnection?.credentials.type !== "OAUTH2") {
       throw new HTTPException(401);
     }
     const token = nangoConnection.credentials.access_token;
