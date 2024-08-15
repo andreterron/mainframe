@@ -134,21 +134,17 @@ export default function ProjectDetailsPage() {
           </svg>
         </Button>
       </PageHeader>
-      {!app ? null : app.showSetup ? (
-        <div className="p-4 space-y-4">
-          <ProjectSetupInstructions appId={app?.id ?? ""}>
-            <Button
-              className="ml-10"
-              onClick={() => {
-                updateApp.mutate({ showSetup: false });
-              }}
-            >
-              Continue
-            </Button>
-          </ProjectSetupInstructions>
-        </div>
-      ) : (
-        <Tabs defaultValue="config" className="flex flex-col w-full">
+      {!app ? null : (
+        <Tabs
+          defaultValue={app.showSetup ? "instructions" : "config"}
+          className="flex flex-col w-full"
+          onValueChange={(value) => {
+            if (app.showSetup && value === "config") {
+              // TODO: Only hide "showSetup" after we got user access
+              updateApp.mutate({ showSetup: false });
+            }
+          }}
+        >
           <TabsList className="grid grid-cols-2 m-4 self-start">
             <TabsTrigger value="config">
               {/* <SheetIcon className="w-3.5 h-3.5 mr-1" /> */}
