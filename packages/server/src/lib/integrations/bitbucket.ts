@@ -2,6 +2,8 @@ import { getTokenFromDataset } from "../integration-token.ts";
 import { Integration } from "../integration-types.ts";
 import { Dataset } from "@mainframe-api/shared";
 
+// URL to configure OAuth: https://bitbucket.org/${workspace}/workspace/settings/api
+
 export const bitbucket: Integration = {
   name: "BitBucket",
   authType: "token",
