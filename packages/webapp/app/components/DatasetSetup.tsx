@@ -72,16 +72,14 @@ function IntegrationButton({
   );
 
   return integration.underReview ? (
-    <TooltipProvider>
-      <Tooltip delayDuration={0}>
-        {btn}
-        <TooltipContent className="max-w-xs" side="bottom" sideOffset={12}>
-          <p>
-            <UnderReviewMessage integration={integration} />
-          </p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip delayDuration={0}>
+      {btn}
+      <TooltipContent className="max-w-xs" side="bottom" sideOffset={12}>
+        <p>
+          <UnderReviewMessage integration={integration} />
+        </p>
+      </TooltipContent>
+    </Tooltip>
   ) : (
     btn
   );

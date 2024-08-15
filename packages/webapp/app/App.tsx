@@ -5,6 +5,7 @@ import { router } from "./router";
 import { OperationsProvider } from "./lib/hooks/use-operations";
 import { PostHogProvider } from "posthog-js/react";
 import { posthog } from "./lib/analytics";
+import { TooltipProvider } from "./components/ui/tooltip";
 
 function App() {
   const queryClient = useRootQueryClient();
@@ -15,7 +16,9 @@ function App() {
       <PostHogProvider client={posthog}>
         <QueryClientProvider client={queryClient}>
           <OperationsProvider>
-            <RouterProvider router={router} />
+            <TooltipProvider>
+              <RouterProvider router={router} />
+            </TooltipProvider>
           </OperationsProvider>
         </QueryClientProvider>
       </PostHogProvider>
