@@ -20,9 +20,8 @@ function getBaseUrl(req: Request) {
   return `${protocol}://${host}/oauth/callback`;
 }
 
-export const oauthRouter = new Hono<Env>().get(
-  "/start/:dataset_id",
-  async (c) => {
+export const oauthRouter = new Hono<Env>()
+  .get("/start/:dataset_id", async (c) => {
     const datasetId = c.req.param("dataset_id");
     const db = c.var.db;
     ensureDB(db);
@@ -67,45 +66,58 @@ export const oauthRouter = new Hono<Env>().get(
       console.error(e);
       throw new HTTPException(500, { cause: e });
     }
-  },
-);
+  })
+  .get("/callback/:dataset_id", async (c) => {
+    const datasetId = c.req.param("dataset_id");
+    const db = c.var.db;
+    ensureDB(db);
 
-oauthRouter.get("/callback/:dataset_id", async (c) => {
-  const datasetId = c.req.param("dataset_id");
-  const db = c.var.db;
-  ensureDB(db);
+    if (!datasetId) {
+      throw new HTTPException(404, { message: "Invalid dataset id" });
+    }
 
-  if (!datasetId) {
-    throw new HTTPException(404, { message: "Invalid dataset id" });
-  }
+    const [dataset] = await db
+      .select()
+      .from(datasetsTable)
+      .where(eq(datasetsTable.id, datasetId))
+      .limit(1);
+    if (!dataset) {
+      throw new HTTPException(404, { message: "Dataset not found" });
+    }
 
-  const [dataset] = await db
-    .select()
-    .from(datasetsTable)
-    .where(eq(datasetsTable.id, datasetId))
-    .limit(1);
-  if (!dataset) {
-    throw new HTTPException(404, { message: "Dataset not found" });
-  }
+    const integration = getIntegrationForDataset(dataset);
+    if (!integration) {
+      throw new HTTPException(404, { message: "Integration not found" });
+    }
 
-  const integration = getIntegrationForDataset(dataset);
-  if (!integration) {
-    throw new HTTPException(404, { message: "Integration not found" });
-  }
+    if (!integration.oauthCallback) {
+      throw new HTTPException(404, {
+        message: "Integration doesn't support oauth",
+      });
+    }
 
-  if (!integration.oauthCallback) {
-    throw new HTTPException(404, {
-      message: "Integration doesn't support oauth",
-    });
-  }
+    const baseUrl = getBaseUrl(c.req.raw);
 
-  const baseUrl = getBaseUrl(c.req.raw);
-
-  try {
-    await integration.oauthCallback(baseUrl, dataset, c.req.query() as any, db);
-    return c.redirect(`${env.APP_URL}/dataset/${dataset.id}`);
-  } catch (e) {
-    console.error(e);
-    throw new HTTPException(500, { cause: e });
-  }
-});
+    try {
+      await integration.oauthCallback(
+        baseUrl,
+        dataset,
+        c.req.query() as any,
+        db,
+      );
+      return c.redirect(`${env.APP_URL}/dataset/${dataset.id}`);
+    } catch (e) {
+      console.error(e);
+      throw new HTTPException(500, { cause: e });
+    }
+  })
+  // This route exists because of Nango
+  .get("/callback", async (c) => {
+    try {
+      const { search } = new URL(c.req.raw.url);
+      return c.redirect(`https://api.nango.dev/oauth/callback${search}`, 308);
+    } catch (e) {
+      console.error(e);
+      return c.notFound();
+    }
+  });
