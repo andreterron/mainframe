@@ -31,6 +31,20 @@ import {
 
 export const connectRouter = new Hono<Env>()
   // TODO: Review this cors() call
+  .use(async (c, next) => {
+    try {
+      const result = await next();
+      if (c.req.path.includes("proxy")) {
+        console.log("BODY LOCKED?", c.res.body?.locked);
+      }
+      return result;
+    } catch (e) {
+      if (c.req.path.includes("proxy")) {
+        console.log("BODY LOCKED? [ERR]", c.res.body?.locked);
+      }
+      throw e;
+    }
+  })
   .use(
     cors({
       origin: (origin) => origin,
@@ -316,7 +330,8 @@ export const connectRouter = new Hono<Env>()
     });
   })
   .all("/proxy/:connection_id/*", async (c) => {
-    console.log("Proxy 1");
+    const debugKey = Math.random().toString(36).slice(2, 8);
+    console.log("Proxy 1", debugKey);
     if (!connectDB) {
       console.error("Missing connectDB");
       throw new HTTPException(500);
@@ -382,7 +397,7 @@ export const connectRouter = new Hono<Env>()
     }
     const token = nangoConnection.credentials.access_token;
 
-    console.log("Proxy 2");
+    console.log("Proxy 2", debugKey);
 
     // Creates a new request overriding a few parameters.
     // NOTE: Destructuring req to create a RequestInit doesn't work:
@@ -394,19 +409,21 @@ export const connectRouter = new Hono<Env>()
       integrity: undefined,
     });
 
-    console.log("Proxy 3");
+    console.log("Proxy 3", debugKey);
     // Delegate request to the integration
     const apiRes = await integration.proxyFetch(token, apipath, newReq);
 
-    console.log("Proxy 4");
+    console.log("Proxy 4", debugKey);
 
-    const res = new Response(apiRes.body, apiRes);
+    const newBody = apiRes.body?.pipeThrough(new TransformStream()) ?? null;
+
+    const res = new Response(newBody, apiRes);
 
     // The content is already decoded when using fetch
     res.headers.delete("Content-Encoding");
     res.headers.delete("Content-Length");
 
-    console.log("Proxy 5");
+    console.log("Proxy 5", debugKey);
 
     return res;
   })
