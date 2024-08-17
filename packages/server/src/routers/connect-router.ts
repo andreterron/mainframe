@@ -316,6 +316,7 @@ export const connectRouter = new Hono<Env>()
     });
   })
   .all("/proxy/:connection_id/*", async (c) => {
+    console.log("Proxy 1");
     if (!connectDB) {
       console.error("Missing connectDB");
       throw new HTTPException(500);
@@ -381,6 +382,8 @@ export const connectRouter = new Hono<Env>()
     }
     const token = nangoConnection.credentials.access_token;
 
+    console.log("Proxy 2");
+
     // Creates a new request overriding a few parameters.
     // NOTE: Destructuring req to create a RequestInit doesn't work:
     //       { ...req, headers }          // Doesn't work!
@@ -391,14 +394,19 @@ export const connectRouter = new Hono<Env>()
       integrity: undefined,
     });
 
+    console.log("Proxy 3");
     // Delegate request to the integration
     const apiRes = await integration.proxyFetch(token, apipath, newReq);
+
+    console.log("Proxy 4");
 
     const res = new Response(apiRes.body, apiRes);
 
     // The content is already decoded when using fetch
     res.headers.delete("Content-Encoding");
     res.headers.delete("Content-Length");
+
+    console.log("Proxy 5");
 
     return res;
   })
