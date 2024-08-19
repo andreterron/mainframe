@@ -9,15 +9,17 @@ import { deserialize } from "../../utils/serialization.ts";
 import { HTTPException } from "hono/http-exception";
 import { Buffer } from "node:buffer";
 
-function togglHeaders(dataset: Dataset) {
+function togglHeadersForToken(token?: string) {
   return {
-    Authorization: dataset.credentials?.token
-      ? `Basic ${Buffer.from(dataset.credentials.token + ":api_token").toString(
-          "base64",
-        )}`
+    Authorization: token
+      ? `Basic ${Buffer.from(token + ":api_token").toString("base64")}`
       : "",
     "User-Agent": "Mainframe <mainframe.so>",
   };
+}
+
+function togglHeadersForDataset(dataset: Dataset) {
+  return togglHeadersForToken(dataset.credentials?.token);
 }
 
 export interface TogglWebhookBase {
@@ -76,7 +78,7 @@ const startEntry = async (dataset: Dataset, input: { workspaceId: string }) => {
     `https://api.track.toggl.com/api/v9/workspaces/${input.workspaceId}/time_entries`,
     {
       method: "POST",
-      headers: togglHeaders(dataset),
+      headers: togglHeadersForDataset(dataset),
       body: JSON.stringify({
         created_with: "Mainframe (https://mainframe.so)",
         description: null,
@@ -112,7 +114,7 @@ export const toggl: Integration = {
     const res = await fetch(
       "https://api.track.toggl.com/api/v9/me/workspaces",
       {
-        headers: togglHeaders(dataset),
+        headers: togglHeadersForDataset(dataset),
       },
     );
     if (!res.ok) {
@@ -128,7 +130,7 @@ export const toggl: Integration = {
       const res = await fetch(
         `https://api.track.toggl.com/webhooks/api/v1/subscriptions/${id}`,
         {
-          headers: togglHeaders(dataset),
+          headers: togglHeadersForDataset(dataset),
         },
       );
       if (!res.ok) {
@@ -149,7 +151,7 @@ export const toggl: Integration = {
           `https://api.track.toggl.com/webhooks/api/v1/subscriptions/${id}`,
           {
             method: "POST",
-            headers: togglHeaders(dataset),
+            headers: togglHeadersForDataset(dataset),
             body: JSON.stringify({
               url_callback: callbackUrl,
               event_filters: [{ entity: "*", action: "*" }],
@@ -184,7 +186,7 @@ export const toggl: Integration = {
             `https://api.track.toggl.com/webhooks/api/v1/ping/${id}/${webhookToThis.subscription_id}`,
             {
               method: "POST",
-              headers: togglHeaders(dataset),
+              headers: togglHeadersForDataset(dataset),
             },
           );
         } else if (!webhookToThis.enabled) {
@@ -192,7 +194,7 @@ export const toggl: Integration = {
             `https://api.track.toggl.com/webhooks/api/v1/subscriptions/${id}/${webhookToThis.subscription_id}`,
             {
               method: "PATCH",
-              headers: togglHeaders(dataset),
+              headers: togglHeadersForDataset(dataset),
               body: JSON.stringify({
                 enabled: true,
               }),
@@ -341,7 +343,7 @@ export const toggl: Integration = {
         const res = await fetch(
           "https://api.track.toggl.com/api/v9/me/time_entries/current",
           {
-            headers: togglHeaders(dataset),
+            headers: togglHeadersForDataset(dataset),
           },
         );
         if (res.ok) {
@@ -364,7 +366,7 @@ export const toggl: Integration = {
         const res = await fetch(
           "https://api.track.toggl.com/api/v9/me/time_entries",
           {
-            headers: togglHeaders(dataset),
+            headers: togglHeadersForDataset(dataset),
           },
         );
         if (res.ok) {
@@ -386,7 +388,7 @@ export const toggl: Integration = {
         const res = await fetch(
           "https://api.track.toggl.com/api/v9/me/workspaces",
           {
-            headers: togglHeaders(dataset),
+            headers: togglHeadersForDataset(dataset),
           },
         );
         if (res.ok) {
@@ -434,7 +436,7 @@ export const toggl: Integration = {
               const res = await fetch(
                 `https://api.track.toggl.com/webhooks/api/v1/subscriptions/${id}`,
                 {
-                  headers: togglHeaders(dataset),
+                  headers: togglHeadersForDataset(dataset),
                 },
               );
               if (!res.ok) {
@@ -469,7 +471,7 @@ export const toggl: Integration = {
       const res = await fetch(
         "https://api.track.toggl.com/api/v9/me/time_entries/current",
         {
-          headers: togglHeaders(dataset),
+          headers: togglHeadersForDataset(dataset),
         },
       );
       if (!res.ok) {
@@ -485,7 +487,7 @@ export const toggl: Integration = {
         `https://api.track.toggl.com/api/v9/workspaces/${entry.workspace_id}/time_entries/${entry.id}/stop`,
         {
           method: "PATCH",
-          headers: togglHeaders(dataset),
+          headers: togglHeadersForDataset(dataset),
         },
       );
     },
@@ -497,7 +499,7 @@ export const toggl: Integration = {
       const res = await fetch(
         "https://api.track.toggl.com/api/v9/me/time_entries/current",
         {
-          headers: togglHeaders(dataset),
+          headers: togglHeadersForDataset(dataset),
         },
       );
       if (!res.ok) {
@@ -516,7 +518,7 @@ export const toggl: Integration = {
           `https://api.track.toggl.com/api/v9/workspaces/${entry.workspace_id}/time_entries/${entry.id}/stop`,
           {
             method: "PATCH",
-            headers: togglHeaders(dataset),
+            headers: togglHeadersForDataset(dataset),
           },
         );
       }
@@ -526,9 +528,21 @@ export const toggl: Integration = {
     const headers = new Headers(init?.headers);
     if (!token) return new Response("Unauthorized", { status: 401 });
 
-    headers.set("Authorization", `Basic ${btoa(`${token}:api_token`)}`);
+    // Toggl Headers
+    const togglHeaders = togglHeadersForToken(token);
+    headers.set("Authorization", togglHeaders.Authorization);
+    // Only set User-Agent if the user didn't define theirs.
+    if (!headers.has("User-Agent")) {
+      headers.set("User-Agent", togglHeaders["User-Agent"]);
+    }
+
+    // Creates the request, then overrides the headers
+    const req = new Request(
+      new Request(`https://api.track.toggl.com/${path}`, init),
+      { headers },
+    );
 
     // TODO: Check if the response needs to be cleaned
-    return fetch(`https://api.track.toggl.com/${path}`, { ...init, headers });
+    return fetch(req);
   },
 };

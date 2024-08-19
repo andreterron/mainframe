@@ -96,8 +96,13 @@ export const bitbucket: Integration = {
 
     headers.set("Authorization", `Bearer ${token}`);
 
+    const req = new Request(
+      new Request(`https://api.bitbucket.org/${path}`, init),
+      { headers },
+    );
+
     // TODO: Check if the response needs to be cleaned
-    return fetch(`https://api.bitbucket.org/${path}`, { ...init, headers });
+    return fetch(req);
   },
 };
 

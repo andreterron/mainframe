@@ -118,10 +118,13 @@ export const google: Integration = {
 
     headers.set("Authorization", `Bearer ${token}`);
 
-    return fetch(`https://www.googleapis.com/${path}`, {
-      ...init,
-      headers,
-    });
+    const req = new Request(
+      new Request(`https://www.googleapis.com/${path}`, init),
+      { headers },
+    );
+
+    // TODO: Check if the response needs to be cleaned
+    return fetch(req);
   },
   tables: {
     events: {
