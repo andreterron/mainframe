@@ -81,27 +81,11 @@ export function ConnectPage() {
   return (
     <div className="flex flex-col justify-center min-h-screen bg-zinc-100 p-6">
       <div className="max-w-lg mx-auto text-center bg-white p-8 rounded-xl">
-        {/* <div className="flex w-full items-center max-w-60">
-          <div className="bg-blue-400 border-blue-600 border size-12 rounded-lg text-white flex items-center justify-center">
-            App
-          </div>
-          <div className="flex-grow h-px border-dashed border-t border-black"></div>
-          <img
-            className="border-amber-300 border size-12 rounded-lg overflow-hidden"
-            src={mainframeLogo}
-          />
-          <div className="flex-grow h-px border-dashed border-t border-black"></div>
-          <div className="bg-white border-gray-400 border size-12 p-1.5 rounded-lg">
-            <img className="relative object-contain" src={icon} />
-          </div>
-        </div> */}
         <div className="flex items-center justify-center mb-10 relative animate-unfold-connect delay-200">
           <div className="bg-white border-zinc-800 border w-12 h-12 rounded-lg text-zinc-900 flex items-center justify-center shadow-0-2">
             <AppWindow className="w-7 h-7" />
           </div>
-          <div className="flex-grow h-[1px] bg-gradient-to-r from-amber-500 via-amber-300 to-amber-500 mx-3 rounded-full relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-amber-400 via-zinc-700 to-amber-400 animate-pulse-beam"></div>
-          </div>
+          <PulseBeam />
           <div className="bg-zinc-800 border-amber-400 border w-14 h-14 rounded-lg flex items-center justify-center overflow-hidden animate-scale-in delay-200">
             <img
               className="w-12 h-12 object-contain"
@@ -109,9 +93,7 @@ export function ConnectPage() {
               alt="Mainframe Logo"
             />
           </div>
-          <div className="flex-grow h-[1px] bg-gradient-to-r from-amber-500 via-amber-300 to-amber-500 mx-3 rounded-full relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-amber-400 via-zinc-700 to-amber-400 animate-pulse-beam delay-1000"></div>
-          </div>
+          <PulseBeam />
           <div className="bg-white border-zinc-800 border w-12 h-12 rounded-lg flex items-center justify-center shadow-0-2">
             <img
               className="w-8 h-8 object-contain"
@@ -120,13 +102,6 @@ export function ConnectPage() {
             />
           </div>
         </div>
-
-        {/* <div className="text-center font-light text-lg">
-          This application uses{" "}
-          <strong className="font-semibold">Mainframe</strong>
-          <br />
-          to connect to {integration.name}.
-        </div> */}
 
         <div className="text-center text-lg mb-12">
           <p className="mb-4 text-zinc-700 dark:text-zinc-300">
@@ -169,21 +144,15 @@ export function ConnectPage() {
             </Button>
           </>
         ) : null}
-
-        {/* <div className="flex flex-col gap-8 items-start px-4">
-          {nangoIntegration && env.VITE_NANGO_PUBLIC_KEY ? (
-            <>
-              <Button
-                onClick={() =>
-                  handleNangoConnection(nangoIntegration.integrationId)
-                }
-              >
-                Continue
-              </Button>
-            </>
-          ) : null}
-        </div> */}
       </div>
+    </div>
+  );
+}
+
+function PulseBeam() {
+  return (
+    <div className="flex-grow h-[1px] bg-gradient-to-r from-amber-500 via-amber-300 to-amber-500 mx-3 rounded-full relative overflow-hidden">
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-amber-400 via-zinc-700 to-amber-400 animate-pulse-beam delay-1000"></div>
     </div>
   );
 }
