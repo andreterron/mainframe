@@ -81,12 +81,12 @@ export function ConnectPage() {
   return (
     <div className="flex flex-col justify-center min-h-screen bg-zinc-100 p-6">
       <div className="max-w-lg mx-auto text-center bg-white p-8 rounded-xl">
-        <div className="flex items-center justify-center mb-10 relative animate-unfold-connect delay-200">
+        <div className="flex items-center justify-center mb-10 relative animate-unfold-connect">
           <div className="bg-white border-zinc-800 border w-12 h-12 rounded-lg text-zinc-900 flex items-center justify-center shadow-0-2">
             <AppWindow className="w-7 h-7" />
           </div>
           <PulseBeam />
-          <div className="bg-zinc-800 border-amber-400 border w-14 h-14 rounded-lg flex items-center justify-center overflow-hidden animate-scale-in delay-200">
+          <div className="bg-zinc-800 border-amber-400 border w-14 h-14 rounded-lg flex items-center justify-center overflow-hidden animate-scale-in">
             <img
               className="w-12 h-12 object-contain"
               src={mainframeLogo}
@@ -152,7 +152,7 @@ export function ConnectPage() {
 function PulseBeam() {
   return (
     <div className="flex-grow h-[1px] bg-gradient-to-r from-amber-500 via-amber-300 to-amber-500 mx-3 rounded-full relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-amber-400 via-zinc-700 to-amber-400 animate-pulse-beam delay-1000"></div>
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-amber-400 via-zinc-700 to-amber-400 animate-pulse-beam translate-x-[-100%]"></div>
     </div>
   );
 }
