@@ -18,17 +18,20 @@ export function ConnectPage() {
   //     utils.datasetsGet.invalidate();
   //   },
   // });
-  const { data: connection } = useQuery(["connect_link", linkId], async () => {
-    if (!linkId) {
-      throw new Error("Invalid link ID");
-    }
-    const res = await apiClient.connect.link[":link_id"].$get({
-      param: {
-        link_id: linkId,
-      },
-    });
-    return res.json();
-  });
+  const { data: connection, isLoading: isLoadingConnection } = useQuery(
+    ["connect_link", linkId],
+    async () => {
+      if (!linkId) {
+        throw new Error("Invalid link ID");
+      }
+      const res = await apiClient.connect.link[":link_id"].$get({
+        param: {
+          link_id: linkId,
+        },
+      });
+      return res.json();
+    },
+  );
   const { data: integrations, isLoading: isLoadingIntegrations } =
     trpc.integrationsAll.useQuery();
   const integration = connection?.provider
@@ -71,7 +74,7 @@ export function ConnectPage() {
   const nangoIntegration = integration?.authTypes?.nango;
 
   if (!nangoIntegration || !connection?.provider) {
-    if (isLoadingIntegrations) {
+    if (isLoadingIntegrations || isLoadingConnection) {
       return <div></div>;
     }
     return <div>Integration not found</div>;
