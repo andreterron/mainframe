@@ -58,7 +58,6 @@ export const code = ({
   children,
   ...properties
 }: DetailedHTMLProps<HTMLAttributes<HTMLElement>, HTMLElement>) => {
-  console.log("className", className);
   const match = /language-(\w+)(?:\{([-\d,]+)\})?/.exec(className || "");
   const lines = match?.[2];
   const lineRangeChecker = prepareLineRanges(lines);
