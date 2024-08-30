@@ -19,6 +19,12 @@ import {
   TabsList,
   TabsTrigger,
 } from "../components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../components/ui/tooltip";
+import { Badge } from "../components/ui/badge";
 
 export default function ProjectDetailsPage() {
   const params = useParams();
@@ -128,21 +134,17 @@ export default function ProjectDetailsPage() {
           </svg>
         </Button>
       </PageHeader>
-      {!app ? null : app.showSetup ? (
-        <div className="p-4 space-y-4">
-          <ProjectSetupInstructions appId={app?.id ?? ""}>
-            <Button
-              className="ml-10"
-              onClick={() => {
-                updateApp.mutate({ showSetup: false });
-              }}
-            >
-              Continue
-            </Button>
-          </ProjectSetupInstructions>
-        </div>
-      ) : (
-        <Tabs defaultValue="config" className="flex flex-col w-full">
+      {!app ? null : (
+        <Tabs
+          defaultValue={app.showSetup ? "instructions" : "config"}
+          className="flex flex-col w-full"
+          onValueChange={(value) => {
+            if (app.showSetup && value === "config") {
+              // TODO: Only hide "showSetup" after we got user access
+              updateApp.mutate({ showSetup: false });
+            }
+          }}
+        >
           <TabsList className="grid grid-cols-2 m-4 self-start">
             <TabsTrigger value="config">
               {/* <SheetIcon className="w-3.5 h-3.5 mr-1" /> */}
@@ -156,8 +158,31 @@ export default function ProjectDetailsPage() {
           <TabsContent value="config">
             <div className="w-96 p-4">
               {/* TODO: Copy button */}
-              <Label>
-                <span>Project ID:</span>
+              <Label className="space-y-1">
+                <p className="flex justify-between items-center gap-1 text-base">
+                  <span>Project ID:</span>
+                  <Tooltip delayDuration={0}>
+                    <TooltipTrigger>
+                      <Badge
+                        variant="outline"
+                        size="xs"
+                        className="text-muted-foreground leading-normal"
+                      >
+                        public
+                      </Badge>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      className="max-w-xs"
+                      side="bottom"
+                      sideOffset={12}
+                    >
+                      This ID doesn't give access to any private data. Apps will
+                      soon be limited to specific domains to prevent app
+                      impersonation. Please reach out if you have any questions
+                      or suggestions.
+                    </TooltipContent>
+                  </Tooltip>
+                </p>
                 <Input
                   className="text-muted-foreground"
                   value={app?.id ?? ""}

@@ -1,0 +1,10 @@
+.step:not(:last-of-type) > h3::before {
+  content: "";
+  @apply absolute block top-10 -left-8 bottom-0 border-r border-border;
+}
+
+.step > h3::after {
+  counter-increment: step;
+  content: counter(step);
+  @apply absolute -left-12 bg-secondary rounded-full border border-border size-8 flex items-center justify-center text-base font-normal ring-background;
+}

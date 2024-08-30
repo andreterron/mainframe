@@ -6,8 +6,14 @@ import { PageBreadcrumb } from "../components/PageBreadcrumb";
 import { BreadcrumbItem, BreadcrumbPage } from "../components/ui/breadcrumb";
 import { PreviewLabel } from "../components/PreviewLabel";
 import { apiClient } from "../lib/api_client";
-import { AppWindow, ChevronRight, Plus } from "lucide-react";
-import { cn } from "~/lib/utils";
+import { cn } from "../lib/utils";
+import {
+  AppWindow,
+  ChevronRight,
+  Plus,
+  AppWindowIcon,
+  PlusSquareIcon,
+} from "lucide-react";
 
 function ProjectItem({
   className,
@@ -22,6 +28,7 @@ function ProjectItem({
   appIdTruncatedLast?: string;
 }>) {
   return (
+    // TODO: Consider fixing the height
     <Link
       className={cn(
         "border flex items-center w-80 rounded-lg shadow px-3 text-sm font-semibold py-3 hover:bg-accent transition",
@@ -94,6 +101,8 @@ export default function ProjectsPage() {
               appIdTruncatedFirst={app.id.slice(0, 4)}
               appIdTruncatedLast={app.id.slice(-4)}
             >
+              {/* <ProjectItem key={app.id} to={`/projects/${app.id}`}>
+              <AppWindowIcon className="size-4 mr-2" /> */}
               {app.name || app.id}
             </ProjectItem>
           );
@@ -103,6 +112,9 @@ export default function ProjectsPage() {
           to="/projects/new"
         >
           Create a new project
+          {/* <ProjectItem className="text-muted-foreground" to="/projects/new">
+          <PlusSquareIcon className="size-4 mr-2" />
+          New Project */}
         </ProjectItem>
       </div>
     </div>

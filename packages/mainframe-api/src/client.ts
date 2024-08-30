@@ -1,7 +1,8 @@
 import { createApiClient } from "./api-client";
 import { Connection } from "./connection";
 import { DEFAULT_HOSTS, MAINFRAME_SESSION_HEADER } from "./constants";
-import { LocalStorageMainframeSessionStore } from "./session-storage";
+import { LocalStorageMainframeSessionStore } from "./session-storage/localstorage-session-storage";
+import { NoopMainframeSessionStore } from "./session-storage/noop-session-storage";
 import {
   MainframeClientConfig,
   MainframeSessionStore,
@@ -13,7 +14,10 @@ export class Mainframe {
 
   constructor(private _config: MainframeClientConfig) {
     this.sessionStore =
-      _config.sessionStore ?? new LocalStorageMainframeSessionStore();
+      _config.sessionStore ??
+      (typeof window !== "undefined"
+        ? new LocalStorageMainframeSessionStore()
+        : new NoopMainframeSessionStore());
   }
 
   get appId() {
@@ -83,6 +87,19 @@ export class Mainframe {
       window.addEventListener("focus", recheck);
       // TODO: Timeout. reject
     });
+  }
+
+  async disconnect() {
+    const res = await this.api.connect.sessions.$delete();
+
+    // NOTE: we await the API call to ensure the session isn't cleared
+    // before we try to delete it in the server.
+    await this.sessionStore.clear();
+
+    if (!res.ok) {
+      console.error("Failed to delete session on server");
+      // TODO: Report error
+    }
   }
 
   private async prepareConnection(provider: ProviderName) {

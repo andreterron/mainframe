@@ -2,6 +2,8 @@ import { getTokenFromDataset } from "../integration-token.ts";
 import { Integration } from "../integration-types.ts";
 import { Dataset } from "@mainframe-api/shared";
 
+// URL to configure OAuth: https://bitbucket.org/${workspace}/workspace/settings/api
+
 export const bitbucket: Integration = {
   name: "BitBucket",
   authType: "token",
@@ -90,12 +92,17 @@ export const bitbucket: Integration = {
   },
   async proxyFetch(token, path, init) {
     const headers = new Headers(init?.headers);
-    if (!token) return new Response("Unauthorized", { status: 407 });
+    if (!token) return new Response("Unauthorized", { status: 401 });
 
     headers.set("Authorization", `Bearer ${token}`);
 
+    const req = new Request(
+      new Request(`https://api.bitbucket.org/${path}`, init),
+      { headers },
+    );
+
     // TODO: Check if the response needs to be cleaned
-    return fetch(`https://api.bitbucket.org/${path}`, { ...init, headers });
+    return fetch(req);
   },
 };
 

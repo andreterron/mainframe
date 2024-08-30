@@ -1,5 +1,5 @@
-import { LOCALSTORAGE_KEY } from "./constants";
-import { MainframeSessionStore } from "./types";
+import { LOCALSTORAGE_KEY } from "../constants";
+import { MainframeSessionStore } from "../types";
 
 export class LocalStorageMainframeSessionStore
   implements MainframeSessionStore
@@ -21,5 +21,9 @@ export class LocalStorageMainframeSessionStore
   set(session: string): void {
     this._mainframeSession = session;
     localStorage.setItem(LOCALSTORAGE_KEY, session);
+  }
+  clear(): void {
+    this._mainframeSession = undefined;
+    localStorage.removeItem(LOCALSTORAGE_KEY);
   }
 }

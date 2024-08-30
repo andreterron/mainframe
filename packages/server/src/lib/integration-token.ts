@@ -1,6 +1,5 @@
 import { Dataset } from "@mainframe-api/shared";
 import { nango } from "./nango.ts";
-import { AuthModes } from "@nangohq/node";
 
 export async function getTokenFromDataset(
   dataset: Pick<Dataset, "id" | "credentials">,
@@ -11,9 +10,10 @@ export async function getTokenFromDataset(
       dataset.id,
       false,
     );
-    if (connection?.credentials.type === AuthModes.OAuth2) {
+    if (connection?.credentials.type === "OAUTH2") {
       return connection.credentials.access_token;
     }
   }
+  // TODO: Support non-Nango OAuth
   return dataset.credentials?.token;
 }

@@ -6,7 +6,6 @@ import {
 } from "./integration-types.ts";
 import { Dataset, ClientIntegration } from "@mainframe-api/shared";
 import { github } from "./integrations/github.ts";
-import { network } from "./integrations/network.ts";
 import { peloton } from "./integrations/peloton.ts";
 import { posthog } from "./integrations/posthog.ts";
 import { toggl } from "./integrations/toggl.ts";
@@ -22,7 +21,11 @@ import { valtown } from "./integrations/valtown.ts";
 import { pick } from "lodash-es";
 import { z } from "zod";
 
-export const supportedConnectProviders = ["github", "bitbucket"] as const;
+export const supportedConnectProviders = [
+  "github",
+  "bitbucket",
+  "google",
+] as const;
 
 export const zTokenCredentials = z.object({ token: z.string().min(1) });
 export const zOAuthCredentials = z.object({
@@ -44,9 +47,6 @@ export function getIntegrationFromType(
   }
   if (type === "peloton") {
     return peloton;
-  }
-  if (type === "network") {
-    return network;
   }
   if (type === "google") {
     return google;

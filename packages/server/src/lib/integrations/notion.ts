@@ -9,8 +9,7 @@ export const notion: Integration = {
     },
   },
   authType: "token",
-  authSetupDocs:
-    "https://github.com/andreterron/mainframe/blob/main/packages/docs/integrations/notion.md",
+  authSetupDocs: "https://docs.mainframe.so/integrations/notion",
 
   objects: {},
   tables: {

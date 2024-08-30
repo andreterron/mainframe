@@ -1,4 +1,6 @@
-# Remote access with Cloudflare Tunnels
+---
+title: Cloudflare Tunnels
+---
 
 If you want live data updates through webhooks, or access your instance outside of your home network, you'll want to configure HTTP tunneling to expose your Mainframe instance to the internet.
 
@@ -25,7 +27,7 @@ Before you start, make sure you:
 
 5. Copy the token displayed in the **Install and run a connector** section, displayed after `sudo cloudflared service install `. Here's a highlighted screenshot:
 
-   ![Cloudflare UI highlighting tokens](./images/cloudflare-tunnel-token.png)
+   ![Cloudflare UI highlighting tokens](/images/cloudflare-tunnel-token.png)
 
 (The tokens in the image are fake)
 

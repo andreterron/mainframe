@@ -78,11 +78,28 @@ export default {
           "0%, 75%": { opacity: "0%" },
           "100%": { opacity: "100%" },
         },
+        "pulse-beam": {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
+        },
+        "unfold-connect": {
+          "0%": { padding: "0 10rem", opacity: "0" },
+          "20%": { opacity: "1" },
+          "100%": { padding: "0 5rem" },
+        },
+        "scale-in": {
+          "0%": { transform: "scale(0.2)", opacity: "0" },
+          "20%": { opacity: "1" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "loading-fade-in": "0.25s loading-fade-in linear",
+        "pulse-beam": "pulse-beam 2.5s linear alternate infinite",
+        "unfold-connect": "unfold-connect 0.4s linear forwards",
+        "scale-in": "scale-in .3s ease-out forwards",
       },
     },
   },

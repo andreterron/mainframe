@@ -7,6 +7,7 @@ export interface HostConfig {
 export interface MainframeSessionStore {
   get(): string | undefined | Promise<string | undefined>;
   set(value: string): void | Promise<void>;
+  clear(): void | Promise<void>;
 }
 
 export interface MainframeClientConfig extends HostConfig {

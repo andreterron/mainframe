@@ -51,4 +51,12 @@ export class Connection {
         : {}),
     });
   }
+
+  isEqual(other: Connection): boolean {
+    return (
+      this.id === other.id &&
+      this.config.apiUrl === other.config.apiUrl &&
+      this.provider === other.provider
+    );
+  }
 }

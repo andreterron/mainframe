@@ -8,11 +8,6 @@ import { parseBearerHeader } from "./parse-bearer-header.ts";
 import { MAINFRAME_SESSION_HEADER } from "../utils/constants.ts";
 
 function getSessionId(c: Context, options?: { authHeader?: string }) {
-  if (!connectDB) {
-    console.error("Missing connectDB");
-    throw new HTTPException(500);
-  }
-
   const token = parseBearerHeader(
     c.req.header(options?.authHeader ?? "Authorization"),
   );
@@ -23,11 +18,6 @@ export function getSessionFromContext(
   c: Context,
   options?: { authHeader?: string },
 ) {
-  if (!connectDB) {
-    console.error("Missing connectDB");
-    throw new HTTPException(500);
-  }
-
   return getSessionId(c, options);
 }
 

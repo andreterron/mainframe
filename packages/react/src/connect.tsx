@@ -1,5 +1,6 @@
 import React, {
   PropsWithChildren,
+  ReactNode,
   createContext,
   useContext,
   useMemo,
@@ -18,14 +19,31 @@ export * from "mainframe-api";
 
 const mainframeReactContext = createContext<Mainframe | undefined>(undefined);
 
+interface MainframeProviderClientProps extends PropsWithChildren<{}> {
+  client: Mainframe;
+}
+
+interface MainframeProviderAppIdProps extends PropsWithChildren<{}> {
+  appId: string;
+  config?: HostConfig;
+}
+
+export type MainframeProviderProps =
+  | MainframeProviderAppIdProps
+  | MainframeProviderClientProps;
+
 export function MainframeProvider({
-  appId,
-  config,
   children,
-}: PropsWithChildren<{ appId: string; config?: HostConfig }>) {
+}: MainframeProviderProps): ReactNode | null;
+export function MainframeProvider({
+  client,
+  appId,
+  children,
+  config,
+}: Partial<MainframeProviderClientProps & MainframeProviderAppIdProps>) {
   const mainframe = useMemo(
-    () => new Mainframe({ ...config, appId }),
-    [appId, config],
+    () => client ?? (appId ? new Mainframe({ ...config, appId }) : undefined),
+    [client, appId, config],
   );
   return (
     <mainframeReactContext.Provider value={mainframe}>
@@ -73,11 +91,7 @@ export function useConnections() {
           return false;
         }
         for (let i = 0; i < a.length; i++) {
-          if (
-            a[i]!.id !== b[i]!.id ||
-            a[i]!.config.apiUrl !== b[i]!.config.apiUrl ||
-            a[i]!.provider !== b[i]!.provider
-          ) {
+          if (!a[i]!.isEqual(b[i]!)) {
             return false;
           }
         }
@@ -90,7 +104,7 @@ export function useConnections() {
 // TODO: Let the developer provide a unique ID
 export function useConnection(provider: ProviderName) {
   const mainframe = useMainframeClient();
-  const { data: connections, isLoading } = useConnections();
+  const { data: connections, isLoading, mutate } = useConnections();
 
   const connection = connections?.find((c) => c.provider === provider);
 
@@ -98,6 +112,10 @@ export function useConnection(provider: ProviderName) {
     connection,
     isLoading,
     initiateAuth: () => mainframe.initiateAuth(provider),
+    disconnect: async () => {
+      await mainframe.disconnect();
+      await mutate();
+    },
   };
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "mainframe-api",
-  "version": "0.8.3",
+  "version": "0.8.7",
   "private": false,
   "description": "",
   "types": "dist/index.d.ts",
@@ -23,6 +23,6 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@mainframe-api/server": "^0.8.3"
+    "@mainframe-api/server": "^0.8.7"
   }
 }
