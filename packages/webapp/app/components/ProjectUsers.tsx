@@ -41,7 +41,7 @@ export function ProjectUsers({ appId }: { appId: string }) {
         <TableHeader>
           <TableRow>
             <TableHead>ID</TableHead>
-            {/* <TableHead>Provider</TableHead> */}
+            <TableHead>Provider</TableHead>
             <TableHead>Initiated At</TableHead>
           </TableRow>
         </TableHeader>
@@ -50,7 +50,7 @@ export function ProjectUsers({ appId }: { appId: string }) {
             rows.map((row) => (
               <TableRow key={row.id}>
                 <TableCell>{row.id}</TableCell>
-                {/* <TableCell>{row.provider}</TableCell> */}
+                <TableCell>{row.provider}</TableCell>
                 <TableCell>{row.initiatedAt}</TableCell>
               </TableRow>
             ))

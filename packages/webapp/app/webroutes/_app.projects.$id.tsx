@@ -140,7 +140,7 @@ export default function ProjectDetailsPage() {
           defaultValue={app.showSetup ? "instructions" : "config"}
           className="flex flex-col w-full"
           onValueChange={(value) => {
-            if (app.showSetup && value === "config") {
+            if (app.showSetup && value !== "instructions") {
               // TODO: Only hide "showSetup" after we got user access
               updateApp.mutate({ showSetup: false });
             }
