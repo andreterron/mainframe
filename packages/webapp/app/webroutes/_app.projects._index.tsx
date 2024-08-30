@@ -1,34 +1,28 @@
 import { PageHeader } from "../components/PageHeader";
 import { Link, To } from "react-router-dom";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { PageBreadcrumb } from "../components/PageBreadcrumb";
 import { BreadcrumbItem, BreadcrumbPage } from "../components/ui/breadcrumb";
 import { PreviewLabel } from "../components/PreviewLabel";
 import { apiClient } from "../lib/api_client";
 import { cn } from "../lib/utils";
-import {
-  AppWindow,
-  ChevronRight,
-  Plus,
-  AppWindowIcon,
-  PlusSquareIcon,
-} from "lucide-react";
+import { ChevronRightIcon, AppWindowIcon, PlusSquareIcon } from "lucide-react";
 
 function ProjectItem({
   className,
   children,
   to,
-  appIdTruncatedFirst,
-  appIdTruncatedLast,
+  icon,
+  appId,
 }: PropsWithChildren<{
   className?: string;
   to: To;
-  appIdTruncatedFirst?: string;
-  appIdTruncatedLast?: string;
+  icon: ReactNode;
+  appId?: string;
 }>) {
   return (
-    // TODO: Consider fixing the height
+    // TODO: Consider setting a fixed height
     <Link
       className={cn(
         "border flex items-center w-80 rounded-lg shadow px-3 text-sm font-semibold py-3 hover:bg-accent transition",
@@ -38,27 +32,23 @@ function ProjectItem({
     >
       <div
         className={`flex items-center justify-center p-2 rounded-full mr-2 ${
-          to === "/projects/new"
-            ? "bg-secondary"
-            : "bg-gradient-to-r from-emerald-200 to-sky-200"
+          appId
+            ? "bg-gradient-to-r from-emerald-200 to-sky-200"
+            : "bg-secondary"
         }`}
       >
-        {to === "/projects/new" ? (
-          <Plus className="w-4 h-4" />
-        ) : (
-          <AppWindow className="w-4 h-4" />
-        )}
+        {icon}
       </div>
       <div className="flex flex-col">
         {children}
-        {appIdTruncatedFirst && appIdTruncatedLast && (
+        {appId && (
           <div className="text-muted-foreground text-xs font-normal">
-            {appIdTruncatedFirst}...{appIdTruncatedLast}
+            {appId.slice(0, 4)}...{appId.slice(-4)}
           </div>
         )}
       </div>
       {to !== "/projects/new" && (
-        <ChevronRight className="w-4 h-4 text-muted-foreground/40 ml-auto" />
+        <ChevronRightIcon className="w-4 h-4 text-muted-foreground/40 ml-auto" />
       )}
     </Link>
   );
@@ -98,11 +88,9 @@ export default function ProjectsPage() {
             <ProjectItem
               key={app.id}
               to={`/projects/${app.id}`}
-              appIdTruncatedFirst={app.id.slice(0, 4)}
-              appIdTruncatedLast={app.id.slice(-4)}
+              appId={app.id}
+              icon={<AppWindowIcon className="size-4 mr-2" />}
             >
-              {/* <ProjectItem key={app.id} to={`/projects/${app.id}`}>
-              <AppWindowIcon className="size-4 mr-2" /> */}
               {app.name || app.id}
             </ProjectItem>
           );
@@ -110,11 +98,9 @@ export default function ProjectsPage() {
         <ProjectItem
           className="text-muted-foreground font-normal"
           to="/projects/new"
+          icon={<PlusSquareIcon className="size-4 mr-2" />}
         >
           Create a new project
-          {/* <ProjectItem className="text-muted-foreground" to="/projects/new">
-          <PlusSquareIcon className="size-4 mr-2" />
-          New Project */}
         </ProjectItem>
       </div>
     </div>
