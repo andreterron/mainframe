@@ -148,7 +148,7 @@ export default function ProjectDetailsPage() {
         >
           <TabsList className="grid grid-cols-3 m-4 self-start">
             <TabsTrigger value="config">Config</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="connections">Connections</TabsTrigger>
             <TabsTrigger value="instructions">Instructions</TabsTrigger>
           </TabsList>
           <TabsContent value="config">
@@ -187,7 +187,7 @@ export default function ProjectDetailsPage() {
               </Label>
             </div>
           </TabsContent>
-          <TabsContent value="users">
+          <TabsContent value="connections">
             <div className="p-4 space-y-4">
               <ProjectUsers appId={app.id} />
             </div>
