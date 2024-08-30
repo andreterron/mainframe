@@ -7,7 +7,7 @@ import { BreadcrumbItem, BreadcrumbPage } from "../components/ui/breadcrumb";
 import { PreviewLabel } from "../components/PreviewLabel";
 import { apiClient } from "../lib/api_client";
 import { cn } from "../lib/utils";
-import { ChevronRightIcon, AppWindowIcon, PlusSquareIcon } from "lucide-react";
+import { ChevronRightIcon, AppWindowIcon, PlusIcon } from "lucide-react";
 
 function ProjectItem({
   className,
@@ -98,7 +98,7 @@ export default function ProjectsPage() {
         <ProjectItem
           className="text-muted-foreground font-normal"
           to="/projects/new"
-          icon={<PlusSquareIcon className="size-4 mr-2" />}
+          icon={<PlusIcon className="size-4 mr-2" />}
         >
           Create a new project
         </ProjectItem>
