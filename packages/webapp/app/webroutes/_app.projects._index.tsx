@@ -8,18 +8,19 @@ import { PreviewLabel } from "../components/PreviewLabel";
 import { apiClient } from "../lib/api_client";
 import { cn } from "../lib/utils";
 import { ChevronRightIcon, AppWindowIcon, PlusIcon } from "lucide-react";
+import type { InferResponseType } from "hono/client";
 
 function ProjectItem({
   className,
   children,
   to,
   icon,
-  appId,
+  app,
 }: PropsWithChildren<{
   className?: string;
   to: To;
   icon: ReactNode;
-  appId?: string;
+  app?: InferResponseType<typeof apiClient.connect.apps.$get>[number];
 }>) {
   return (
     <Link
@@ -31,18 +32,21 @@ function ProjectItem({
     >
       <div
         className={`flex items-center justify-center p-2 rounded-full mr-2 ${
-          appId
-            ? "bg-gradient-to-r from-emerald-200 to-sky-200"
-            : "bg-secondary"
+          app ? "bg-gradient-to-r from-emerald-200 to-sky-200" : "bg-secondary"
         }`}
       >
         {icon}
       </div>
       <div className="flex flex-col">
         {children}
-        {appId && (
+        {app?.id && (
           <div className="text-muted-foreground text-xs font-normal">
-            {appId.slice(0, 4)}...{appId.slice(-4)}
+            <span className="font-mono">
+              {app.id.slice(0, 4)}
+              <span className="font-sans">…</span>
+              {app.id.slice(-4)}
+            </span>{" "}
+            • {app.sessions} {app.sessions === 1 ? "user" : "users"}
           </div>
         )}
       </div>
@@ -87,7 +91,7 @@ export default function ProjectsPage() {
             <ProjectItem
               key={app.id}
               to={`/projects/${app.id}`}
-              appId={app.id}
+              app={app}
               icon={<AppWindowIcon className="size-4" />}
             >
               {app.name || app.id}

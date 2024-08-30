@@ -53,13 +53,13 @@ export const connectRouter = new Hono<Env>()
         id: appsTable.id,
         name: appsTable.name,
         ownerId: appsTable.ownerId,
-        // TODO: Count users
-        // sessions: count(),
+        // TODO: Only count session with active connections
+        sessions: count(),
         // TODO: Return integrations
       })
       .from(appsTable)
-      // .leftJoin(sessionsTable, eq(sessionsTable.appId, appsTable.id))
-      // .groupBy(appsTable.id, appsTable.name, appsTable.ownerId)
+      .leftJoin(sessionsTable, eq(sessionsTable.appId, appsTable.id))
+      .groupBy(appsTable.id, appsTable.name, appsTable.ownerId)
       .where(eq(appsTable.ownerId, c.var.userId));
     return c.json(apps);
   })
