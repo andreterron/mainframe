@@ -22,10 +22,9 @@ function ProjectItem({
   appId?: string;
 }>) {
   return (
-    // TODO: Consider setting a fixed height
     <Link
       className={cn(
-        "border flex items-center w-80 rounded-lg shadow px-3 text-sm font-semibold py-3 hover:bg-accent transition",
+        "border flex items-center w-80 h-16 rounded-lg shadow px-3 text-sm font-semibold py-3 hover:bg-accent transition",
         className,
       )}
       to={to}
@@ -89,7 +88,7 @@ export default function ProjectsPage() {
               key={app.id}
               to={`/projects/${app.id}`}
               appId={app.id}
-              icon={<AppWindowIcon className="size-4 mr-2" />}
+              icon={<AppWindowIcon className="size-4" />}
             >
               {app.name || app.id}
             </ProjectItem>
@@ -98,7 +97,7 @@ export default function ProjectsPage() {
         <ProjectItem
           className="text-muted-foreground font-normal"
           to="/projects/new"
-          icon={<PlusIcon className="size-4 mr-2" />}
+          icon={<PlusIcon className="size-4" />}
         >
           Create a new project
         </ProjectItem>
