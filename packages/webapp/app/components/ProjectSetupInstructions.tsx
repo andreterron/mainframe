@@ -31,7 +31,6 @@ export function ProjectSetupInstructions({
   children,
 }: PropsWithChildren<{ appId: string }>) {
   // TODO: Get inspiration from tailwind, shadcn and other dev tools setups
-  // TODO: Ensure this is also in our docs
 
   const [activeSection, setActiveSection] = useState<string>("create-project");
 

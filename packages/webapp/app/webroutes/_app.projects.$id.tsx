@@ -25,6 +25,7 @@ import {
   TooltipTrigger,
 } from "../components/ui/tooltip";
 import { Badge } from "../components/ui/badge";
+import { ProjectUsers } from "../components/ProjectUsers";
 
 export default function ProjectDetailsPage() {
   const params = useParams();
@@ -145,15 +146,10 @@ export default function ProjectDetailsPage() {
             }
           }}
         >
-          <TabsList className="grid grid-cols-2 m-4 self-start">
-            <TabsTrigger value="config">
-              {/* <SheetIcon className="w-3.5 h-3.5 mr-1" /> */}
-              Config
-            </TabsTrigger>
-            <TabsTrigger value="instructions">
-              {/* <PlayIcon className="w-3.5 h-3.5 mr-1" /> */}
-              Instructions
-            </TabsTrigger>
+          <TabsList className="grid grid-cols-3 m-4 self-start">
+            <TabsTrigger value="config">Config</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="instructions">Instructions</TabsTrigger>
           </TabsList>
           <TabsContent value="config">
             <div className="w-96 p-4">
@@ -185,15 +181,20 @@ export default function ProjectDetailsPage() {
                 </p>
                 <Input
                   className="text-muted-foreground"
-                  value={app?.id ?? ""}
+                  value={app.id}
                   readOnly
                 />
               </Label>
             </div>
           </TabsContent>
+          <TabsContent value="users">
+            <div className="p-4 space-y-4">
+              <ProjectUsers appId={app.id} />
+            </div>
+          </TabsContent>
           <TabsContent value="instructions">
             <div className="p-4 space-y-4">
-              <ProjectSetupInstructions appId={app?.id ?? ""} />
+              <ProjectSetupInstructions appId={app.id} />
             </div>
           </TabsContent>
         </Tabs>

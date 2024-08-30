@@ -173,6 +173,47 @@ export const connectRouter = new Hono<Env>()
       );
     return new Response(null, { status: 204 });
   })
+  .get("/apps/:app_id/users", async (c) => {
+    if (!c.var.userId) {
+      throw new HTTPException(401);
+    }
+    if (!connectDB) {
+      console.error("Missing connectDB");
+      throw new HTTPException(500);
+    }
+
+    const appId = c.req.param("app_id");
+
+    // TODO: Return provider
+    const connections = await connectDB
+      .select({
+        id: connectionsTable.id,
+        // provider: connectionsTable.provider,
+        // nangoConnectionId: connectionsTable.nangoConnectionId,
+        // linkId: connectionsTable.linkId,
+        initiatedAt: connectionsTable.initiatedAt,
+      })
+      .from(connectionsTable)
+      .innerJoin(
+        sessionsTable,
+        eq(sessionsTable.id, connectionsTable.sessionId),
+      )
+      .innerJoin(appsTable, eq(appsTable.id, sessionsTable.appId))
+      .where(
+        and(
+          eq(appsTable.ownerId, c.var.userId),
+          eq(sessionsTable.appId, appId),
+          isNotNull(connectionsTable.nangoConnectionId),
+        ),
+      );
+    // TODO: Pagination
+
+    return c.json({
+      data: connections,
+      count: connections.length, // TODO: Use a SQL count
+      // integrations: [],
+    });
+  })
   .get("/apps/:app_id/connections", async (c) => {
     if (!connectDB) {
       console.error("Missing connectDB");
