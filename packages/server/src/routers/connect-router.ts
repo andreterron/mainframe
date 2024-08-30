@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { Env } from "../types.ts";
-import { eq, and, isNull, gte, isNotNull, count, desc } from "drizzle-orm";
+import { eq, and, isNull, gte, isNotNull, count, desc, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
@@ -53,12 +53,20 @@ export const connectRouter = new Hono<Env>()
         id: appsTable.id,
         name: appsTable.name,
         ownerId: appsTable.ownerId,
-        // TODO: Only count session with active connections
-        sessions: count(),
+        // TODO: This is counting connections instead of users
+        sessions: count(
+          sql`CASE WHEN ${isNotNull(
+            connectionsTable.nangoConnectionId,
+          )} THEN 1 END`,
+        ),
         // TODO: Return integrations
       })
       .from(appsTable)
       .leftJoin(sessionsTable, eq(sessionsTable.appId, appsTable.id))
+      .leftJoin(
+        connectionsTable,
+        eq(connectionsTable.sessionId, sessionsTable.id),
+      )
       .groupBy(appsTable.id, appsTable.name, appsTable.ownerId)
       .where(eq(appsTable.ownerId, c.var.userId));
     return c.json(apps);
