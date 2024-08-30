@@ -1,0 +1,1 @@
+CREATE INDEX `initiated_at_idx` ON `connections` (`initiated_at_sec`);

@@ -29,6 +29,7 @@ export function ProjectUsers({ appId }: { appId: string }) {
     },
   );
 
+  // TODO: Parse row.initiatedAt
   const rows = data?.data;
 
   if (!rows || isLoadingUsers) {
@@ -51,6 +52,7 @@ export function ProjectUsers({ appId }: { appId: string }) {
               <TableRow key={row.id}>
                 <TableCell>{row.id}</TableCell>
                 <TableCell>{row.provider}</TableCell>
+                {/* TODO: Format date */}
                 <TableCell>{row.initiatedAt}</TableCell>
               </TableRow>
             ))
@@ -63,6 +65,20 @@ export function ProjectUsers({ appId }: { appId: string }) {
           )}
         </TableBody>
       </Table>
+      {/* TODO: Pagination */}
+      {data.count > data.data.length && (
+        <p className="text-xs text-muted-foreground p-4 prose">
+          Showing first {data.data.length} rows. Pagination coming soon.{" "}
+          <a
+            href="https://discord.gg/HUS4y59Dxw"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Request it on our Discord
+          </a>
+        </p>
+      )}
     </div>
   );
 }

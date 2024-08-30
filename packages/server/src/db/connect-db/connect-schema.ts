@@ -3,6 +3,7 @@ import {
   text,
   customType,
   integer,
+  index,
 } from "drizzle-orm/sqlite-core";
 import { relations, sql } from "drizzle-orm";
 import { supportedConnectProviders } from "../../lib/integrations";
@@ -104,20 +105,26 @@ export const sessionsTable = sqliteTable("sessions", {
   // expires: integer("expires"),
 });
 
-export const connectionsTable = sqliteTable("connections", {
-  id: text("id").notNull().primaryKey(),
-  // userId: text("user_id").references(() => usersTable.id, {
-  sessionId: text("session_id")
-    .notNull()
-    .references(() => sessionsTable.id, {
-      onDelete: "cascade",
-      onUpdate: "cascade",
-    }),
-  nangoConnectionId: text("nango_connection_id"),
-  provider: runtimeEnumType("provider", supportedConnectProviders).notNull(),
-  initiatedAt: integer("initiated_at_sec", { mode: "timestamp" }).notNull(),
-  linkId: text("link_id").unique(),
-});
+export const connectionsTable = sqliteTable(
+  "connections",
+  {
+    id: text("id").notNull().primaryKey(),
+    // userId: text("user_id").references(() => usersTable.id, {
+    sessionId: text("session_id")
+      .notNull()
+      .references(() => sessionsTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    nangoConnectionId: text("nango_connection_id"),
+    provider: runtimeEnumType("provider", supportedConnectProviders).notNull(),
+    initiatedAt: integer("initiated_at_sec", { mode: "timestamp" }).notNull(),
+    linkId: text("link_id").unique(),
+  },
+  (table) => ({
+    initiatedAtIndex: index("initiated_at_idx").on(table.initiatedAt),
+  }),
+);
 
 export const connectionSessionRelation = relations(
   connectionsTable,
