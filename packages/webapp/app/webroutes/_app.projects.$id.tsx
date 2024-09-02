@@ -26,6 +26,7 @@ import {
 } from "../components/ui/tooltip";
 import { Badge } from "../components/ui/badge";
 import { ProjectUsers } from "../components/ProjectUsers";
+import ProjectInfo from "~/components/ProjectInfo";
 
 export default function ProjectDetailsPage() {
   const params = useParams();
@@ -137,7 +138,7 @@ export default function ProjectDetailsPage() {
       </PageHeader>
       {!app ? null : (
         <Tabs
-          defaultValue={app.showSetup ? "instructions" : "config"}
+          defaultValue={app.showSetup ? "instructions" : "general"}
           className="flex flex-col w-full"
           onValueChange={(value) => {
             if (app.showSetup && value !== "instructions") {
@@ -147,45 +148,12 @@ export default function ProjectDetailsPage() {
           }}
         >
           <TabsList className="grid grid-cols-3 m-4 self-start">
-            <TabsTrigger value="config">Config</TabsTrigger>
+            <TabsTrigger value="general">General</TabsTrigger>
             <TabsTrigger value="connections">Connections</TabsTrigger>
             <TabsTrigger value="instructions">Instructions</TabsTrigger>
           </TabsList>
-          <TabsContent value="config">
-            <div className="w-96 p-4">
-              {/* TODO: Copy button */}
-              <Label className="space-y-1">
-                <p className="flex justify-between items-center gap-1 text-base">
-                  <span>Project ID:</span>
-                  <Tooltip delayDuration={0}>
-                    <TooltipTrigger>
-                      <Badge
-                        variant="outline"
-                        size="xs"
-                        className="text-muted-foreground leading-normal"
-                      >
-                        public
-                      </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent
-                      className="max-w-xs"
-                      side="bottom"
-                      sideOffset={12}
-                    >
-                      This ID doesn't give access to any private data. Apps will
-                      soon be limited to specific domains to prevent app
-                      impersonation. Please reach out if you have any questions
-                      or suggestions.
-                    </TooltipContent>
-                  </Tooltip>
-                </p>
-                <Input
-                  className="text-muted-foreground"
-                  value={app.id}
-                  readOnly
-                />
-              </Label>
-            </div>
+          <TabsContent value="general">
+            <ProjectInfo id={app.id} name={app.name} />
           </TabsContent>
           <TabsContent value="connections">
             <div className="p-4 space-y-4">
