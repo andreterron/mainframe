@@ -223,8 +223,6 @@ export const connectRouter = new Hono<Env>()
           .select({
             id: connectionsTable.id,
             provider: connectionsTable.provider,
-            // nangoConnectionId: connectionsTable.nangoConnectionId,
-            // linkId: connectionsTable.linkId,
             initiatedAt: connectionsTable.initiatedAt,
           })
           .from(connectionsTable)
