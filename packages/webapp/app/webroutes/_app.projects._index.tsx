@@ -45,13 +45,15 @@ function ProjectItem({
               {app.id.slice(0, 4)}
               <span className="font-sans">…</span>
               {app.id.slice(-4)}
-            </span>{" "}
-            •{" "}
-            {app.connectionsCount === 0
-              ? "no connections"
-              : app.connectionsCount === 1
-              ? "1 connection"
-              : `${app.connectionsCount} connections`}
+            </span>
+            {typeof app.connectionsCount === "number" &&
+              ` • ${
+                app.connectionsCount === 0
+                  ? "no connections"
+                  : app.connectionsCount === 1
+                  ? "1 connection"
+                  : `${app.connectionsCount} connections`
+              }`}
           </div>
         )}
       </div>
