@@ -41,8 +41,7 @@ export function ProjectUsers({ appId }: { appId: string }) {
     <div>
       <div className="border rounded overflow-hidden">
         <Table>
-          <TableHeader className="">
-            {/* !border-b-0  */}
+          <TableHeader>
             <TableRow className="[&>*]:bg-muted">
               <TableHead>ID</TableHead>
               <TableHead>Provider</TableHead>
@@ -55,7 +54,6 @@ export function ProjectUsers({ appId }: { appId: string }) {
                 <TableRow key={row.id}>
                   <TableCell>{row.id}</TableCell>
                   <TableCell>{row.provider}</TableCell>
-                  {/* TODO: Format date */}
                   {/* TODO: Timezones */}
                   <Tooltip delayDuration={500}>
                     <TooltipTrigger asChild>
