@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "./ui/table";
 import { SadPath } from "./SadPath";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 
 const NUMBER_OF_COLS = 3;
 
@@ -37,48 +38,71 @@ export function ProjectUsers({ appId }: { appId: string }) {
   }
 
   return (
-    <div className="">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>Provider</TableHead>
-            <TableHead>Initiated At</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {rows.length ? (
-            rows.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>{row.id}</TableCell>
-                <TableCell>{row.provider}</TableCell>
-                {/* TODO: Format date */}
-                <TableCell>{row.initiatedAt}</TableCell>
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={NUMBER_OF_COLS} className="h-24 text-center">
-                No results.
-              </TableCell>
+    <div>
+      <div className="border rounded overflow-hidden">
+        <Table>
+          <TableHeader className="">
+            {/* !border-b-0  */}
+            <TableRow className="[&>*]:bg-muted">
+              <TableHead>ID</TableHead>
+              <TableHead>Provider</TableHead>
+              <TableHead>Connected on</TableHead>
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {rows.length ? (
+              rows.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell>{row.id}</TableCell>
+                  <TableCell>{row.provider}</TableCell>
+                  {/* TODO: Format date */}
+                  {/* TODO: Timezones */}
+                  <Tooltip delayDuration={500}>
+                    <TooltipTrigger asChild>
+                      <TableCell>
+                        {new Date(row.initiatedAt).toLocaleString()}
+                      </TableCell>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      className="max-w-xs"
+                      side="bottom"
+                      sideOffset={12}
+                    >
+                      {row.initiatedAt}
+                    </TooltipContent>
+                  </Tooltip>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={NUMBER_OF_COLS}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
       {/* TODO: Pagination */}
-      {data.count > data.data.length && (
-        <p className="text-xs text-muted-foreground p-4 prose">
-          Showing first {data.data.length} rows. Pagination coming soon.{" "}
-          <a
-            href="https://discord.gg/HUS4y59Dxw"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-muted-foreground hover:text-foreground"
-          >
-            Request it on our Discord
-          </a>
-        </p>
-      )}
+      <p className="text-xs text-muted-foreground p-4 prose max-w-none">
+        {data.count} connection total
+        {data.count > data.data.length && (
+          <>
+            . Showing first {data.data.length} rows. Pagination coming soon.{" "}
+            <a
+              href="https://discord.gg/HUS4y59Dxw"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-muted-foreground hover:text-foreground"
+            >
+              Request it on our Discord
+            </a>
+          </>
+        )}
+      </p>
     </div>
   );
 }
