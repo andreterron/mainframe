@@ -54,7 +54,7 @@ export const connectRouter = new Hono<Env>()
         name: appsTable.name,
         ownerId: appsTable.ownerId,
         // TODO: This is counting connections instead of users
-        sessions: count(
+        connectionsCount: count(
           sql`CASE WHEN ${isNotNull(
             connectionsTable.nangoConnectionId,
           )} THEN 1 END`,
