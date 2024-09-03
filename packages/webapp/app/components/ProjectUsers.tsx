@@ -86,7 +86,7 @@ export function ProjectUsers({ appId }: { appId: string }) {
       </div>
       {/* TODO: Pagination */}
       <p className="text-xs text-muted-foreground p-4 prose max-w-none">
-        {data.count} connection total
+        {data.count} {data.count === 1 ? "connection" : "connections"} total
         {data.count > data.data.length && (
           <>
             . Showing first {data.data.length} rows. Pagination coming soon.{" "}
