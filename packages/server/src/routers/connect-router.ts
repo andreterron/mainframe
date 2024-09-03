@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { Env } from "../types.ts";
-import { eq, and, isNull, gte, isNotNull } from "drizzle-orm";
+import { eq, and, isNull, gte, isNotNull, count, desc, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
@@ -21,13 +21,15 @@ import {
   supportedConnectProviders,
 } from "../lib/integrations.ts";
 import { nango } from "../lib/nango.ts";
-import { AuthModes } from "@nangohq/node";
 import { env } from "../lib/env.server.ts";
 import {
   CONNECT_LINK_TIMEOUT,
   MAINFRAME_PROXY_HEADER,
   MAINFRAME_SESSION_HEADER,
 } from "../utils/constants.ts";
+
+const MAX_PAGE_SIZE = 100;
+const DEFAULT_PAGE_SIZE = 50;
 
 export const connectRouter = new Hono<Env>()
   // TODO: Review this cors() call
@@ -51,8 +53,21 @@ export const connectRouter = new Hono<Env>()
         id: appsTable.id,
         name: appsTable.name,
         ownerId: appsTable.ownerId,
+        // TODO: This is counting connections instead of users
+        connectionsCount: count(
+          sql`CASE WHEN ${isNotNull(
+            connectionsTable.nangoConnectionId,
+          )} THEN 1 END`,
+        ),
+        // TODO: Return integrations
       })
       .from(appsTable)
+      .leftJoin(sessionsTable, eq(sessionsTable.appId, appsTable.id))
+      .leftJoin(
+        connectionsTable,
+        eq(connectionsTable.sessionId, sessionsTable.id),
+      )
+      .groupBy(appsTable.id, appsTable.name, appsTable.ownerId)
       .where(eq(appsTable.ownerId, c.var.userId));
     return c.json(apps);
   })
@@ -173,6 +188,101 @@ export const connectRouter = new Hono<Env>()
       );
     return new Response(null, { status: 204 });
   })
+  .get(
+    "/apps/:app_id/users",
+    zValidator(
+      "query",
+      z
+        .object({
+          offset: z.number().optional().default(0),
+          limit: z
+            .number()
+            .min(1)
+            .max(MAX_PAGE_SIZE)
+            .optional()
+            .default(DEFAULT_PAGE_SIZE),
+        })
+        .optional()
+        .default({}),
+    ),
+    async (c) => {
+      if (!c.var.userId) {
+        throw new HTTPException(401);
+      }
+      if (!connectDB) {
+        console.error("Missing connectDB");
+        throw new HTTPException(500);
+      }
+
+      const appId = c.req.param("app_id");
+
+      const q = c.req.valid("query");
+
+      const [users, usersCount, providers] = await Promise.all([
+        connectDB
+          .select({
+            id: connectionsTable.id,
+            provider: connectionsTable.provider,
+            initiatedAt: connectionsTable.initiatedAt,
+          })
+          .from(connectionsTable)
+          .innerJoin(
+            sessionsTable,
+            eq(sessionsTable.id, connectionsTable.sessionId),
+          )
+          .innerJoin(appsTable, eq(appsTable.id, sessionsTable.appId))
+          .where(
+            and(
+              eq(appsTable.ownerId, c.var.userId),
+              eq(sessionsTable.appId, appId),
+              isNotNull(connectionsTable.nangoConnectionId),
+            ),
+          )
+          .orderBy(desc(connectionsTable.initiatedAt))
+          .offset(q.offset)
+          .limit(q.limit),
+        connectDB
+          .select({ count: count() })
+          .from(connectionsTable)
+          .innerJoin(
+            sessionsTable,
+            eq(sessionsTable.id, connectionsTable.sessionId),
+          )
+          .innerJoin(appsTable, eq(appsTable.id, sessionsTable.appId))
+          .where(
+            and(
+              eq(appsTable.ownerId, c.var.userId),
+              eq(sessionsTable.appId, appId),
+              isNotNull(connectionsTable.nangoConnectionId),
+            ),
+          ),
+        connectDB
+          .select({
+            provider: connectionsTable.provider,
+            count: count(),
+          })
+          .from(connectionsTable)
+          .innerJoin(
+            sessionsTable,
+            eq(sessionsTable.id, connectionsTable.sessionId),
+          )
+          .innerJoin(appsTable, eq(appsTable.id, sessionsTable.appId))
+          .where(
+            and(
+              eq(appsTable.ownerId, c.var.userId),
+              eq(sessionsTable.appId, appId),
+              isNotNull(connectionsTable.nangoConnectionId),
+            ),
+          ),
+      ]);
+
+      return c.json({
+        data: users,
+        count: usersCount[0]?.count ?? 0,
+        providers: providers,
+      });
+    },
+  )
   .get("/apps/:app_id/connections", async (c) => {
     if (!connectDB) {
       console.error("Missing connectDB");
