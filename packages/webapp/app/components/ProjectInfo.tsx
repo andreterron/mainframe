@@ -6,6 +6,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "~/lib/api_client";
 import { cn } from "../lib/utils";
+import { Button } from "./ui/button";
+import { Check, Copy } from "lucide-react";
 
 type ProjectInfoProps = {
   id: string;
@@ -14,6 +16,7 @@ type ProjectInfoProps = {
 
 export default function ProjectInfo({ id, name }: ProjectInfoProps) {
   const [projectName, setProjectName] = useState(name);
+  const [copied, setCopied] = useState(false);
   const qc = useQueryClient();
 
   const updateProjectName = useMutation({
@@ -34,7 +37,6 @@ export default function ProjectInfo({ id, name }: ProjectInfoProps) {
   };
 
   const handleNameBlur = () => {
-    // Submit form
     formRef.current?.requestSubmit();
   };
 
@@ -46,9 +48,15 @@ export default function ProjectInfo({ id, name }: ProjectInfoProps) {
 
   const formRef = useRef<HTMLFormElement | null>(null);
 
+  const handleCopyId = () => {
+    navigator.clipboard.writeText(id).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  };
+
   return (
     <div className="w-96 p-4 flex flex-col gap-6">
-      {/* TODO: Copy button */}
       <form
         ref={formRef}
         onSubmit={(e) => {
@@ -101,12 +109,27 @@ export default function ProjectInfo({ id, name }: ProjectInfoProps) {
             </TooltipContent>
           </Tooltip>
         </div>
-        <Input
-          id="project-id"
-          className="text-muted-foreground bg-primary-foreground"
-          value={id}
-          readOnly
-        />
+        <div className="relative">
+          <Input
+            id="project-id"
+            className="text-muted-foreground bg-primary-foreground pr-10"
+            value={id}
+            readOnly
+          />
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+            onClick={handleCopyId}
+            title="Copy Project ID"
+          >
+            {copied ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
         <p className="font-normal text-muted-foreground text-xs">
           This is your app ID in your MainframeProvider
         </p>
