@@ -6,7 +6,7 @@ import {
   index,
 } from "drizzle-orm/sqlite-core";
 import { relations, sql } from "drizzle-orm";
-import { supportedConnectProviders } from "../../lib/integrations";
+import { supportedConnectProviders } from "../../lib/integrations.ts";
 
 const enumType = <VALUES extends readonly string[]>(
   name: string,
