@@ -71,7 +71,11 @@ export function createMainframeAPI<E extends Env = Env>(
       router: appRouter,
       createContext: createContext(init),
       onError: ({ error, path }) => {
-        console.error(path, error);
+        if (error.code === "UNAUTHORIZED" || error.code === "NOT_FOUND") {
+          console.log("tRPC info:", path, error.message);
+        } else {
+          console.error(path, error);
+        }
       },
     }),
   );
