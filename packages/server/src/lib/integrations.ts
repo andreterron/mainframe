@@ -25,6 +25,7 @@ export const supportedConnectProviders = [
   "github",
   "bitbucket",
   "google",
+  "toggl",
 ] as const;
 
 export const zTokenCredentials = z.object({ token: z.string().min(1) });

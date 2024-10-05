@@ -117,6 +117,7 @@ export const connectionsTable = sqliteTable(
         onUpdate: "cascade",
       }),
     nangoConnectionId: text("nango_connection_id"),
+    token: text("token"),
     provider: runtimeEnumType("provider", supportedConnectProviders).notNull(),
     initiatedAt: integer("initiated_at_sec", { mode: "timestamp" }).notNull(),
     linkId: text("link_id").unique(),

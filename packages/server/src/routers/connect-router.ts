@@ -1,6 +1,16 @@
 import { Hono } from "hono";
 import { Env } from "../types.ts";
-import { eq, and, isNull, gte, isNotNull, count, desc, sql } from "drizzle-orm";
+import {
+  eq,
+  and,
+  isNull,
+  gte,
+  isNotNull,
+  count,
+  desc,
+  sql,
+  or,
+} from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { zValidator } from "@hono/zod-validator";
 import { z } from "zod";
@@ -55,8 +65,9 @@ export const connectRouter = new Hono<Env>()
         ownerId: appsTable.ownerId,
         // TODO: This is counting connections instead of users
         connectionsCount: count(
-          sql`CASE WHEN ${isNotNull(
-            connectionsTable.nangoConnectionId,
+          sql`CASE WHEN ${or(
+            isNotNull(connectionsTable.nangoConnectionId),
+            isNotNull(connectionsTable.token),
           )} THEN 1 END`,
         ),
         // TODO: Return integrations
@@ -235,7 +246,10 @@ export const connectRouter = new Hono<Env>()
             and(
               eq(appsTable.ownerId, c.var.userId),
               eq(sessionsTable.appId, appId),
-              isNotNull(connectionsTable.nangoConnectionId),
+              or(
+                isNotNull(connectionsTable.nangoConnectionId),
+                isNotNull(connectionsTable.token),
+              ),
             ),
           )
           .orderBy(desc(connectionsTable.initiatedAt))
@@ -253,7 +267,10 @@ export const connectRouter = new Hono<Env>()
             and(
               eq(appsTable.ownerId, c.var.userId),
               eq(sessionsTable.appId, appId),
-              isNotNull(connectionsTable.nangoConnectionId),
+              or(
+                isNotNull(connectionsTable.nangoConnectionId),
+                isNotNull(connectionsTable.token),
+              ),
             ),
           ),
         connectDB
@@ -271,7 +288,10 @@ export const connectRouter = new Hono<Env>()
             and(
               eq(appsTable.ownerId, c.var.userId),
               eq(sessionsTable.appId, appId),
-              isNotNull(connectionsTable.nangoConnectionId),
+              or(
+                isNotNull(connectionsTable.nangoConnectionId),
+                isNotNull(connectionsTable.token),
+              ),
             ),
           ),
       ]);
@@ -296,8 +316,6 @@ export const connectRouter = new Hono<Env>()
       .select({
         id: connectionsTable.id,
         provider: connectionsTable.provider,
-        nangoConnectionId: connectionsTable.nangoConnectionId,
-        linkId: connectionsTable.linkId,
       })
       .from(connectionsTable)
       .innerJoin(
@@ -308,7 +326,10 @@ export const connectRouter = new Hono<Env>()
         and(
           eq(sessionsTable.appId, appId),
           eq(connectionsTable.sessionId, sessionId),
-          isNotNull(connectionsTable.nangoConnectionId),
+          or(
+            isNotNull(connectionsTable.nangoConnectionId),
+            isNotNull(connectionsTable.token),
+          ),
         ),
       );
 
@@ -402,6 +423,7 @@ export const connectRouter = new Hono<Env>()
         id: connectionsTable.id,
         provider: connectionsTable.provider,
         nangoConnectionId: connectionsTable.nangoConnectionId,
+        token: connectionsTable.token,
       })
       .from(connectionsTable)
       .where(
@@ -422,7 +444,7 @@ export const connectRouter = new Hono<Env>()
     return c.json({
       id: connection.id,
       provider: connection.provider,
-      connected: !!connection.nangoConnectionId,
+      connected: !!(connection.nangoConnectionId || connection.token),
     });
   })
   .all("/proxy/:connection_id/*", async (c) => {
@@ -456,9 +478,11 @@ export const connectRouter = new Hono<Env>()
     const integration = getIntegrationFromType(connection?.provider);
 
     if (
-      !connection?.nangoConnectionId ||
+      !connection ||
       !integration?.proxyFetch ||
-      !integration.authTypes?.nango?.integrationId
+      ((!connection.nangoConnectionId ||
+        !integration?.authTypes?.nango?.integrationId) &&
+        !connection.token)
     ) {
       return c.notFound();
     }
@@ -481,15 +505,22 @@ export const connectRouter = new Hono<Env>()
     headers.delete("Content-Encoding");
     headers.delete("Content-Length");
 
-    const nangoConnection = await nango?.getConnection(
-      integration.authTypes.nango.integrationId,
-      connection.id,
-      false,
-    );
-    if (nangoConnection?.credentials.type !== "OAUTH2") {
-      throw new HTTPException(401);
+    let token: string | undefined;
+    if (connection.token) {
+      token = connection.token;
+    } else if (integration.authTypes?.nango?.integrationId) {
+      const nangoConnection = await nango?.getConnection(
+        integration.authTypes.nango.integrationId,
+        connection.id,
+        false,
+      );
+      if (nangoConnection?.credentials.type !== "OAUTH2") {
+        throw new HTTPException(401);
+      }
+      token = nangoConnection.credentials.access_token;
+    } else {
+      throw new HTTPException(500);
     }
-    const token = nangoConnection.credentials.access_token;
 
     // Creates a new request overriding a few parameters.
     // NOTE: Destructuring req to create a RequestInit doesn't work:
@@ -521,7 +552,6 @@ export const connectRouter = new Hono<Env>()
       columns: {
         id: true,
         provider: true,
-        nangoConnectionId: true,
       },
       with: {
         session: {
@@ -544,6 +574,7 @@ export const connectRouter = new Hono<Env>()
           eq(fields.linkId, c.req.param("link_id")),
           // Check that the link is for a connection that's not active
           isNull(fields.nangoConnectionId),
+          isNull(fields.token),
           // Ensure the connection was initiated in the last 5 minutes
           gte(fields.initiatedAt, new Date(Date.now() - CONNECT_LINK_TIMEOUT)),
         ),
@@ -577,40 +608,78 @@ export const connectRouter = new Hono<Env>()
     "/link/:link_id",
     zValidator(
       "json",
-      z.object({
-        nangoConnectionId: z.string(),
-      }),
+      z.union([
+        z.object({
+          nangoConnectionId: z.string(),
+          apiKey: z.undefined().optional(),
+        }),
+        z.object({
+          nangoConnectionId: z.undefined().optional(),
+          apiKey: z.string(),
+        }),
+      ]),
     ),
     async (c) => {
       if (!connectDB) {
         console.error("Missing connectDB");
         throw new HTTPException(500);
       }
-      const { nangoConnectionId } = c.req.valid("json");
+      const json = c.req.valid("json");
 
-      // TODO: Validate nangoConnectionId with Nango
-
-      const [updated] = await connectDB
-        .update(connectionsTable)
-        .set({
-          nangoConnectionId: nangoConnectionId,
-        })
-        .where(
-          and(
-            eq(connectionsTable.linkId, c.req.param("link_id")),
-            isNull(connectionsTable.nangoConnectionId),
-            gte(
-              connectionsTable.initiatedAt,
-              new Date(Date.now() - CONNECT_LINK_TIMEOUT),
+      if (json.nangoConnectionId) {
+        // TODO: Validate nangoConnectionId with Nango
+        const [updated] = await connectDB
+          .update(connectionsTable)
+          .set({
+            nangoConnectionId: json.nangoConnectionId,
+          })
+          .where(
+            and(
+              eq(connectionsTable.linkId, c.req.param("link_id")),
+              isNull(connectionsTable.nangoConnectionId),
+              gte(
+                connectionsTable.initiatedAt,
+                new Date(Date.now() - CONNECT_LINK_TIMEOUT),
+              ),
             ),
-          ),
-        )
-        .returning({ id: connectionsTable.id });
+          )
+          .returning({ id: connectionsTable.id });
 
-      // TODO: Handle if any id doesn't exist.
-      if (!updated) {
-        throw new HTTPException(500, {
-          message: "Failed to create connection",
+        // TODO: Handle if any id doesn't exist.
+        if (!updated) {
+          throw new HTTPException(500, {
+            message: "Failed to create connection",
+          });
+        }
+      } else if (json.apiKey) {
+        // TODO: Validate API Key for each integration type
+        const [updated] = await connectDB
+          .update(connectionsTable)
+          .set({
+            token: json.apiKey,
+          })
+          .where(
+            and(
+              eq(connectionsTable.linkId, c.req.param("link_id")),
+              isNull(connectionsTable.token),
+              gte(
+                connectionsTable.initiatedAt,
+                new Date(Date.now() - CONNECT_LINK_TIMEOUT),
+              ),
+            ),
+          )
+          .returning({ id: connectionsTable.id });
+
+        // TODO: Handle if any id doesn't exist.
+        if (!updated) {
+          throw new HTTPException(500, {
+            message: "Failed to create connection",
+          });
+        }
+      } else {
+        throw new HTTPException(400, {
+          message:
+            "Request body should either contain the `nangoConnectionId` or `apiKey` parameters.",
         });
       }
 

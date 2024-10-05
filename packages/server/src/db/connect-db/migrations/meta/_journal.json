@@ -36,6 +36,13 @@
       "when": 1725042987610,
       "tag": "0004_daffy_saracen",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1728003396422,
+      "tag": "0005_modern_stepford_cuckoos",
+      "breakpoints": true
     }
   ]
 }

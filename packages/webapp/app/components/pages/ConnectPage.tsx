@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { AppWindow, ShieldCheck, Zap } from "lucide-react";
+import { AppWindow, ArrowUpRightIcon, ShieldCheck, Zap } from "lucide-react";
 import { trpc } from "../../lib/trpc_client";
 import { Button } from "../ui/button";
 import { env } from "../../lib/env_client";
@@ -8,6 +8,10 @@ import { datasetIcon } from "../../lib/integrations/icons/datasetIcon";
 import mainframeLogo from "../../images/mainframe-dark.svg";
 import { apiClient } from "../../lib/api_client";
 import { useQuery } from "@tanstack/react-query";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { cn } from "../../lib/utils";
+import { z } from "zod";
 
 export function ConnectPage() {
   const params = useParams();
@@ -71,9 +75,35 @@ export function ConnectPage() {
       console.error(e);
     }
   };
+  const handleTokenConnection = async (apiKey: string) => {
+    if (!connection?.id || !linkId) {
+      return;
+    }
+
+    try {
+      const connRes = await apiClient.connect.link[":link_id"].$put({
+        param: {
+          link_id: linkId,
+        },
+        json: {
+          apiKey,
+        },
+      });
+
+      if (!connRes.ok) {
+        console.error(await connRes.text());
+        return;
+      }
+      // Inform the backend that this is connected
+      // await checkNangoIntegration.mutateAsync({ datasetId: dataset.id });
+      window.close();
+    } catch (e) {
+      console.error(e);
+    }
+  };
   const nangoIntegration = integration?.authTypes?.nango;
 
-  if (!nangoIntegration || !connection?.provider) {
+  if (!integration || !connection?.provider) {
     if (isLoadingIntegrations || isLoadingConnection) {
       return <div></div>;
     }
@@ -136,17 +166,61 @@ export function ConnectPage() {
         </div>
 
         {nangoIntegration && env.VITE_NANGO_PUBLIC_KEY ? (
-          <>
-            <Button
-              className="bg-zinc-900 hover:bg-zinc-800 text-amber-50 font-semibold py-3 px-8 transition duration-300 ease-in-out"
-              onClick={() =>
-                handleNangoConnection(nangoIntegration.integrationId)
-              }
+          <Button
+            className="bg-zinc-900 hover:bg-zinc-800 text-amber-50 font-semibold py-3 px-8 transition duration-300 ease-in-out"
+            onClick={() =>
+              handleNangoConnection(nangoIntegration.integrationId)
+            }
+          >
+            Continue
+          </Button>
+        ) : (
+          <form
+            className="text-start"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const apiKey = z
+                .string()
+                .parse(
+                  new FormData(e.target as HTMLFormElement).get("key_input"),
+                );
+              handleTokenConnection(apiKey);
+            }}
+          >
+            <Label
+              htmlFor="key_input"
+              className="ml-3 border-l border-l-transparent"
             >
-              Continue
-            </Button>
-          </>
-        ) : null}
+              API key
+            </Label>
+            <Input
+              id="key_input"
+              type="password"
+              name="key_input"
+              placeholder="Paste your API key here"
+            />
+            <div
+              className={cn(
+                "flex w-full items-center mt-2",
+                integration.authSetupDocs ? "justify-between" : "justify-end",
+              )}
+            >
+              {integration.authSetupDocs ? (
+                <Button asChild variant="ghost" size="sm">
+                  <a
+                    href={integration?.authSetupDocs}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-sky-500"
+                  >
+                    Documentation <ArrowUpRightIcon className="size-4" />
+                  </a>
+                </Button>
+              ) : null}
+              <Button size="sm">Continue</Button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );
