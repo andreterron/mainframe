@@ -1,6 +1,6 @@
 {
   "name": "@mainframe-api/server",
-  "version": "0.8.7",
+  "version": "0.8.8",
   "private": false,
   "description": "",
   "sideEffects": false,
@@ -43,7 +43,7 @@
   "dependencies": {
     "@hono/trpc-server": "^0.3.2",
     "@hono/zod-validator": "^0.2.2",
-    "@mainframe-api/shared": "0.8.7",
+    "@mainframe-api/shared": "0.8.8",
     "@nangohq/node": "^0.42.4",
     "@nangohq/types": "^0.42.4",
     "@sentry/core": "^8.15.0",
