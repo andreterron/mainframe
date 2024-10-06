@@ -1,12 +1,13 @@
 {
   "name": "mainframe-api",
-  "version": "0.8.8",
+  "version": "0.8.11",
   "private": false,
   "description": "",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "dev": "tsc --watch",
@@ -23,6 +24,6 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@mainframe-api/server": "^0.8.8"
+    "@mainframe-api/server": "^0.8.11"
   }
 }

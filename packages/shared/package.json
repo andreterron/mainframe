@@ -1,6 +1,6 @@
 {
   "name": "@mainframe-api/shared",
-  "version": "0.8.8",
+  "version": "0.8.11",
   "private": false,
   "description": "",
   "sideEffects": false,
@@ -9,7 +9,8 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "dev": "tsup --format esm --watch src",
