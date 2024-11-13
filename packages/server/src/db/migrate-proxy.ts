@@ -1,5 +1,5 @@
 import { migrate } from "drizzle-orm/sqlite-proxy/migrator";
-import { migrationsFolder } from "./migrate";
+import { migrationsFolder } from "./migrate.ts";
 import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 import { sql } from "drizzle-orm";
 

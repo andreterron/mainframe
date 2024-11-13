@@ -2,6 +2,7 @@ import { createClient } from "@libsql/client";
 import { mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { __dirnameFromImportMetaUrl } from "@mainframe-api/server";
+import { pathToFileURL } from "node:url";
 
 const __dirname = __dirnameFromImportMetaUrl(import.meta.url);
 
@@ -21,4 +22,4 @@ try {
   }
 }
 
-export const dbClient = createClient({ url: `file://${dbPath}` });
+export const dbClient = createClient({ url: pathToFileURL(dbPath).toString() });

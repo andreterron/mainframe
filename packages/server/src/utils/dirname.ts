@@ -7,12 +7,13 @@ export function __dirnameFromImportMetaUrl(url: string) {
 
 export function src__dirnameFromImportMetaUrl(url: string) {
   const distDirname = __dirnameFromImportMetaUrl(url);
-  const matches = Array.from(distDirname.matchAll(/(^|\/)dist(\/|$)/g));
+  // Instead of doing \/|\\, we could use the platform separator: path.sep
+  const matches = Array.from(distDirname.matchAll(/(^|\/|\\)dist(\/|\\|$)/g));
   const i = matches.at(-1)?.index;
   if (i === undefined) {
     return distDirname;
   }
   return `${distDirname.substring(0, i)}${distDirname
     .slice(i)
-    .replace(/(^|\/)dist(\/|$)/, "$1src$2")}`;
+    .replace(/(^|\/|\\)dist(\/|\\|$)/, "$1src$2")}`;
 }

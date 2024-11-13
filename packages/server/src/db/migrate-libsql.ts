@@ -1,6 +1,6 @@
 import { drizzle, LibSQLDatabase } from "drizzle-orm/libsql";
 import { migrate } from "drizzle-orm/libsql/migrator";
-import { migrationsFolder } from "./migrate";
+import { migrationsFolder } from "./migrate.ts";
 import { Client } from "@libsql/client";
 
 export function migrateLibsqlDB(db: LibSQLDatabase) {

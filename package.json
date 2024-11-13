@@ -8,7 +8,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "turbo run \"@mainframe-api/node#serve\" dev --env-mode=loose --filter=!@mainframe-api/node",
+    "dev": "turbo run \"@mainframe-api/node#serve\" dev --env-mode=loose --filter=!@mainframe-api/node --ui=tui",
     "build": "turbo run build --env-mode=loose",
     "publish-package": "turbo run publish-package",
     "publish-jsr": "turbo run publish-jsr",
