@@ -34,7 +34,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@libsql/client": "0.7.0",
+    "@libsql/client": "^0.14.0",
     "@types/cookie": "^0.6.0",
     "@types/cookie-signature": "^1.1.2",
     "@types/lodash-es": "^4.17.12",

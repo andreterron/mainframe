@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.11.2",
-    "@libsql/client": "^0.5.6",
+    "@libsql/client": "^0.14.0",
     "@mainframe-api/server": "0.8.11",
     "@mainframe-api/shared": "0.8.11",
     "address": "^2.0.1",
