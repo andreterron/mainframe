@@ -11,6 +11,7 @@ config({ path: process.env.DOTENV_CONFIG_PATH || "../../.env" });
 export default defineConfig({
   server: {
     port: 8744,
+    host: parseHost(process.env.MAINFRAME_HOST),
   },
 
   plugins: [
@@ -34,3 +35,16 @@ export default defineConfig({
     sourcemap: true,
   },
 });
+
+function parseHost(input: string | undefined): boolean | string | undefined {
+  switch (input) {
+    case "true":
+      return true;
+    case "false":
+      return false;
+    case undefined:
+      return undefined;
+    default:
+      return input;
+  }
+}
