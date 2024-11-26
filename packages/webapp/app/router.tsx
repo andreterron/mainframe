@@ -1,23 +1,25 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate, useParams } from "react-router-dom";
 
 import AuthPage from "./webroutes/_auth";
 import AuthLogin from "./webroutes/_auth.login";
 import AuthLogout from "./webroutes/_auth.logout";
 import AuthSignup from "./webroutes/_auth.setup";
 import AppPages from "./webroutes/_app";
-import DatasetDetails from "./webroutes/_app.dataset.$id._index";
-import DatasetObjectDetails from "./webroutes/_app.dataset.$id.object.$object_id";
-import DatasetTableDetailsPage from "./webroutes/_app.dataset.$id.table.$table_id";
+import AccountObjectDetails from "./webroutes/_app.accounts.$id.object.$object_id";
+import AccountTableDetailsPage from "./webroutes/_app.accounts.$id.table.$table_id";
 import DatasetRowDetails from "./webroutes/_app.row.$row_id";
 import NewPage from "./webroutes/_app.new";
-import DatasetCredentials from "./webroutes/_app.dataset.$id.credentials";
+import AccountCredentials from "./webroutes/_app.accounts.$id.credentials";
 import DashboardComponentPage from "./webroutes/_app.dashboard.$id";
 import DashboardPage from "./webroutes/_app.dashboard._index";
-import DatasetComputed from "./webroutes/_app.dataset.$id.computed.$computed_id";
+import AccountComputed from "./webroutes/_app.accounts.$id.computed.$computed_id";
 import { ConnectPage } from "./components/pages/ConnectPage";
 import ProjectsPage from "./webroutes/_app.projects._index";
 import ProjectDetailsPage from "./webroutes/_app.projects.$id";
 import NewProjectPage from "./webroutes/_app.projects.new";
+import AccountsPage from "./webroutes/_app.accounts._index";
+import AccountDetailsPage from "./webroutes/_app.accounts.$id._index";
+import { CreateAccountPage } from "./webroutes/_app.accounts.new.$service";
 
 export const router = createBrowserRouter([
   {
@@ -48,11 +50,23 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
+        element: <Navigate to="/accounts" replace />,
+      },
+      {
+        path: "/accounts",
+        element: <AccountsPage />,
+      },
+      {
+        path: "/accounts/new",
         element: <NewPage />,
       },
       {
-        path: "/new",
-        element: <NewPage />,
+        path: "/accounts/new/:service",
+        element: <CreateAccountPage />,
+      },
+      {
+        path: "/accounts/:id",
+        element: <AccountDetailsPage />,
       },
       {
         path: "/projects",
@@ -75,29 +89,41 @@ export const router = createBrowserRouter([
         element: <DashboardComponentPage />,
       },
       {
-        path: "/dataset/:id",
-        element: <DatasetDetails />,
+        path: "/accounts/:id/credentials",
+        element: <AccountCredentials />,
       },
       {
-        path: "/dataset/:id/credentials",
-        element: <DatasetCredentials />,
+        path: "/accounts/:id/object/:object_id",
+        element: <AccountObjectDetails />,
       },
       {
-        path: "/dataset/:id/object/:object_id",
-        element: <DatasetObjectDetails />,
+        path: "/accounts/:id/table/:table_id",
+        element: <AccountTableDetailsPage />,
       },
       {
-        path: "/dataset/:id/table/:table_id",
-        element: <DatasetTableDetailsPage />,
-      },
-      {
-        path: "/dataset/:id/computed/:computed_id",
-        element: <DatasetComputed />,
+        path: "/accounts/:id/computed/:computed_id",
+        element: <AccountComputed />,
       },
       {
         path: "/row/:row_id",
         element: <DatasetRowDetails />,
       },
+      // Renamed
+      {
+        path: "/new",
+        element: <Navigate to="/accounts/new" replace />,
+      },
+      {
+        path: "/dataset/*",
+        element: <DatasetRedirect />,
+      },
     ],
   },
 ]);
+
+function DatasetRedirect() {
+  let params = useParams();
+  let path = params["*"];
+
+  return <Navigate to={`/accounts/${path}`} replace />;
+}

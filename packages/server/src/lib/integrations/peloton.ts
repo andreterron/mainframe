@@ -1,5 +1,4 @@
-import { and, eq } from "drizzle-orm";
-import { datasetsTable } from "@mainframe-api/shared";
+import { DatasetCredentials } from "@mainframe-api/shared";
 import { Integration } from "../integration-types.ts";
 import { Dataset } from "@mainframe-api/shared";
 import { z } from "zod";
@@ -29,7 +28,9 @@ export const peloton: Integration = {
         },
       ],
       info: "We don't store your password.",
-      async onSubmit(dataset: Dataset, params: Record<string, string>, db) {
+      async onSubmit(
+        params: Record<string, string>,
+      ): Promise<DatasetCredentials> {
         const res = await fetch("https://api.onepeloton.com/auth/login", {
           method: "POST",
           headers: {
@@ -41,15 +42,14 @@ export const peloton: Integration = {
           }),
         });
 
+        if (!res.ok) {
+          throw new Error("Failed to login to Peloton");
+        }
+
         // TODO: this throws!
         const body = zPelotonAuthResponseBody.parse(await res.json());
 
-        await db
-          .update(datasetsTable)
-          .set({
-            credentials: { ...dataset.credentials, token: body.session_id },
-          })
-          .where(eq(datasetsTable.id, dataset.id));
+        return { token: body.session_id };
       },
     },
   },

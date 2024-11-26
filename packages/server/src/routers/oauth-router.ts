@@ -105,7 +105,7 @@ export const oauthRouter = new Hono<Env>()
         c.req.query() as any,
         db,
       );
-      return c.redirect(`${env.APP_URL}/dataset/${dataset.id}`);
+      return c.redirect(`${env.APP_URL}/accounts/${dataset.id}`);
     } catch (e) {
       console.error(e);
       throw new HTTPException(500, { cause: e });

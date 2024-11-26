@@ -26,7 +26,7 @@ import { env } from "../lib/env_client";
 import { ScopeProvider } from "jotai-scope";
 import { trpcProxyClient } from "../lib/trpc_client";
 
-export default function DatasetObjectDetails() {
+export default function AccountObjectDetails() {
   const { id: datasetId, object_id: objectId } = useParams();
 
   const { data, error, isLoading } = useObject(datasetId, objectId);

@@ -26,6 +26,7 @@ import {
   getDatasetObject,
   getDatasetTable,
   getIntegrationForDataset,
+  getIntegrationFromType,
   zOAuthCredentials,
   zTokenCredentials,
 } from "../integrations.ts";
@@ -308,9 +309,35 @@ export const appRouter = router({
   datasetsCreate: protectedProcedure
     .input(zDatasetInsert)
     .mutation(async ({ input, ctx }) => {
+      const integration = getIntegrationFromType(
+        input.integrationType ?? undefined,
+      );
+
+      if (!integration) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const credentials: DatasetCredentials | undefined = integration.authTypes
+        ?.form
+        ? zTokenCredentials.parse(
+            await integration.authTypes.form.onSubmit(input.credentials),
+          )
+        : integration.authType === "token"
+        ? zTokenCredentials.parse(input.credentials)
+        : integration.authType === "oauth2"
+        ? zOAuthCredentials.parse(input.credentials)
+        : undefined;
+
+      if (!credentials) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Error matching credentials",
+        });
+      }
+
       const [dataset] = await ctx.db
         .insert(datasetsTable)
-        .values(input)
+        .values({ ...input, credentials })
         .returning();
 
       if (!dataset) {
@@ -338,6 +365,7 @@ export const appRouter = router({
 
       return dataset;
     }),
+  // DEPRECATED
   datasetsSetAuth: protectedProcedure
     .input(z.object({ datasetId: z.string(), params: z.record(z.string()) }))
     .mutation(async ({ input, ctx }) => {
@@ -357,34 +385,30 @@ export const appRouter = router({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      if (integration.authTypes?.form) {
-        await integration.authTypes.form.onSubmit(
-          dataset,
-          input.params,
-          ctx.db,
-        );
-      } else {
-        const credentials: DatasetCredentials | undefined =
-          integration.authType === "token"
-            ? zTokenCredentials.parse(input.params)
-            : integration.authType === "oauth2"
-            ? zOAuthCredentials.parse(input.params)
-            : undefined;
+      const credentials: DatasetCredentials | undefined = integration.authTypes
+        ?.form
+        ? zTokenCredentials.parse(
+            await integration.authTypes.form.onSubmit(input.params),
+          )
+        : integration.authType === "token"
+        ? zTokenCredentials.parse(input.params)
+        : integration.authType === "oauth2"
+        ? zOAuthCredentials.parse(input.params)
+        : undefined;
 
-        if (!credentials) {
-          throw new TRPCError({
-            code: "BAD_REQUEST",
-            message: "Error matching credentials",
-          });
-        }
-
-        await ctx.db
-          .update(datasetsTable)
-          .set({
-            credentials,
-          })
-          .where(eq(datasetsTable.id, input.datasetId));
+      if (!credentials) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Error matching credentials",
+        });
       }
+
+      await ctx.db
+        .update(datasetsTable)
+        .set({
+          credentials,
+        })
+        .where(eq(datasetsTable.id, input.datasetId));
     }),
   datasetsDelete: protectedProcedure
     .input(z.object({ id: z.string() }))
@@ -553,6 +577,7 @@ export const appRouter = router({
     };
   }),
 
+  // DEPRECATED
   checkNangoIntegration: protectedProcedure
     .input(z.object({ datasetId: z.string() }))
     .mutation(async ({ input, ctx }) => {
@@ -596,10 +621,66 @@ export const appRouter = router({
         .set({
           credentials: {
             nangoIntegrationId,
+            nangoConnectionId: dataset.id,
           },
         })
         .where(eq(datasetsTable.id, input.datasetId));
     }),
+
+  datasetCreateWithNango: protectedProcedure
+    .input(
+      z.object({
+        integrationType: z.string().min(1),
+        nangoIntegrationId: z.string().min(1),
+        nangoConnectionId: z.string().min(1),
+      }),
+    )
+    .mutation(
+      async ({
+        input: { integrationType, nangoConnectionId, nangoIntegrationId },
+        ctx,
+      }) => {
+        if (!nango) {
+          throw new TRPCError({ code: "NOT_FOUND" });
+        }
+
+        const integration = getIntegrationFromType(integrationType);
+
+        if (!integration) {
+          throw new TRPCError({ code: "NOT_FOUND" });
+        }
+
+        const nangoConnection = await nango.getConnection(
+          nangoIntegrationId,
+          nangoConnectionId,
+        );
+
+        if (!nangoConnection) {
+          throw new TRPCError({ code: "NOT_FOUND" });
+        }
+
+        // Create the dataset
+        const [dataset] = await ctx.db
+          .insert(datasetsTable)
+          .values({
+            name: integration.name,
+            integrationType,
+            credentials: {
+              nangoIntegrationId,
+              nangoConnectionId,
+            },
+          })
+          .returning();
+
+        if (!dataset) {
+          throw new TRPCError({ code: "CONFLICT" });
+        }
+
+        void syncDataset(ctx, dataset).catch((e) => console.error(e));
+
+        return dataset;
+      },
+    ),
 
   getAccessToken: protectedProcedure
     .input(z.object({ datasetId: z.string() }))

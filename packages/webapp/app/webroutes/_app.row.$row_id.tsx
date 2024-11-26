@@ -36,7 +36,7 @@ export default function DatasetRowDetails() {
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbLink
-                  to={`/dataset/${row.dataset.id}/table/${row.table.key}`}
+                  to={`/accounts/${row.dataset.id}/table/${row.table.key}`}
                 >
                   {row.table.name}
                 </BreadcrumbLink>

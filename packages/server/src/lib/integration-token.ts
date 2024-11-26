@@ -7,7 +7,7 @@ export async function getTokenFromDataset(
   if (dataset.credentials?.nangoIntegrationId) {
     const connection = await nango?.getConnection(
       dataset.credentials?.nangoIntegrationId,
-      dataset.id,
+      dataset.credentials?.nangoConnectionId ?? dataset.id,
       false,
     );
     if (connection?.credentials.type === "OAUTH2") {

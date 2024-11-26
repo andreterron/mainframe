@@ -22,7 +22,7 @@ export function SidebarButton({ dataset }: { dataset: Dataset }) {
   const type = dataset.integrationType;
   const icon = type ? datasetIcon(type) : undefined;
   return (
-    <NavLink to={`/dataset/${dataset.id}`} className={"block group py-1"}>
+    <NavLink to={`/accounts/${dataset.id}`} className={"block group py-1"}>
       {({ isActive }) => (
         <span
           className={clsx([

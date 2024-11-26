@@ -2,6 +2,7 @@ import {
   Dataset,
   AuthType,
   ComputedDataParamsDef,
+  DatasetCredentials,
 } from "@mainframe-api/shared";
 import { SqliteRemoteDatabase } from "drizzle-orm/sqlite-proxy";
 import { MainframeContext } from "./context";
@@ -43,10 +44,8 @@ export interface Integration {
       }[];
       info?: string;
       onSubmit(
-        dataset: Dataset,
         params: Record<string, string>,
-        db: SqliteRemoteDatabase<Record<string, never>>,
-      ): Promise<void>;
+      ): Promise<DatasetCredentials | undefined>;
     };
   };
   proxyFetch?: (

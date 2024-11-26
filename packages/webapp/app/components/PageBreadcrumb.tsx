@@ -13,7 +13,7 @@ export function PageBreadcrumb({ children }: PropsWithChildren<{}>) {
     <Breadcrumb>
       <BreadcrumbList>
         <BreadcrumbItem>
-          <BreadcrumbLink to="/">
+          <BreadcrumbLink to="/accounts">
             <HomeIcon className="w-5 h-5" />
           </BreadcrumbLink>
         </BreadcrumbItem>

@@ -24,6 +24,7 @@ export interface DatasetCredentials {
   clientId?: string;
   clientSecret?: string;
   nangoIntegrationId?: string;
+  nangoConnectionId?: string;
 }
 
 // Operations

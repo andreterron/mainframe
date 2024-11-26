@@ -58,9 +58,9 @@ export default function DashboardComponentPage() {
           title={component?.name || "Component"}
           breadcrumb={
             <PageBreadcrumb>
-              <BreadcrumbLink to="/dashboard">
-                <BreadcrumbItem>Dashboard</BreadcrumbItem>
-              </BreadcrumbLink>
+              <BreadcrumbItem>
+                <BreadcrumbLink to="/dashboard">Dashboard</BreadcrumbLink>
+              </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>Component</BreadcrumbItem>
             </PageBreadcrumb>

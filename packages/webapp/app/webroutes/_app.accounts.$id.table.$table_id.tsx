@@ -85,14 +85,14 @@ function ColumnMenuItem({ column }: { column: Column<RowType, unknown> }) {
   );
 }
 
-export default function DatasetTableDetailsPage() {
+export default function AccountTableDetailsPage() {
   return (
     <ScopeProvider atoms={[codeAtom]}>
-      <DatasetTableDetails />
+      <AccountTableDetails />
     </ScopeProvider>
   );
 }
-export function DatasetTableDetails() {
+export function AccountTableDetails() {
   const params = useParams();
   const datasetId = params.id;
   const tableId = params.table_id;

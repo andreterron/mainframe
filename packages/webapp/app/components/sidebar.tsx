@@ -3,7 +3,12 @@ import { Link, NavLink, useMatch } from "react-router-dom";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
 import { Dataset } from "@mainframe-api/shared";
 import { useLogout } from "../lib/use-logout";
-import { LayoutGridIcon, LineChartIcon, Loader2Icon } from "lucide-react";
+import {
+  LayoutGridIcon,
+  LineChartIcon,
+  Loader2Icon,
+  IdCardIcon,
+} from "lucide-react";
 import { trpc } from "../lib/trpc_client";
 import { ReactNode } from "react";
 
@@ -57,7 +62,7 @@ export function SidebarDatasetButton({ dataset }: { dataset: Dataset }) {
 
   return (
     <SidebarButton
-      href={`/dataset/${dataset.id}`}
+      href={`/accounts/${dataset.id}`}
       icon={
         icon ? (
           <img className="relative h-4 w-4 m-0.5 object-contain" src={icon} />
@@ -134,22 +139,10 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
           </svg>
         </Link>
         <section className="pt-8">
-          <SidebarButton
-            href="/projects"
-            name={() => "Projects"}
-            icon={<LayoutGridIcon className="relative w-5 h-5" />}
-          />
-          {!hideDashboard && (
-            <SidebarButton
-              href="/dashboard"
-              name={() => "Dashboard"}
-              icon={<LineChartIcon className="relative w-5 h-5" />}
-            />
-          )}
-          <SidebarButton
+          {/* <SidebarButton
             href="/new"
             isActive={(isActive) => isActive || !!isIndexPath}
-            name={() => "New Dataset"}
+            name={() => "New Account"}
             icon={
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -168,9 +161,32 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
                 </g>
               </svg>
             }
+          /> */}
+          <h2 className="opacity-50 text-xs font-medium px-1 uppercase mb-2">
+            Warehouse
+          </h2>
+          <SidebarButton
+            href="/accounts"
+            name={() => "Accounts"}
+            icon={<IdCardIcon className="relative w-5 h-5" />}
           />
+          <h2 className="opacity-50 text-xs font-medium px-1 mt-8 uppercase mb-2">
+            Build
+          </h2>
+          <SidebarButton
+            href="/projects"
+            name={() => "Projects"}
+            icon={<LayoutGridIcon className="relative w-5 h-5" />}
+          />
+          {!hideDashboard && (
+            <SidebarButton
+              href="/dashboard"
+              name={() => "Dashboard"}
+              icon={<LineChartIcon className="relative w-5 h-5" />}
+            />
+          )}
         </section>
-        {(datasets ?? []).length > 0 ? (
+        {/* {(datasets ?? []).length > 0 ? (
           <section className="pt-4">
             <h2 className="opacity-50 text-sm px-1">Datasets</h2>
             <ul className="w-full flex-shrink flex-1">
@@ -183,7 +199,7 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
               })}
             </ul>
           </section>
-        ) : null}
+        ) : null} */}
         <div className="flex-1" />
         <div className="flex gap-2">
           <button

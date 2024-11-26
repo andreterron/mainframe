@@ -1,32 +1,23 @@
 import { ClientIntegration } from "@mainframe-api/shared";
 import { datasetIcon } from "../lib/integrations/icons/datasetIcon";
-import { trpc } from "../lib/trpc_client";
-import { PageHeader } from "./PageHeader";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { AlertCircleIcon } from "lucide-react";
 import { cn } from "../lib/utils";
 import { UnderReviewMessage } from "./UnderReviewMessage";
-import { partition } from "lodash-es";
+import { Link } from "react-router-dom";
 
-function IntegrationButton({
+export function IntegrationButton({
   integration,
   type,
-  onClick,
 }: {
   integration: ClientIntegration;
   type: string;
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
 }) {
   const icon = type ? datasetIcon(type) : undefined;
   const btn = (
-    <button
+    <Link
       className="border shadow rounded-lg py-2 px-4 flex items-center gap-2"
-      onClick={onClick}
+      to={`/accounts/new/${type}`}
     >
       {icon ? (
         <img
@@ -68,7 +59,7 @@ function IntegrationButton({
           <AlertCircleIcon className="w-4 h-4 text-gray-400" />
         </TooltipTrigger>
       )}
-    </button>
+    </Link>
   );
 
   return integration.underReview ? (
@@ -82,58 +73,5 @@ function IntegrationButton({
     </Tooltip>
   ) : (
     btn
-  );
-}
-
-export default function DatasetSetup({
-  onIntegrationSelected,
-}: {
-  onIntegrationSelected: (type: string) => void;
-}) {
-  const { data: integrations } = trpc.integrationsAll.useQuery();
-
-  const [good, bad] = partition(
-    Object.entries(integrations ?? []),
-    ([, integration]) => {
-      return (
-        !integration.underReview && integration.authTypes?.nango?.integrationId
-      );
-    },
-  );
-
-  return (
-    <div className="flex flex-col items-start gap-4">
-      <PageHeader title="New Dataset" />
-      <div className="px-4 mt-4">
-        <h1 className=" text-lg font-medium ">Featured</h1>
-        <p className="text-sm text-muted-foreground">
-          Easier to connect. Uses OAuth
-        </p>
-      </div>
-      <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
-        {good.map(([key, integration]) => (
-          <IntegrationButton
-            key={key}
-            integration={integration}
-            type={key}
-            onClick={() => onIntegrationSelected(key)}
-          />
-        ))}
-      </div>
-      <div className="px-4 mt-4">
-        <h1 className="text-lg font-medium">All integrations</h1>
-        <p className="text-sm text-muted-foreground">Use your own keys</p>
-      </div>
-      <div className="w-full max-w-3xl grid md:grid-cols-2 lg:grid-cols-3 gap-4 px-4">
-        {bad.map(([key, integration]) => (
-          <IntegrationButton
-            key={key}
-            integration={integration}
-            type={key}
-            onClick={() => onIntegrationSelected(key)}
-          />
-        ))}
-      </div>
-    </div>
   );
 }

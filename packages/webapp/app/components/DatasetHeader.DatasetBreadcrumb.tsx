@@ -4,6 +4,7 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbPage,
+  BreadcrumbSeparator,
 } from "./ui/breadcrumb";
 import { PageBreadcrumb } from "./PageBreadcrumb";
 
@@ -16,8 +17,12 @@ export function DatasetBreadcrumb({
   return (
     <PageBreadcrumb>
       <BreadcrumbItem>
+        <BreadcrumbLink to={`/accounts`}>Accounts</BreadcrumbLink>
+      </BreadcrumbItem>
+      <BreadcrumbSeparator />
+      <BreadcrumbItem>
         {children ? (
-          <BreadcrumbLink to={`/dataset/${dataset.id}`}>
+          <BreadcrumbLink to={`/accounts/${dataset.id}`}>
             {dataset.name}
           </BreadcrumbLink>
         ) : (

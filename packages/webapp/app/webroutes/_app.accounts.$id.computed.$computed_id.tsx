@@ -20,7 +20,7 @@ import { Input } from "../components/ui/input";
 import { PreviewLabel } from "../components/PreviewLabel";
 import { formJson } from "../utils/form-json";
 
-export default function DatasetComputed() {
+export default function AccountComputed() {
   const [paramValues, setParamValues] = useState<Record<string, string>>();
   const routeParams = useParams();
   const datasetId = routeParams.id;

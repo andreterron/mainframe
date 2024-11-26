@@ -105,7 +105,7 @@ function AccessTokenInput({ datasetId }: { datasetId: string }) {
   );
 }
 
-export default function DatasetCredentials() {
+export default function AccountCredentials() {
   const { id: datasetId } = useParams();
 
   const {
@@ -176,7 +176,7 @@ export default function DatasetCredentials() {
               <TabsContent value="credentials">
                 <div className="w-full max-w-xl px-4 pb-4">
                   {getDatasetCredentialsKeys(dataset.credentials).map((key) => (
-                    <div className="w-full">
+                    <div className="w-full" key={key}>
                       <Label htmlFor={key}>{formatCredentialKey(key)}</Label>
                       <HiddenReadonlyInput
                         id={key}
@@ -190,7 +190,7 @@ export default function DatasetCredentials() {
                   ))}
                   {dataset.credentials?.nangoIntegrationId ? (
                     <div className="w-full">
-                      <Label htmlFor={"nangoIntegrationId"}>Access Token</Label>
+                      <Label htmlFor={"nangoAccessToken"}>Access Token</Label>
                       <AccessTokenInput datasetId={dataset.id} />
                     </div>
                   ) : null}

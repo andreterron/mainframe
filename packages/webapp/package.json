@@ -39,7 +39,7 @@
     "jotai": "^2.8.0",
     "jotai-scope": "^0.6.0",
     "lodash-es": "^4.17.21",
-    "lucide-react": "^0.279.0",
+    "lucide-react": "^0.461.0",
     "postcss": "^8.4.31",
     "posthog-js": "^1.116.6",
     "prismjs": "^1.29.0",
@@ -53,6 +53,7 @@
     "tailwindcss": "^3.3.3",
     "tailwindcss-animate": "^1.0.7",
     "thememirror": "^2.0.1",
+    "uuid": "^11.0.3",
     "zod": "^3.21.4"
   },
   "devDependencies": {
