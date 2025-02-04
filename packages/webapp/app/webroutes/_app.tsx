@@ -17,6 +17,7 @@ import { Loader2Icon } from "lucide-react";
 import { Sidebar } from "../components/sidebar";
 import { posthog } from "../lib/analytics";
 import { env } from "../lib/env_client";
+import ScrollToTop from "../utils/scroll-to-top";
 
 export function SidebarButton({ dataset }: { dataset: Dataset }) {
   const type = dataset.integrationType;
@@ -105,6 +106,7 @@ export default function AppPages() {
 
   return (
     <>
+      <ScrollToTop />
       <button
         data-drawer-target="default-sidebar"
         data-drawer-toggle="default-sidebar"

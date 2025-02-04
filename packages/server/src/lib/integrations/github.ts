@@ -1,6 +1,7 @@
 import { getTokenFromDataset } from "../integration-token.ts";
 import { Integration } from "../integration-types.ts";
 import { Dataset } from "@mainframe-api/shared";
+import githubOpenApi from "./openapi/github.json?raw";
 
 export const github: Integration = {
   name: "GitHub",
@@ -12,6 +13,7 @@ export const github: Integration = {
   },
   authSetupDocs:
     "https://docs.github.com/en/enterprise-server@3.6/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens",
+  openapiSpecs: [githubOpenApi],
   objects: {
     currentUser: {
       name: "Current User",

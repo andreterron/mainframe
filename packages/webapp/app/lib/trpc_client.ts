@@ -9,6 +9,8 @@ import { useState } from "react";
 import { QueryClient } from "@tanstack/react-query";
 import { isTrpcNotFoundError } from "../utils/errors";
 import { env } from "./env_client";
+import { persistQueryClient } from "@tanstack/react-query-persist-client";
+import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 
 const links = [
   httpBatchLink({
@@ -29,23 +31,30 @@ export const trpcProxyClient = createTRPCProxyClient<AppRouter>({
 export const trpc = createTRPCReact<AppRouter>();
 
 export const useRootQueryClient = () => {
-  const [queryClient] = useState(
-    () =>
-      new QueryClient({
-        defaultOptions: {
-          queries: {
-            retry(failureCount, error) {
-              return (
-                // Do not retry "Not Found" errors
-                !(
-                  error instanceof TRPCClientError && isTrpcNotFoundError(error)
-                ) && failureCount < 3
-              );
-            },
+  const [queryClient] = useState(() => {
+    const localStoragePersister = createSyncStoragePersister({
+      storage: window.localStorage,
+    });
+    const client = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry(failureCount, error) {
+            return (
+              // Do not retry "Not Found" errors
+              !(
+                error instanceof TRPCClientError && isTrpcNotFoundError(error)
+              ) && failureCount < 3
+            );
           },
         },
-      }),
-  );
+      },
+    });
+    persistQueryClient({
+      queryClient: client,
+      persister: localStoragePersister,
+    });
+    return client;
+  });
   return queryClient;
 };
 

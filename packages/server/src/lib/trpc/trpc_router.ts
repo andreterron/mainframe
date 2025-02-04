@@ -30,6 +30,7 @@ import {
   zOAuthCredentials,
   zTokenCredentials,
 } from "../integrations.ts";
+import { integrationsMap } from "../integrationsMap.ts";
 import { deserializeData } from "../../utils/serialization.ts";
 import { createUserAccount, validateUserAccount } from "./auth.ts";
 import { checkIfUserExists } from "./db-helpers.ts";
@@ -37,19 +38,6 @@ import { env } from "../env.server.ts";
 import { nango } from "../nango.ts";
 import { trpcMiddleware } from "@sentry/core";
 import { getTokenFromDataset } from "../integration-token.ts";
-import { github } from "../integrations/github.ts";
-import { peloton } from "../integrations/peloton.ts";
-import { posthog } from "../integrations/posthog.ts";
-import { toggl } from "../integrations/toggl.ts";
-import { google } from "../integrations/google.ts";
-import { zotero } from "../integrations/zotero.ts";
-import { notion } from "../integrations/notion.ts";
-import { oura } from "../integrations/oura.ts";
-import { valtown } from "../integrations/valtown.ts";
-import { spotify } from "../integrations/spotify.ts";
-import { render } from "../integrations/render.ts";
-import { vercel } from "../integrations/vercel.ts";
-import { bitbucket } from "../integrations/bitbucket.ts";
 import { getTableData } from "./table-data.ts";
 import {
   generateObjectComponent,
@@ -57,6 +45,7 @@ import {
 } from "../llm/openai.ts";
 import { getObjectAndDataset } from "./object-data.ts";
 import { nanoid } from "nanoid";
+import { mapObject } from "../../utils/map-object.ts";
 
 /**
  * Initialization of tRPC backend
@@ -74,6 +63,16 @@ const sentryMiddleware = t.middleware(
 const procedure = t.procedure.use(sentryMiddleware);
 
 const router = t.router;
+
+const clientIntegrationsInfo = mapObject(integrationsMap, (v) => ({
+  client: createClientIntegration(v),
+  openApiSpec: v.openapiSpecs?.[0],
+}));
+
+const allClientIntegrations = mapObject(
+  clientIntegrationsInfo,
+  (v) => v.client,
+);
 
 async function getUserInfoFromCtx(ctx: Context): Promise<{
   user: UserInfo | undefined;
@@ -557,25 +556,29 @@ export const appRouter = router({
 
   // Integrations
   integrationsAll: procedure.query((): Record<string, ClientIntegration> => {
-    return {
-      google: createClientIntegration(google),
-      toggl: createClientIntegration(toggl),
-      posthog: createClientIntegration(posthog),
-      github: createClientIntegration(github),
-      render: createClientIntegration(render),
-      vercel: createClientIntegration(vercel),
-      peloton: createClientIntegration(peloton),
-      // network: createClientIntegration(network),
-      zotero: createClientIntegration(zotero),
-      notion: createClientIntegration(notion),
-      oura: createClientIntegration(oura),
-      bitbucket: createClientIntegration(bitbucket),
-      valtown: createClientIntegration(valtown),
-      ...(env.NANGO_PRIVATE_KEY
-        ? { spotify: createClientIntegration(spotify) }
-        : {}),
-    };
+    return allClientIntegrations;
   }),
+  integration: procedure
+    .input(
+      z.object({
+        id: z.string(),
+        includeOpenAPI: z.boolean().optional().default(false),
+      }),
+    )
+    .query(
+      ({
+        input: { id, includeOpenAPI },
+      }): ClientIntegration & { openApiSpec?: string } => {
+        const integration = clientIntegrationsInfo[id];
+        if (!integration) {
+          throw new TRPCError({ code: "NOT_FOUND" });
+        }
+        if (!includeOpenAPI) {
+          return integration.client;
+        }
+        return { ...integration.client, openApiSpec: integration.openApiSpec };
+      },
+    ),
 
   // DEPRECATED
   checkNangoIntegration: protectedProcedure

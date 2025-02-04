@@ -108,6 +108,7 @@ export function createClientIntegration(
       name: v.name,
       params: v.params,
     })),
+    hasOpenAPI: !!integration.openapiSpecs?.length,
   };
 }
 

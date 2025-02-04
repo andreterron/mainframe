@@ -48,6 +48,11 @@ export interface Integration {
       ): Promise<DatasetCredentials | undefined>;
     };
   };
+  /**
+   * Array of strings. Each item is an OpenAPI spec in JSON format.
+   * TODO: Support yaml
+   */
+  openapiSpecs?: string[];
   proxyFetch?: (
     token: string,
     path: string,

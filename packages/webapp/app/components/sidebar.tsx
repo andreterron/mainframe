@@ -8,6 +8,7 @@ import {
   LineChartIcon,
   Loader2Icon,
   IdCardIcon,
+  GlobeIcon,
 } from "lucide-react";
 import { trpc } from "../lib/trpc_client";
 import { ReactNode } from "react";
@@ -173,6 +174,11 @@ export function Sidebar({ sidebarOpen }: SidebarProps) {
           <h2 className="opacity-50 text-xs font-medium px-1 mt-8 uppercase mb-2">
             Build
           </h2>
+          <SidebarButton
+            href="/apis"
+            name={() => "APIs"}
+            icon={<GlobeIcon className="relative w-5 h-5" />}
+          />
           <SidebarButton
             href="/projects"
             name={() => "Projects"}

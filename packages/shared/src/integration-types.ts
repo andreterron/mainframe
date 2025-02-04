@@ -42,4 +42,5 @@ export interface ClientIntegration {
     name: string;
     params: ComputedDataParamsDef;
   }[];
+  hasOpenAPI: boolean;
 }

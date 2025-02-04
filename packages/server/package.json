@@ -38,6 +38,7 @@
     "@types/cookie": "^0.6.0",
     "@types/cookie-signature": "^1.1.2",
     "@types/lodash-es": "^4.17.12",
+    "esbuild-raw-plugin": "^0.1.1",
     "jsr": "^0.12.4",
     "typescript": "^5.0.4"
   },

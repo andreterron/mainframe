@@ -11,6 +11,9 @@
   },
   "aliases": {
     "components": "app/components",
-    "utils": "app/lib/utils"
+    "utils": "app/lib/utils",
+    "ui": "app/components/ui",
+    "lib": "app/lib",
+    "hooks": "app/hooks"
   }
 }

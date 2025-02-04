@@ -1,5 +1,6 @@
 import { defineConfig } from "tsup";
 import { extname } from "node:path";
+import { raw } from "esbuild-raw-plugin";
 
 const BUNDLED_EXTENSIONS = [".txt", ".json"];
 
@@ -18,6 +19,8 @@ export default defineConfig({
     "**/.git",
   ],
   onSuccess: "tsc --emitDeclarationOnly --declaration",
+
+  plugins: [raw()],
 
   // We don't clean in watch mode, because if the IDE or another tsup process
   // will fail if the files aren't there.
@@ -40,7 +43,8 @@ export default defineConfig({
           }
           if (
             args.kind !== "entry-point" &&
-            !BUNDLED_EXTENSIONS.includes(extname(args.path))
+            !BUNDLED_EXTENSIONS.includes(extname(args.path)) &&
+            !args.path.endsWith("?raw")
           ) {
             return { path: args.path, external: true };
           }

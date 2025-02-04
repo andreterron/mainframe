@@ -8,6 +8,7 @@ import { and, eq } from "drizzle-orm";
 import { deserialize } from "../../utils/serialization.ts";
 import { HTTPException } from "hono/http-exception";
 import { Buffer } from "node:buffer";
+import togglApiOpenApi from "./openapi/toggl-api.json?raw";
 
 function togglHeadersForToken(token?: string) {
   return {
@@ -101,6 +102,7 @@ export const toggl: Integration = {
   name: "Toggl",
   authType: "token",
   authSetupDocs: "https://docs.mainframe.so/integrations/toggl",
+  openapiSpecs: [togglApiOpenApi],
   setupWebhooks: async (ctx, dataset: Dataset, baseApiUrl: string) => {
     // Remove trailing slashes
     const normalizedBaseApiUrl = baseApiUrl.replace(/\/+$/, "");

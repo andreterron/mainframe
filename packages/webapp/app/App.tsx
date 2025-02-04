@@ -6,6 +6,7 @@ import { OperationsProvider } from "./lib/hooks/use-operations";
 import { PostHogProvider } from "posthog-js/react";
 import { posthog } from "./lib/analytics";
 import { TooltipProvider } from "./components/ui/tooltip";
+import { LoadingBarContainer } from "react-top-loading-bar";
 
 function App() {
   const queryClient = useRootQueryClient();
@@ -17,7 +18,10 @@ function App() {
         <QueryClientProvider client={queryClient}>
           <OperationsProvider>
             <TooltipProvider>
-              <RouterProvider router={router} />
+              {/* TODO: Use color from a variable, from css or ts */}
+              <LoadingBarContainer props={{ color: "#f59e0b" }}>
+                <RouterProvider router={router} />
+              </LoadingBarContainer>
             </TooltipProvider>
           </OperationsProvider>
         </QueryClientProvider>

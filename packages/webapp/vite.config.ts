@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import { config } from "dotenv";
 import process from "node:process";
+import { nodePolyfills } from "vite-plugin-node-polyfills";
 
 config({ path: process.env.DOTENV_CONFIG_PATH || "../../.env" });
 
@@ -22,12 +23,18 @@ export default defineConfig({
       project: "mainframe-client",
       disable: !!process.env.SENTRY_AUTH_TOKEN,
     }),
+    nodePolyfills({
+      // Specify what to polyfill (e.g., process, Buffer, etc.)
+      protocolImports: true,
+    }),
   ],
 
   resolve: {
     alias: {
       "~": resolve(__dirname, "./app"),
       app: resolve(__dirname, "./app"),
+      // Use a fallback for process
+      process: "process/browser",
     },
   },
 

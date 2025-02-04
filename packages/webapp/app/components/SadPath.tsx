@@ -15,8 +15,10 @@ export function SadPath({
   useEffect(() => {
     if (error) {
       console.error(error);
+    } else if (!isLoading) {
+      console.log("No error, not loading");
     }
-  }, [error]);
+  }, [error, isLoading]);
   return (
     <div className={className}>
       {isTrpcNotFoundError(error ?? undefined) ? (
