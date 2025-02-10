@@ -89,7 +89,7 @@ export const truecoach: Integration = {
     return fetch(req.url, {
       method: req.method,
       // body: req.body, // TODO: Support body
-      headers: headers.entries(),
+      headers: Object.fromEntries(headers.entries()),
       agent: httpsAgent,
     }) as any as Promise<Response>;
   },
