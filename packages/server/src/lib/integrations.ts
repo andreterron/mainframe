@@ -7,6 +7,7 @@ import {
 import { Dataset, ClientIntegration } from "@mainframe-api/shared";
 import { github } from "./integrations/github.ts";
 import { peloton } from "./integrations/peloton.ts";
+import { truecoach } from "./integrations/truecoach.ts";
 import { posthog } from "./integrations/posthog.ts";
 import { toggl } from "./integrations/toggl.ts";
 import { google } from "./integrations/google.ts";
@@ -48,6 +49,9 @@ export function getIntegrationFromType(
   }
   if (type === "peloton") {
     return peloton;
+  }
+  if (type === "truecoach") {
+    return truecoach;
   }
   if (type === "google") {
     return google;

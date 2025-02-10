@@ -2,6 +2,7 @@ import github from "./github.png";
 import toggl from "./toggl.png";
 import posthog from "./posthog.png";
 import peloton from "./peloton.png";
+import truecoach from "./truecoach.png";
 import gcal from "./google_calendar.png";
 import zotero from "./zotero.png";
 import notion from "./notion.png";
@@ -22,6 +23,8 @@ export function datasetIcon(id: string) {
       return posthog;
     case "peloton":
       return peloton;
+    case "truecoach":
+      return truecoach;
     case "google":
       return gcal;
     case "zotero":

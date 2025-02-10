@@ -1,5 +1,6 @@
 export * from "./lib/integrations/github.ts";
 export * from "./lib/integrations/peloton.ts";
+export * from "./lib/integrations/truecoach.ts";
 export * from "./lib/integrations/posthog.ts";
 export * from "./lib/integrations/toggl.ts";
 export * from "./lib/integrations/google.ts";

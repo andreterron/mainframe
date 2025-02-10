@@ -34,6 +34,10 @@ import remarkGfm from "remark-gfm";
 // TODO: Improve the "Use Example" button
 // TODO: There's a log of useState and variables depending on having synchronous `oas`, which is now async
 
+function randomKey() {
+  return Math.random().toString(36).substring(2, 10);
+}
+
 const zRequestBodyType = z.enum(["none", "text"]);
 type RequestBodyType = z.infer<typeof zRequestBodyType>;
 
@@ -149,30 +153,36 @@ export default function ApiEndpointPage() {
       setUrl(buildBaseUrl());
     }
   }, [baseUrl, operation]);
-  const [headers, setHeaders] = useState<{ [key: string]: string }>(
-    (operation?.getHeaders().request ?? []).reduce(
-      (h, key) => ({ ...h, [key]: "" }),
-      {},
-    ),
+  const headerParams = useMemo(
+    () => operation?.getParameters().filter((f) => f.in === "header") ?? [],
+    [operation],
+  );
+  const [headers, setHeaders] = useState<
+    { id: string; key: string; value: string }[]
+  >(
+    (operation?.getHeaders().request ?? []).map((key) => {
+      const param = headerParams.find((h) => h.name === key);
+      const schema =
+        param?.schema && !("$ref" in param.schema) ? param.schema : undefined;
+      const value = param?.example ?? schema?.enum?.[0] ?? "";
+      return { id: randomKey(), key, value };
+    }),
   );
   const [body, setBody] = useState("");
   const [response, setResponse] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleAddHeader = () => {
-    setHeaders({ ...headers, "": "" });
+    setHeaders(headers.concat({ id: randomKey(), key: "", value: "" }));
   };
 
-  const handleHeaderChange = (index: number, key: string, value: string) => {
-    const newHeaders = { ...headers };
-    delete newHeaders[Object.keys(headers)[index]!];
-    newHeaders[key] = value;
-    setHeaders(newHeaders);
+  const handleHeaderChange = (id: string, key: string, value: string) => {
+    setHeaders((headersState) =>
+      headersState.map((h) => (h.id === id ? { id, key, value } : h)),
+    );
   };
-  const handleDeleteHeader = (index: number) => {
-    const newHeaders = { ...headers };
-    delete newHeaders[Object.keys(headers)[index]!];
-    setHeaders(newHeaders);
+  const handleDeleteHeader = (id: string) => {
+    setHeaders((headersState) => headersState.filter((h) => h.id !== id));
   };
 
   const handleSendRequest = async () => {
@@ -186,7 +196,7 @@ export default function ApiEndpointPage() {
     try {
       const options: RequestInit = {
         method,
-        headers,
+        headers: headers.map((h): [string, string] => [h.key, h.value]),
         credentials: "include",
       };
 
@@ -359,25 +369,23 @@ export default function ApiEndpointPage() {
 
         <div className="mb-4">
           <h3 className="text-lg font-semibold mb-2">Headers</h3>
-          {Object.entries(headers).map(([key, value], index) => (
-            <div key={index} className="flex space-x-2 mb-2">
+          {headers.map(({ id, key, value }) => (
+            <div key={id} className="flex space-x-2 mb-2">
               <Input
                 placeholder="Key"
                 value={key}
-                onChange={(e) =>
-                  handleHeaderChange(index, e.target.value, value)
-                }
+                onChange={(e) => handleHeaderChange(id, e.target.value, value)}
               />
               <Input
                 placeholder="Value"
                 value={value}
-                onChange={(e) => handleHeaderChange(index, key, e.target.value)}
+                onChange={(e) => handleHeaderChange(id, key, e.target.value)}
               />
               <Button
                 variant="ghost"
                 size="icon"
                 className="shrink-0"
-                onClick={() => handleDeleteHeader(index)}
+                onClick={() => handleDeleteHeader(id)}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"

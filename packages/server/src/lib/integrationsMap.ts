@@ -6,6 +6,7 @@ import { google } from "./integrations/google";
 import { notion } from "./integrations/notion";
 import { oura } from "./integrations/oura";
 import { peloton } from "./integrations/peloton";
+import { truecoach } from "./integrations/truecoach";
 import { posthog } from "./integrations/posthog";
 import { render } from "./integrations/render";
 import { spotify } from "./integrations/spotify";
@@ -22,6 +23,7 @@ export const integrationsMap: Record<string, Integration> = {
   render: render,
   vercel: vercel,
   peloton: peloton,
+  truecoach: truecoach,
   // network: network,
   zotero: zotero,
   notion: notion,
