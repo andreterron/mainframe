@@ -196,7 +196,9 @@ export default function ApiEndpointPage() {
     try {
       const options: RequestInit = {
         method,
-        headers: headers.map((h): [string, string] => [h.key, h.value]),
+        headers: headers
+          .filter((h) => h.value)
+          .map((h): [string, string] => [h.key, h.value]),
         credentials: "include",
       };
 
