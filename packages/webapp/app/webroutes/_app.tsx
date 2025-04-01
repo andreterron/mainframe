@@ -15,7 +15,7 @@ import { trpc } from "../lib/trpc_client";
 import { useLogout } from "../lib/use-logout";
 import { Loader2Icon } from "lucide-react";
 import { Sidebar } from "../components/sidebar";
-import { posthog } from "../lib/analytics";
+import { posthog, Sentry, statsig } from "../lib/analytics";
 import { env } from "../lib/env_client";
 import ScrollToTop from "../utils/scroll-to-top";
 
@@ -85,12 +85,34 @@ export default function AppPages() {
   const { data: authInfo, isFetching } = trpc.authInfo.useQuery();
 
   useEffect(() => {
-    if (authInfo && !env.VITE_AUTH_PASS && posthog) {
+    if (authInfo) {
       const user = authInfo.user;
-      if (user) {
-        posthog.identify(user.id, { email: user.email, name: user.name });
-      } else {
-        posthog.identify(undefined);
+      if (posthog && !env.VITE_AUTH_PASS) {
+        if (user) {
+          posthog.identify(user.id, { email: user.email, name: user.name });
+        } else {
+          posthog.identify(undefined);
+        }
+      }
+      if (statsig) {
+        if (user) {
+          statsig
+            .updateUserAsync({
+              userID: user.id,
+              email: user.email,
+              custom: { name: user.name },
+            })
+            .catch((e) =>
+              Sentry.captureException(e, {
+                extra: {
+                  operation: "statsig.updateUserAsync",
+                },
+                user: { id: user.id, email: user.email },
+              }),
+            );
+        } else {
+          statsig.updateUserAsync({});
+        }
       }
     }
     if (!isFetching && authInfo && !authInfo.isLoggedIn) {

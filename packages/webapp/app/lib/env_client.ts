@@ -13,6 +13,7 @@ export const env = envsafe(
     VITE_AUTH_PASS: bool({ default: true }),
     VITE_NANGO_PUBLIC_KEY: str({ default: "", allowEmpty: true }),
     VITE_POSTHOG_KEY: str({ default: "", allowEmpty: true }),
+    VITE_STATSIG_CLIENT_KEY: str({ default: "", allowEmpty: true }),
     VITE_SENTRY_DNS: str({ default: "", allowEmpty: true }),
   },
   {
